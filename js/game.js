@@ -75,7 +75,12 @@ function finishDrag(event) {
   if (isCorrectDropZone(item, targetDropZone)) {
     placeItemInsideDropZone(item, targetDropZone);
     item.classList.add("is-correct");
-    showFeedback(`Muito bem! ${item.dataset.itemName} está em ${getDropZoneName(targetDropZone)}.`, "success");
+
+    if (isOrganizationComplete()) {
+      showFeedback("Parabéns! Você organizou todos os objetos!", "success");
+    } else {
+      showFeedback(`Muito bem! ${item.dataset.itemName} está em ${getDropZoneName(targetDropZone)}.`, "success");
+    }
   } else {
     returnItemToStart(item);
     showFeedbackForIncorrectDrop(item);
@@ -143,6 +148,10 @@ function isCorrectDropZone(item, dropZone) {
 
 function findCorrectDropZone(item) {
   return Array.from(dropZones).find((dropZone) => isCorrectDropZone(item, dropZone));
+}
+
+function isOrganizationComplete() {
+  return Array.from(draggableItems).every((item) => item.classList.contains("is-correct"));
 }
 
 function getDropZoneName(dropZone) {
