@@ -10,6 +10,7 @@
 
 .cenario-fase,
 .tela-fase1 {
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -23,23 +24,46 @@
   display: flex;
   justify-content: center;
   width: 100%;
+  padding-top: 10px;
+}
+
+.hud-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: min(85vw, 680px);
 }
 
 .caixa-instrucoes {
-  margin: 0 auto;
-  align-self: center;
-  max-width: min(85vw, 700px);
+  width: 100%;
   height: auto;
 }
 
+.feedback-message {
+  position: absolute;
+  bottom: 14px;
+  margin: 0;
+  padding: 4px 20px;
+  color: #1f2933;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  text-align: center;
+  pointer-events: none;
+}
+
+.feedback-message.is-success {
+  color: #156936;
+}
+
+.feedback-message.is-error {
+  color: #b9442a;
+}
+
 .area-objetos {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  gap: 40px;
+  position: relative;
   width: 100%;
-  flex-wrap: nowrap;
   flex: 1;
 }
 
@@ -47,9 +71,101 @@
   display: contents;
 }
 
-.objeto {
-  max-width: 100px;
+.draggable-item {
+  position: absolute;
+  z-index: 10;
+  width: 86px;
+  height: 86px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  background: rgba(255, 255, 255, 0.75);
+  border: 3px solid rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.draggable-item:focus-visible {
+  outline: 4px solid #e05d2f;
+  outline-offset: 3px;
+}
+
+.draggable-item .objeto {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
   height: auto;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.draggable-item.is-dragging {
+  cursor: grabbing;
+  z-index: 100;
+  transform: scale(1.15);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.28);
+  background: rgba(255, 255, 255, 0.98);
+  border-color: #24577a;
+}
+
+.draggable-item.is-correct {
+  z-index: 20;
+  cursor: default;
+  background: rgba(223, 245, 232, 0.92);
+  border-color: #1f7a45;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* Posições iniciais dos 9 objetos */
+#item-urso-1 {
+  left: 8%;
+  top: 24%;
+}
+
+#item-maca {
+  left: 27%;
+  top: 22%;
+}
+
+#item-lapis {
+  left: 46%;
+  top: 25%;
+}
+
+#item-pera {
+  left: 65%;
+  top: 22%;
+}
+
+#item-urso-2 {
+  left: 84%;
+  top: 24%;
+}
+
+#item-banana {
+  left: 17%;
+  top: 42%;
+}
+
+#item-borracha {
+  left: 36%;
+  top: 40%;
+}
+
+#item-urso-3 {
+  left: 56%;
+  top: 43%;
+}
+
+#item-apontador {
+  left: 75%;
+  top: 41%;
 }
 
 .area-cestas,
@@ -68,6 +184,18 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
+  transition: transform 0.15s ease;
+}
+
+.drop-zone.is-over {
+  transform: scale(1.04);
+}
+
+.drop-zone:focus-visible {
+  outline: 4px solid #e05d2f;
+  outline-offset: 4px;
+  border-radius: 12px;
 }
 
 .cesta {
@@ -84,4 +212,16 @@
 .pagina-fase1 img {
   pointer-events: none;
   display: block;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }

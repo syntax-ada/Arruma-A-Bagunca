@@ -9,79 +9,172 @@
     </head>
 
     <body class="pagina-fase1">
-        <main class="tela-fase1">
+        <main class="tela-fase1" id="play-area">
             <header class="topo-fase1">
-                <img
-                class="caixa-instrucoes"
-                src="assets/images/tela_fase1/hud_branco.png"
-                alt="Caixa de instruções da Fase 1"w
-                />
+                <div class="hud-container">
+                    <img
+                        class="caixa-instrucoes"
+                        src="assets/images/tela_fase1/hud_branco.png"
+                        alt="Caixa de instruções da Fase 1"
+                    />
+                    <p class="feedback-message" id="feedback-message" role="status" aria-live="polite">
+                        Arraste cada item até a cesta correta!
+                    </p>
+                </div>
             </header>
 
-        <section class="area-objetos" aria-label="Objetos da Fase 1">
-            <div class="grupo-objetos">
-                <img
-                class="objeto"
-                src="assets/images/tela_fase1/uso 3.png"
-                alt="Brinquedo para organizar"
-                />
+            <section class="area-objetos" aria-label="Objetos da Fase 1">
+                <div class="grupo-objetos">
+                    <button
+                        class="draggable-item"
+                        id="item-urso-1"
+                        type="button"
+                        data-category="brinquedos"
+                        data-item-name="o ursinho"
+                        aria-label="Ursinho de brinquedo. Arraste para a cesta de brinquedos."
+                    >
+                        <img
+                            class="objeto"
+                            src="assets/images/tela_fase1/uso 3.png"
+                            alt="Ursinho de brinquedo"
+                        />
+                    </button>
 
-                <img
-                class="objeto"
-                src="assets/images/tela_fase1/uso 3.png"
-                alt="Brinquedo para organizar"
-                />
+                    <button
+                        class="draggable-item"
+                        id="item-maca"
+                        type="button"
+                        data-category="comidas"
+                        data-item-name="a maçã"
+                        aria-label="Maçã. Arraste para a cesta de comidas."
+                    >
+                        <img
+                            class="objeto"
+                            src="assets/images/tela_fase1/maça.png"
+                            alt="Maçã"
+                        />
+                    </button>
 
-                <img
-                class="objeto"
-                src="assets/images/tela_fase1/uso 3.png"
-                alt="Brinquedo para organizar"
-                />
+                    <button
+                        class="draggable-item"
+                        id="item-lapis"
+                        type="button"
+                        data-category="materiais"
+                        data-item-name="o lápis"
+                        aria-label="Lápis. Arraste para a cesta de materiais escolares."
+                    >
+                        <img
+                            class="objeto"
+                            src="assets/images/tela_fase1/lápis.png"
+                            alt="Lápis"
+                        />
+                    </button>
                 </div>
 
                 <div class="grupo-objetos">
-                <img
-                class="objeto"
-                src="assets/images/tela_fase1/maça.png"
-                alt="Maçã"
-                />
+                    <button
+                        class="draggable-item"
+                        id="item-pera"
+                        type="button"
+                        data-category="comidas"
+                        data-item-name="a pera"
+                        aria-label="Pera. Arraste para a cesta de comidas."
+                    >
+                        <img
+                            class="objeto"
+                            src="assets/images/tela_fase1/pera.png"
+                            alt="Pera"
+                        />
+                    </button>
 
-                <img
-                class="objeto"
-                src="assets/images/tela_fase1/pera.png"
-                alt="Pera"
-                />
+                    <button
+                        class="draggable-item"
+                        id="item-urso-2"
+                        type="button"
+                        data-category="brinquedos"
+                        data-item-name="o ursinho"
+                        aria-label="Ursinho de brinquedo. Arraste para a cesta de brinquedos."
+                    >
+                        <img
+                            class="objeto"
+                            src="assets/images/tela_fase1/uso 3.png"
+                            alt="Ursinho de brinquedo"
+                        />
+                    </button>
 
-                <img
-                class="objeto"
-                src="assets/images/tela_fase1/banana.png"
-                alt="Banana"
-                />
+                    <button
+                        class="draggable-item"
+                        id="item-banana"
+                        type="button"
+                        data-category="comidas"
+                        data-item-name="a banana"
+                        aria-label="Banana. Arraste para a cesta de comidas."
+                    >
+                        <img
+                            class="objeto"
+                            src="assets/images/tela_fase1/banana.png"
+                            alt="Banana"
+                        />
+                    </button>
                 </div>
 
                 <div class="grupo-objetos">
-                <img
-                class="objeto"
-                src="assets/images/tela_fase1/lápis.png"
-                alt="Lápis"
-                />
+                    <button
+                        class="draggable-item"
+                        id="item-borracha"
+                        type="button"
+                        data-category="materiais"
+                        data-item-name="a borracha"
+                        aria-label="Borracha. Arraste para a cesta de materiais escolares."
+                    >
+                        <img
+                            class="objeto"
+                            src="assets/images/tela_fase1/borracha.png"
+                            alt="Borracha"
+                        />
+                    </button>
 
-                <img
-                class="objeto"
-                src="assets/images/tela_fase1/borracha.png"
-                alt="Borracha"
-                />
+                    <button
+                        class="draggable-item"
+                        id="item-urso-3"
+                        type="button"
+                        data-category="brinquedos"
+                        data-item-name="o ursinho"
+                        aria-label="Ursinho de brinquedo. Arraste para a cesta de brinquedos."
+                    >
+                        <img
+                            class="objeto"
+                            src="assets/images/tela_fase1/uso 3.png"
+                            alt="Ursinho de brinquedo"
+                        />
+                    </button>
 
-                <img
-                class="objeto"
-                src="assets/images/tela_fase1/apontador.png"
-                alt="Apontador"
-                />
-            </div>
-        </section>
+                    <button
+                        class="draggable-item"
+                        id="item-apontador"
+                        type="button"
+                        data-category="materiais"
+                        data-item-name="o apontador"
+                        aria-label="Apontador. Arraste para a cesta de materiais escolares."
+                    >
+                        <img
+                            class="objeto"
+                            src="assets/images/tela_fase1/apontador.png"
+                            alt="Apontador"
+                        />
+                    </button>
+                </div>
+            </section>
 
             <footer class="categorias">
-                <div class="categoria">
+                <div
+                    class="categoria drop-zone"
+                    id="cesta-brinquedos"
+                    data-accepts="brinquedos"
+                    tabindex="0"
+                    aria-label="Cesta de brinquedos"
+                >
+                    <strong class="sr-only">Brinquedos</strong>
                     <img
                         class="cesta"
                         src="assets/images/tela_fase1/sprites_cestas/brinquedos/1_cesta_brinquedo-1.png"
@@ -95,7 +188,14 @@
                     />
                 </div>
 
-                <div class="categoria">
+                <div
+                    class="categoria drop-zone"
+                    id="cesta-comidas"
+                    data-accepts="comidas"
+                    tabindex="0"
+                    aria-label="Cesta de comidas"
+                >
+                    <strong class="sr-only">Comidas</strong>
                     <img
                         class="cesta"
                         src="assets/images/tela_fase1/sprites_cestas/comidas/1_cesta_comida-1.png"
@@ -109,7 +209,14 @@
                     />
                 </div>
 
-                <div class="categoria">
+                <div
+                    class="categoria drop-zone"
+                    id="cesta-materiais"
+                    data-accepts="materiais"
+                    tabindex="0"
+                    aria-label="Cesta de materiais escolares"
+                >
+                    <strong class="sr-only">Materiais</strong>
                     <img
                         class="cesta"
                         src="assets/images/tela_fase1/sprites_cestas/materiais/1_cesta_material-1.png"
