@@ -1,0 +1,99 @@
+body {
+  min-height: 100vh;
+  background-image: url("assets/images/tela_inicial/fundo.png");
+  background-position: center;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+
+.escondido {
+  display: none !important;
+}
+
+#tela-inicial {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+img {
+  pointer-events: none;
+  display: block;
+}
+
+#tela-inicial > img {
+  max-width: 85%;
+  height: auto;
+}
+
+button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: transparent;
+  outline: none;
+  cursor: pointer;
+}
+
+#tela-inicial button {
+  max-width: 85%;
+}
+
+#tela-inicial button img {
+  max-width: 100%;
+  height: auto;
+}
+
+#tela-fases {
+  min-height: 100vh;
+  background-image: url("assets/images/tela_inicial/fundo.png");
+  background-position: center;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px;
+}
+
+.logotipo-fases {
+  max-width: min(80%, 420px);
+  height: auto;
+  margin-top: 40px;
+}
+
+.botoes-fases {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 85%;
+  margin: 2rem auto;
+}
+
+.botoes-fases button:nth-child(1) {
+  transform: translateY(-50px);
+}
+
+.botoes-fases button:nth-child(2) {
+  transform: translateY(45px);
+}
+
+.botoes-fases button:nth-child(3) {
+  transform: translateY(-35px);
+}
+
+.botoes-fases button:nth-child(4) {
+  transform: translateY(80px);
+}
+
+.barra-progresso {
+  max-width: min(90%, 600px);
+  height: auto;
+  margin-bottom: 30px;
+}

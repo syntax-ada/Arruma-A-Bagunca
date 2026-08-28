@@ -1,156 +1,74 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Arruma a Bagunça</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <main class="game-screen" aria-labelledby="game-title">
-    <section class="game-panel">
-      <div class="game-header">
-        <h1 id="game-title">Arruma a Bagunça</h1>
-        <p>Leve cada item até o destino correto.</p>
-      </div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Arruma a Bagunça</title>
+    <link rel="stylesheet" href="global.css" />
+    <link rel="stylesheet" href="style-menu.css" />
 
-      <div class="play-area" id="play-area">
-        <button
-          class="draggable-item"
-          id="toy-car"
-          type="button"
-          data-category="brinquedos"
-          data-item-name="o carrinho"
-          aria-label="Carrinho de brinquedo. Arraste para a caixa de brinquedos."
-        >
-          <span class="item-icon" aria-hidden="true">🚗</span>
-          <span>Carrinho</span>
+  </head>
+
+  <body>
+    <main>
+      <section id="tela-inicial">
+        <img
+          src="assets/images/tela_inicial/logotipo_arruma _a_bagunça.png"
+          alt="Logotipo do jogo Arruma a Bagunça"
+        />
+
+        <button id="botao-jogar" type="button">
+          <img
+            src="assets/images/tela_inicial/botão_jogar.png"
+            alt="Jogar"
+          />
         </button>
+      </section>
 
-        <button
-          class="draggable-item"
-          id="toy-teddy"
-          type="button"
-          data-category="brinquedos"
-          data-item-name="o ursinho"
-          aria-label="Ursinho de brinquedo. Arraste para a caixa de brinquedos."
-        >
-          <span class="item-icon" aria-hidden="true">🧸</span>
-          <span>Ursinho</span>
-        </button>
+      <section id="tela-fases" class="escondido">
+        <img
+          class="logotipo-fases"
+          src="assets/images/tela_menu/logotipo_arruma_a_Bagunça.png"
+          alt="Logotipo do jogo Arruma a Bagunça"
+        />
 
-        <button
-          class="draggable-item"
-          id="toy-ball"
-          type="button"
-          data-category="brinquedos"
-          data-item-name="a bola"
-          aria-label="Bola de brinquedo. Arraste para a caixa de brinquedos."
-        >
-          <span class="item-icon" aria-hidden="true">⚽</span>
-          <span>Bola</span>
-        </button>
+        <div class="botoes-fases">
+          <button  id="botao-fase1" type="button" aria-label="Selecionar Fase 1">
+            <img
+              src="assets/images/tela_menu/fase_1.png"
+              alt="Botão da Fase 1"
+            />
+          </button>
 
-        <button
-          class="draggable-item"
-          id="food-apple"
-          type="button"
-          data-category="comidas"
-          data-item-name="a maçã"
-          aria-label="Maçã. Arraste para a área de comidas."
-        >
-          <span class="item-icon" aria-hidden="true">🍎</span>
-          <span>Maçã</span>
-        </button>
+          <button type="button" aria-label="Selecionar Fase 2">
+            <img
+              src="assets/images/tela_menu/fase_2.png"
+              alt="Botão da Fase 2"
+            />
+          </button>
 
-        <button
-          class="draggable-item"
-          id="food-banana"
-          type="button"
-          data-category="comidas"
-          data-item-name="a banana"
-          aria-label="Banana. Arraste para a área de comidas."
-        >
-          <span class="item-icon" aria-hidden="true">🍌</span>
-          <span>Banana</span>
-        </button>
+          <button type="button" aria-label="Selecionar Fase 3">
+            <img
+              src="assets/images/tela_menu/fase_3.png"
+              alt="Botão da Fase 3"
+            />
+          </button>
 
-        <button
-          class="draggable-item"
-          id="food-bread"
-          type="button"
-          data-category="comidas"
-          data-item-name="o pão"
-          aria-label="Pão. Arraste para a área de comidas."
-        >
-          <span class="item-icon" aria-hidden="true">🍞</span>
-          <span>Pão</span>
-        </button>
-
-        <button
-          class="draggable-item"
-          id="school-book"
-          type="button"
-          data-category="escola"
-          data-item-name="o livro"
-          aria-label="Livro. Arraste para a área da escola."
-        >
-          <span class="item-icon" aria-hidden="true">📚</span>
-          <span>Livro</span>
-        </button>
-
-        <button
-          class="draggable-item"
-          id="school-pencil"
-          type="button"
-          data-category="escola"
-          data-item-name="o lápis"
-          aria-label="Lápis. Arraste para a área da escola."
-        >
-          <span class="item-icon" aria-hidden="true">✏️</span>
-          <span>Lápis</span>
-        </button>
-
-        <div
-          class="drop-zone"
-          id="toy-box"
-          data-accepts="brinquedos"
-          tabindex="0"
-          aria-label="Caixa de brinquedos"
-        >
-          <strong>Brinquedos</strong>
-          <span>Solte aqui</span>
+          <button type="button" aria-label="Selecionar Fase 4">
+            <img
+              src="assets/images/tela_menu/fase_4.png"
+              alt="Botão da Fase 4"
+            />
+          </button>
         </div>
 
-        <div
-          class="drop-zone"
-          id="food-box"
-          data-accepts="comidas"
-          tabindex="0"
-          aria-label="Área de comidas"
-        >
-          <strong>Comidas</strong>
-          <span>Solte aqui</span>
-        </div>
-
-        <div
-          class="drop-zone"
-          id="school-box"
-          data-accepts="escola"
-          tabindex="0"
-          aria-label="Área da escola"
-        >
-          <strong>Escola</strong>
-          <span>Solte aqui</span>
-        </div>
-      </div>
-
-      <p class="feedback-message" id="feedback-message" role="status" aria-live="polite">
-        Arraste um item até o destino correto.
-      </p>
-    </section>
-  </main>
-
-  <script src="js/game.js"></script>
-</body>
+        <img
+          class="barra-progresso"
+          src="assets/images/tela_menu/bar.png"
+          alt="Barra de progresso das fases"
+        />
+      </section>
+    </main>
+    <script src="js/menu.js"></script>
+  </body>
 </html>
