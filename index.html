@@ -1,49 +1,30 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Arruma a Bagunça</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <main class="game-screen" aria-labelledby="game-title">
-    <section class="game-panel">
-      <div class="game-header">
-        <h1 id="game-title">Arruma a Bagunça</h1>
-        <p>Leve o brinquedo até a caixa certa.</p>
-      </div>
+  <head>
+    <meta charset="UTF-8" />
 
-      <div class="play-area" id="play-area">
-        <button
-          class="draggable-item"
-          id="toy-car"
-          type="button"
-          data-category="brinquedos"
-          aria-label="Carrinho de brinquedo. Arraste para a caixa de brinquedos."
-        >
-          <span class="item-icon" aria-hidden="true">🚗</span>
-          <span>Carrinho</span>
-        </button>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        <div
-          class="drop-zone"
-          id="toy-box"
-          data-accepts="brinquedos"
-          tabindex="0"
-          aria-label="Caixa de brinquedos"
-        >
-          <strong>Brinquedos</strong>
-          <span>Solte aqui</span>
-        </div>
-      </div>
+    <title>Arruma a Bagunça</title>
 
-      <p class="feedback-message" id="feedback-message" role="status" aria-live="polite">
-        Arraste o carrinho até a caixa de brinquedos.
-      </p>
-    </section>
-  </main>
+    <link rel="stylesheet" href="style.css" />
+  </head>
 
-  <script src="js/game.js"></script>
-</body>
+  <body>
+    <main id="tela-menu">
+      <img
+        src="assets/images/tela_inicial/logotipo_arruma _a_bagunça.png"
+        alt="Logotipo do jogo Arruma a Bagunça"
+      />
+
+      <button type="button">
+        <img
+          src="assets/images/tela_inicial/botão_jogar.png"
+          alt="Jogar"
+        />
+      </button>
+    </main>
+
+    <script src="js/menu.js"></script>
+  </body>
 </html>
