@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arruma a Bagunça</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="game-screen" aria-labelledby="game-title">
+    <section class="game-panel">
+      <div class="game-header">
+        <h1 id="game-title">Arruma a Bagunça</h1>
+        <p>Leve o brinquedo até a caixa certa.</p>
+      </div>
+
+      <div class="play-area" id="play-area">
+        <button
+          class="draggable-item"
+          id="toy-car"
+          type="button"
+          data-category="brinquedos"
+          aria-label="Carrinho de brinquedo. Arraste para a caixa de brinquedos."
+        >
+          <span class="item-icon" aria-hidden="true">🚗</span>
+          <span>Carrinho</span>
+        </button>
+
+        <div
+          class="drop-zone"
+          id="toy-box"
+          data-accepts="brinquedos"
+          tabindex="0"
+          aria-label="Caixa de brinquedos"
+        >
+          <strong>Brinquedos</strong>
+          <span>Solte aqui</span>
+        </div>
+      </div>
+
+      <p class="feedback-message" id="feedback-message" role="status" aria-live="polite">
+        Arraste o carrinho até a caixa de brinquedos.
+      </p>
+    </section>
+  </main>
+
+  <script src="js/game.js"></script>
+</body>
+</html>

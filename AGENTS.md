@@ -370,3 +370,15 @@ Quando houver mais de uma solução tecnicamente adequada:
 4. evitar complexidade desnecessária.
 
 Não implementar funcionalidades, requisitos ou decisões que não estejam definidos no contexto atual do projeto.
+
+
+## Colaboração e controle de alterações
+
+- Trabalhar em branches específicas para cada tarefa ou funcionalidade.
+- Evitar realizar alterações simultâneas no mesmo arquivo sem coordenação entre os integrantes.
+- Respeitar a separação de responsabilidades definida para os arquivos.
+- Não sobrescrever alterações realizadas por outro integrante.
+- Antes de modificar um arquivo que esteja sendo trabalhado por outra pessoa, comunicar e alinhar a alteração.
+- Manter commits pequenos e relacionados à tarefa.
+- Não fazer merge diretamente na `main` sem revisão/validação da equipe.
+- 
