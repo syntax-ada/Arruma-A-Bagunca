@@ -20,10 +20,35 @@
           id="toy-car"
           type="button"
           data-category="brinquedos"
+          data-item-name="o carrinho"
           aria-label="Carrinho de brinquedo. Arraste para a caixa de brinquedos."
         >
           <span class="item-icon" aria-hidden="true">🚗</span>
           <span>Carrinho</span>
+        </button>
+
+        <button
+          class="draggable-item"
+          id="toy-teddy"
+          type="button"
+          data-category="brinquedos"
+          data-item-name="o ursinho"
+          aria-label="Ursinho de brinquedo. Arraste para a caixa de brinquedos."
+        >
+          <span class="item-icon" aria-hidden="true">🧸</span>
+          <span>Ursinho</span>
+        </button>
+
+        <button
+          class="draggable-item"
+          id="toy-ball"
+          type="button"
+          data-category="brinquedos"
+          data-item-name="a bola"
+          aria-label="Bola de brinquedo. Arraste para a caixa de brinquedos."
+        >
+          <span class="item-icon" aria-hidden="true">⚽</span>
+          <span>Bola</span>
         </button>
 
         <div
@@ -39,7 +64,7 @@
       </div>
 
       <p class="feedback-message" id="feedback-message" role="status" aria-live="polite">
-        Arraste o carrinho até a caixa de brinquedos.
+        Arraste um item até o destino correto.
       </p>
     </section>
   </main>

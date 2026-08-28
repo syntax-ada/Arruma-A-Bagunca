@@ -1,21 +1,23 @@
-const draggableItem = document.querySelector(".draggable-item");
+const draggableItems = document.querySelectorAll(".draggable-item");
+const draggableItem = draggableItems[0];
 const dropZones = document.querySelectorAll(".drop-zone");
 const feedbackMessage = document.querySelector("#feedback-message");
 
 let activeDrag = null;
 
 function startGame() {
-  if (!draggableItem || dropZones.length === 0 || !feedbackMessage) {
+  if (draggableItems.length === 0 || dropZones.length === 0 || !feedbackMessage) {
     return;
   }
 
-  saveStartPosition(draggableItem);
-
-  draggableItem.addEventListener("pointerdown", startDrag);
-  draggableItem.addEventListener("pointermove", moveDrag);
-  draggableItem.addEventListener("pointerup", finishDrag);
-  draggableItem.addEventListener("pointercancel", cancelDrag);
-  draggableItem.addEventListener("keydown", handleItemKeyboard);
+  draggableItems.forEach((item) => {
+    saveStartPosition(item);
+    item.addEventListener("pointerdown", startDrag);
+    item.addEventListener("pointermove", moveDrag);
+    item.addEventListener("pointerup", finishDrag);
+    item.addEventListener("pointercancel", cancelDrag);
+    item.addEventListener("keydown", handleItemKeyboard);
+  });
 
   dropZones.forEach((dropZone) => {
     dropZone.addEventListener("keydown", handleDropZoneKeyboard);
@@ -45,7 +47,7 @@ function startDrag(event) {
 
   item.setPointerCapture(event.pointerId);
   item.classList.add("is-dragging");
-  showFeedback("Leve o carrinho até a caixa.", "neutral");
+  showFeedback(`Leve ${item.dataset.itemName} até a caixa.`, "neutral");
 }
 
 function moveDrag(event) {
@@ -74,10 +76,10 @@ function finishDrag(event) {
     placeItemInsideDropZone(item, targetDropZone);
     targetDropZone.classList.add("is-correct");
     item.classList.add("is-correct");
-    showFeedback("Muito bem! O carrinho está no lugar certo.", "success");
+    showFeedback(`Muito bem! ${item.dataset.itemName} está em ${getDropZoneName(targetDropZone)}.`, "success");
   } else {
     returnItemToStart(item);
-    showFeedback("Quase! Tente colocar o carrinho na caixa de brinquedos.", "error");
+    showFeedbackForIncorrectDrop(item);
   }
 
   activeDrag = null;
@@ -140,17 +142,46 @@ function isCorrectDropZone(item, dropZone) {
   return item.dataset.category === dropZone.dataset.accepts;
 }
 
+function findCorrectDropZone(item) {
+  return Array.from(dropZones).find((dropZone) => isCorrectDropZone(item, dropZone));
+}
+
+function getDropZoneName(dropZone) {
+  const title = dropZone.querySelector("strong");
+
+  return title ? title.textContent.trim() : "o destino correto";
+}
+
+function showFeedbackForIncorrectDrop(item) {
+  const correctDropZone = findCorrectDropZone(item);
+
+  if (correctDropZone) {
+    showFeedback(`Quase! Tente colocar ${item.dataset.itemName} em ${getDropZoneName(correctDropZone)}.`, "error");
+    return;
+  }
+
+  showFeedback(`Quase! Tente colocar ${item.dataset.itemName} no destino correto.`, "error");
+}
+
 function placeItemInsideDropZone(item, dropZone) {
   const playArea = document.querySelector("#play-area");
   const playAreaRect = playArea.getBoundingClientRect();
   const dropZoneRect = dropZone.getBoundingClientRect();
   const itemRect = item.getBoundingClientRect();
+  const placedItems = Array.from(draggableItems).filter((placedItem) => {
+    return placedItem.dataset.dropZoneId === dropZone.id;
+  }).length;
+  const itemsPerRow = 2;
+  const gap = 12;
+  const column = placedItems % itemsPerRow;
+  const row = Math.floor(placedItems / itemsPerRow);
+  const rowWidth = itemsPerRow * itemRect.width + gap;
+  const left = dropZoneRect.left - playAreaRect.left + (dropZoneRect.width - rowWidth) / 2 + column * (itemRect.width + gap);
+  const top = dropZoneRect.top - playAreaRect.top + 72 + row * (itemRect.height + gap);
 
-  const centeredLeft = dropZoneRect.left - playAreaRect.left + (dropZoneRect.width - itemRect.width) / 2;
-  const centeredTop = dropZoneRect.top - playAreaRect.top + (dropZoneRect.height - itemRect.height) / 2;
-
-  item.style.left = `${centeredLeft}px`;
-  item.style.top = `${centeredTop}px`;
+  item.style.left = `${left}px`;
+  item.style.top = `${top}px`;
+  item.dataset.dropZoneId = dropZone.id;
 }
 
 function returnItemToStart(item) {
