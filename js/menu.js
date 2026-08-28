@@ -1,17 +1,17 @@
-// Encontra o botão Jogar da tela inicial.
 const botaoJogar = document.querySelector("#botao-jogar");
 
-// Encontra a tela inicial.
 const telaInicial = document.querySelector("#tela-inicial");
 
-// Encontra a tela de seleção de fases.
 const telaFases = document.querySelector("#tela-fases");
 
-// Espera o clique no botão Jogar.
+const botaoFase1 = document.querySelector("#botao-fase1");
+
 botaoJogar.addEventListener("click", function () {
-  // Esconde a tela inicial.
   telaInicial.classList.add("escondido");
 
-  // Mostra a tela de seleção de fases.
   telaFases.classList.remove("escondido");
+});
+
+botaoFase1.addEventListener("click", function () {
+  window.location.href = "fase1.html";
 });

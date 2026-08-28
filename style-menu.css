@@ -1,24 +1,8 @@
-* {
-  user-select: none;
-
-  -webkit-user-select: none;
-
-  caret-color: transparent;
-
-  box-sizing: border-box;
-}
-
 body {
-  margin: 0;
-
   min-height: 100vh;
-
   background-image: url("assets/images/tela_inicial/fundo.png");
-
   background-position: center;
-
   background-size: 100% 100%;
-
   background-repeat: no-repeat;
 }
 
@@ -28,51 +12,31 @@ body {
 
 #tela-inicial {
   min-height: 100vh;
-
   display: flex;
-
   flex-direction: column;
-
   align-items: center;
-
   justify-content: center;
-
   gap: 16px;
 }
 
 img {
   pointer-events: none;
-
-  user-select: none;
-
-  -webkit-user-select: none;
-
-  -webkit-user-drag: none;
-
   display: block;
 }
 
 #tela-inicial > img {
   max-width: 85%;
-
   height: auto;
 }
 
 button {
   display: inline-flex;
-
   align-items: center;
-
   justify-content: center;
-
   padding: 0;
-
   border: none;
-
   background: transparent;
-
   outline: none;
-
   cursor: pointer;
 }
 
@@ -82,29 +46,19 @@ button {
 
 #tela-inicial button img {
   max-width: 100%;
-
   height: auto;
 }
 
 #tela-fases {
   min-height: 100vh;
-
   background-image: url("assets/images/tela_inicial/fundo.png");
-
   background-position: center;
-
   background-size: 100% 100%;
-
   background-repeat: no-repeat;
-
   display: flex;
-
   flex-direction: column;
-
   align-items: center;
-
   justify-content: space-between;
-
   padding: 24px;
 }
 
@@ -112,7 +66,6 @@ button {
   max-width: min(80%, 420px);
   height: auto;
   margin-top: 40px;
-  height: auto;
 }
 
 .botoes-fases {

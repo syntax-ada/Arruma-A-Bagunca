@@ -1,0 +1,87 @@
+.pagina-fase1 {
+  width: 100vw;
+  height: 100vh;
+  background-image: url("assets/images/tela_fase1/fundo.png");
+  background-position: center;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  overflow: hidden;
+}
+
+.cenario-fase,
+.tela-fase1 {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.topo-fase1 {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.caixa-instrucoes {
+  margin: 0 auto;
+  align-self: center;
+  max-width: min(85vw, 700px);
+  height: auto;
+}
+
+.area-objetos {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  width: 100%;
+  flex-wrap: nowrap;
+  flex: 1;
+}
+
+.grupo-objetos {
+  display: contents;
+}
+
+.objeto {
+  max-width: 100px;
+  height: auto;
+}
+
+.area-cestas,
+.categorias {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 40px;
+  width: 100%;
+  padding-bottom: 35px;
+}
+
+.cesta-container,
+.categoria {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cesta {
+  width: 300px;
+  height: auto;
+}
+
+.etiqueta-categoria {
+  margin-top: -12px;
+  max-width: 300px;
+  height: auto;
+}
+
+.pagina-fase1 img {
+  pointer-events: none;
+  display: block;
+}
