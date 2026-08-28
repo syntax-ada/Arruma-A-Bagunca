@@ -1,30 +1,97 @@
 <!DOCTYPE html>
+<!-- Informa ao navegador que este arquivo usa HTML5. -->
 <html lang="pt-BR">
+  <!-- Define que a página está em português do Brasil. -->
   <head>
+    <!-- Guarda informações sobre a página. -->
     <meta charset="UTF-8" />
+    <!-- Permite o uso correto de acentos. -->
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Ajuda a página a se ajustar a celulares e tablets. -->
 
     <title>Arruma a Bagunça</title>
+    <!-- Texto mostrado na aba do navegador. -->
 
     <link rel="stylesheet" href="style.css" />
+    <!-- Conecta a página ao arquivo de estilos. -->
   </head>
 
   <body>
-    <main id="tela-menu">
-      <img
-        src="assets/images/tela_inicial/logotipo_arruma _a_bagunça.png"
-        alt="Logotipo do jogo Arruma a Bagunça"
-      />
-
-      <button type="button">
+    <!-- Guarda as telas principais do jogo. -->
+    <main>
+      <!-- Esta é a tela mostrada quando o jogo é aberto. -->
+      <section id="tela-inicial">
+        <!-- Mostra o logotipo da tela inicial. -->
         <img
-          src="assets/images/tela_inicial/botão_jogar.png"
-          alt="Jogar"
+          src="assets/images/tela_inicial/logotipo_arruma _a_bagunça.png"
+          alt="Logotipo do jogo Arruma a Bagunça"
         />
-      </button>
+
+        <!-- Botão usado para mostrar a tela de seleção de fases. -->
+        <button id="botao-jogar" type="button">
+          <!-- Imagem que representa o botão Jogar. -->
+          <img
+            src="assets/images/tela_inicial/botão_jogar.png"
+            alt="Jogar"
+          />
+        </button>
+      </section>
+
+      <!-- Esta é a tela de escolha de fases. Ela começa escondida. -->
+      <section id="tela-fases" class="escondido">
+        <!-- Mostra o logotipo no topo da tela de fases. -->
+        <img
+          class="logotipo-fases"
+          src="assets/images/tela_menu/logotipo_arruma_a_Bagunça.png"
+          alt="Logotipo do jogo Arruma a Bagunça"
+        />
+
+        <!-- Agrupa os botões que permitem escolher uma fase. -->
+        <div class="botoes-fases">
+          <!-- Botão da primeira fase. -->
+          <button type="button" aria-label="Selecionar Fase 1">
+            <img
+              src="assets/images/tela_menu/fase_1.png"
+              alt="Botão da Fase 1"
+            />
+          </button>
+
+          <!-- Botão da segunda fase. -->
+          <button type="button" aria-label="Selecionar Fase 2">
+            <img
+              src="assets/images/tela_menu/fase_2.png"
+              alt="Botão da Fase 2"
+            />
+          </button>
+
+          <!-- Botão da terceira fase. -->
+          <button type="button" aria-label="Selecionar Fase 3">
+            <img
+              src="assets/images/tela_menu/fase_3.png"
+              alt="Botão da Fase 3"
+            />
+          </button>
+
+          <!-- Botão da quarta fase. -->
+          <button type="button" aria-label="Selecionar Fase 4">
+            <img
+              src="assets/images/tela_menu/fase_4.png"
+              alt="Botão da Fase 4"
+            />
+          </button>
+        </div>
+
+        <!-- Mostra a barra de progresso na parte inferior da tela. -->
+        <img
+          class="barra-progresso"
+          src="assets/images/tela_menu/bar.png"
+          alt="Barra de progresso das fases"
+        />
+      </section>
     </main>
 
     <script src="js/menu.js"></script>
+    <!-- Conecta a página ao JavaScript responsável pela troca de telas. -->
   </body>
 </html>
