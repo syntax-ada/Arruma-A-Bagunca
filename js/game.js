@@ -28,20 +28,23 @@ function saveStartPosition(item) {
 }
 
 function startDrag(event) {
-  if (draggableItem.classList.contains("is-correct")) {
+  const item = event.currentTarget;
+
+  if (item.classList.contains("is-correct")) {
     return;
   }
 
-  const itemRect = draggableItem.getBoundingClientRect();
+  const itemRect = item.getBoundingClientRect();
 
   activeDrag = {
+    item,
     pointerId: event.pointerId,
     shiftX: event.clientX - itemRect.left,
     shiftY: event.clientY - itemRect.top,
   };
 
-  draggableItem.setPointerCapture(event.pointerId);
-  draggableItem.classList.add("is-dragging");
+  item.setPointerCapture(event.pointerId);
+  item.classList.add("is-dragging");
   showFeedback("Leve o carrinho até a caixa.", "neutral");
 }
 
@@ -50,7 +53,7 @@ function moveDrag(event) {
     return;
   }
 
-  moveItemToPointer(event.clientX, event.clientY);
+  moveItemToPointer(activeDrag.item, event.clientX, event.clientY);
   updateDropZoneHighlight(event.clientX, event.clientY);
 }
 
@@ -59,19 +62,21 @@ function finishDrag(event) {
     return;
   }
 
-  draggableItem.releasePointerCapture(event.pointerId);
-  draggableItem.classList.remove("is-dragging");
+  const item = activeDrag.item;
+
+  item.releasePointerCapture(event.pointerId);
+  item.classList.remove("is-dragging");
   clearDropZoneHighlight();
 
   const targetDropZone = findDropZoneAtPoint(event.clientX, event.clientY);
 
-  if (isCorrectDropZone(draggableItem, targetDropZone)) {
-    placeItemInsideDropZone(draggableItem, targetDropZone);
+  if (isCorrectDropZone(item, targetDropZone)) {
+    placeItemInsideDropZone(item, targetDropZone);
     targetDropZone.classList.add("is-correct");
-    draggableItem.classList.add("is-correct");
+    item.classList.add("is-correct");
     showFeedback("Muito bem! O carrinho está no lugar certo.", "success");
   } else {
-    returnItemToStart(draggableItem);
+    returnItemToStart(item);
     showFeedback("Quase! Tente colocar o carrinho na caixa de brinquedos.", "error");
   }
 
@@ -83,9 +88,11 @@ function cancelDrag(event) {
     return;
   }
 
-  draggableItem.classList.remove("is-dragging");
+  const item = activeDrag.item;
+
+  item.classList.remove("is-dragging");
   clearDropZoneHighlight();
-  returnItemToStart(draggableItem);
+  returnItemToStart(item);
   showFeedback("Tudo bem, tente arrastar de novo.", "error");
   activeDrag = null;
 }
@@ -94,18 +101,18 @@ function isCurrentPointer(event) {
   return activeDrag && activeDrag.pointerId === event.pointerId;
 }
 
-function moveItemToPointer(clientX, clientY) {
+function moveItemToPointer(item, clientX, clientY) {
   const playArea = document.querySelector("#play-area");
   const playAreaRect = playArea.getBoundingClientRect();
-  const itemRect = draggableItem.getBoundingClientRect();
+  const itemRect = item.getBoundingClientRect();
 
   const newLeft = clientX - playAreaRect.left - activeDrag.shiftX;
   const newTop = clientY - playAreaRect.top - activeDrag.shiftY;
   const maxLeft = playArea.clientWidth - itemRect.width;
   const maxTop = playArea.clientHeight - itemRect.height;
 
-  draggableItem.style.left = `${limitNumber(newLeft, 0, maxLeft)}px`;
-  draggableItem.style.top = `${limitNumber(newTop, 0, maxTop)}px`;
+  item.style.left = `${limitNumber(newLeft, 0, maxLeft)}px`;
+  item.style.top = `${limitNumber(newTop, 0, maxTop)}px`;
 }
 
 function limitNumber(value, min, max) {
