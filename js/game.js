@@ -5,6 +5,27 @@ const feedbackMessage = document.querySelector("#feedback-message");
 
 let activeDrag = null;
 
+const basketSprites = {
+  brinquedos: [
+    "assets/images/tela_fase1/sprites_cestas/brinquedos/1_cesta_brinquedo-1.png",
+    "assets/images/tela_fase1/sprites_cestas/brinquedos/1_cesta_brinquedo.png",
+    "assets/images/tela_fase1/sprites_cestas/brinquedos/2_cesta_brinquedo.png",
+    "assets/images/tela_fase1/sprites_cestas/brinquedos/3_cesta_brinquedo.png",
+  ],
+  comidas: [
+    "assets/images/tela_fase1/sprites_cestas/comidas/1_cesta_comida-1.png",
+    "assets/images/tela_fase1/sprites_cestas/comidas/1_cesta_comida.png",
+    "assets/images/tela_fase1/sprites_cestas/comidas/2_cesta_comida.png",
+    "assets/images/tela_fase1/sprites_cestas/comidas/3_cesta_comida.png",
+  ],
+  materiais: [
+    "assets/images/tela_fase1/sprites_cestas/materiais/1_cesta_material-1.png",
+    "assets/images/tela_fase1/sprites_cestas/materiais/1_cesta_material.png",
+    "assets/images/tela_fase1/sprites_cestas/materiais/2_cesta_material.png",
+    "assets/images/tela_fase1/sprites_cestas/materiais/3_cesta_material.png",
+  ],
+};
+
 function startGame() {
   if (draggableItems.length === 0 || dropZones.length === 0 || !feedbackMessage) {
     return;
@@ -20,6 +41,7 @@ function startGame() {
   });
 
   dropZones.forEach((dropZone) => {
+    updateDropZoneCounter(dropZone);
     dropZone.addEventListener("keydown", handleDropZoneKeyboard);
   });
 }
@@ -75,6 +97,7 @@ function finishDrag(event) {
   if (isCorrectDropZone(item, targetDropZone)) {
     placeItemInsideDropZone(item, targetDropZone);
     item.classList.add("is-correct");
+    updateDropZoneCounter(targetDropZone);
 
     if (isOrganizationComplete()) {
       showFeedback("Parabéns! Você organizou todos os objetos!", "success");
@@ -190,6 +213,28 @@ function placeItemInsideDropZone(item, dropZone) {
   item.style.left = `${left}px`;
   item.style.top = `${top}px`;
   item.dataset.dropZoneId = dropZone.id;
+}
+
+function updateDropZoneCounter(dropZone) {
+  if (!dropZone) {
+    return;
+  }
+
+  const placedCount = Array.from(draggableItems).filter((item) => {
+    return item.dataset.dropZoneId === dropZone.id && item.classList.contains("is-correct");
+  }).length;
+
+  const counter = dropZone.querySelector(".contador-categoria");
+  if (counter) {
+    counter.textContent = placedCount;
+    counter.setAttribute("aria-label", `${placedCount} itens organizados`);
+  }
+
+  const category = dropZone.dataset.accepts;
+  const cestaImg = dropZone.querySelector(".cesta");
+  if (cestaImg && basketSprites[category] && basketSprites[category][placedCount]) {
+    cestaImg.src = basketSprites[category][placedCount];
+  }
 }
 
 function returnItemToStart(item) {
