@@ -43,7 +43,7 @@ button {
 
 .play-area {
   position: relative;
-  min-height: 470px;
+  min-height: 800px;
   border: 4px solid #24577a;
   border-radius: 8px;
   background: #ffffff;
@@ -108,11 +108,36 @@ button {
   top: 272px;
 }
 
+#food-apple {
+  left: 450px;
+  top: 58px;
+}
+
+#food-banana {
+  left: 590px;
+  top: 58px;
+}
+
+#food-bread {
+  left: 730px;
+  top: 58px;
+}
+
+#school-book {
+  left: 450px;
+  top: 272px;
+}
+
+#school-pencil {
+  left: 590px;
+  top: 272px;
+}
+
 .drop-zone {
   position: absolute;
-  right: 48px;
-  top: 55px;
-  width: 330px;
+  left: 20px;
+  top: 430px;
+  width: 280px;
   min-height: 340px;
   padding: 20px;
   display: flex;
@@ -124,6 +149,14 @@ button {
   border-radius: 8px;
   background: #e8f7ee;
   text-align: center;
+}
+
+#food-box {
+  left: 320px;
+}
+
+#school-box {
+  left: 620px;
 }
 
 .drop-zone strong {
@@ -175,7 +208,7 @@ button {
   }
 
   .play-area {
-    min-height: 780px;
+    min-height: 1600px;
   }
 
   .draggable-item {
@@ -185,12 +218,46 @@ button {
     min-height: 108px;
   }
 
-  #toy-teddy {
-    top: 145px;
+  #toy-car {
+    left: 16px;
   }
 
   #toy-ball {
-    top: 266px;
+    left: 16px;
+    top: 276px;
+  }
+
+  #toy-teddy {
+    left: auto;
+    right: 16px;
+    top: 24px;
+  }
+
+  #food-apple {
+    left: 16px;
+    top: 150px;
+  }
+
+  #food-banana {
+    left: auto;
+    right: 16px;
+    top: 150px;
+  }
+
+  #food-bread {
+    left: 16px;
+    top: 276px;
+  }
+
+  #school-book {
+    left: auto;
+    right: 16px;
+    top: 276px;
+  }
+
+  #school-pencil {
+    left: 16px;
+    top: 402px;
   }
 
   .draggable-item.is-dragging {
@@ -200,9 +267,19 @@ button {
   .drop-zone {
     left: 50%;
     right: auto;
-    top: 420px;
+    top: 540px;
     width: min(330px, calc(100% - 32px));
     min-height: 340px;
     transform: translateX(-50%);
+  }
+
+  #food-box {
+    left: 50%;
+    top: 920px;
+  }
+
+  #school-box {
+    left: 50%;
+    top: 1300px;
   }
 }

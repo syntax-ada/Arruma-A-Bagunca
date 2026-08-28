@@ -74,7 +74,6 @@ function finishDrag(event) {
 
   if (isCorrectDropZone(item, targetDropZone)) {
     placeItemInsideDropZone(item, targetDropZone);
-    targetDropZone.classList.add("is-correct");
     item.classList.add("is-correct");
     showFeedback(`Muito bem! ${item.dataset.itemName} está em ${getDropZoneName(targetDropZone)}.`, "success");
   } else {

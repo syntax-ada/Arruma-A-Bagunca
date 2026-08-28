@@ -11,7 +11,7 @@
     <section class="game-panel">
       <div class="game-header">
         <h1 id="game-title">Arruma a Bagunça</h1>
-        <p>Leve o brinquedo até a caixa certa.</p>
+        <p>Leve cada item até o destino correto.</p>
       </div>
 
       <div class="play-area" id="play-area">
@@ -51,6 +51,66 @@
           <span>Bola</span>
         </button>
 
+        <button
+          class="draggable-item"
+          id="food-apple"
+          type="button"
+          data-category="comidas"
+          data-item-name="a maçã"
+          aria-label="Maçã. Arraste para a área de comidas."
+        >
+          <span class="item-icon" aria-hidden="true">🍎</span>
+          <span>Maçã</span>
+        </button>
+
+        <button
+          class="draggable-item"
+          id="food-banana"
+          type="button"
+          data-category="comidas"
+          data-item-name="a banana"
+          aria-label="Banana. Arraste para a área de comidas."
+        >
+          <span class="item-icon" aria-hidden="true">🍌</span>
+          <span>Banana</span>
+        </button>
+
+        <button
+          class="draggable-item"
+          id="food-bread"
+          type="button"
+          data-category="comidas"
+          data-item-name="o pão"
+          aria-label="Pão. Arraste para a área de comidas."
+        >
+          <span class="item-icon" aria-hidden="true">🍞</span>
+          <span>Pão</span>
+        </button>
+
+        <button
+          class="draggable-item"
+          id="school-book"
+          type="button"
+          data-category="escola"
+          data-item-name="o livro"
+          aria-label="Livro. Arraste para a área da escola."
+        >
+          <span class="item-icon" aria-hidden="true">📚</span>
+          <span>Livro</span>
+        </button>
+
+        <button
+          class="draggable-item"
+          id="school-pencil"
+          type="button"
+          data-category="escola"
+          data-item-name="o lápis"
+          aria-label="Lápis. Arraste para a área da escola."
+        >
+          <span class="item-icon" aria-hidden="true">✏️</span>
+          <span>Lápis</span>
+        </button>
+
         <div
           class="drop-zone"
           id="toy-box"
@@ -59,6 +119,28 @@
           aria-label="Caixa de brinquedos"
         >
           <strong>Brinquedos</strong>
+          <span>Solte aqui</span>
+        </div>
+
+        <div
+          class="drop-zone"
+          id="food-box"
+          data-accepts="comidas"
+          tabindex="0"
+          aria-label="Área de comidas"
+        >
+          <strong>Comidas</strong>
+          <span>Solte aqui</span>
+        </div>
+
+        <div
+          class="drop-zone"
+          id="school-box"
+          data-accepts="escola"
+          tabindex="0"
+          aria-label="Área da escola"
+        >
+          <strong>Escola</strong>
           <span>Solte aqui</span>
         </div>
       </div>
