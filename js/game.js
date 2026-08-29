@@ -101,6 +101,13 @@ function finishDrag(event) {
 
     if (isOrganizationComplete()) {
       showFeedback("Parabéns! Você organizou todos os objetos!", "success");
+
+      const dadosQuantidades = getCategoryCounts();
+      setTimeout(() => {
+        if (typeof iniciarDesafioMatematico === "function") {
+          iniciarDesafioMatematico(dadosQuantidades);
+        }
+      }, 1000);
     } else {
       showFeedback(`Muito bem! ${item.dataset.itemName} está em ${getDropZoneName(targetDropZone)}.`, "success");
     }
@@ -110,6 +117,20 @@ function finishDrag(event) {
   }
 
   activeDrag = null;
+}
+
+function getCategoryCounts() {
+  const counts = {};
+
+  dropZones.forEach((dropZone) => {
+    const category = dropZone.dataset.accepts;
+    const count = Array.from(draggableItems).filter((item) => {
+      return item.dataset.dropZoneId === dropZone.id && item.classList.contains("is-correct");
+    }).length;
+    counts[category] = count;
+  });
+
+  return counts;
 }
 
 function cancelDrag(event) {

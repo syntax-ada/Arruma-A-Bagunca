@@ -10,230 +10,284 @@
 
     <body class="pagina-fase1">
         <main class="tela-fase1" id="play-area">
-            <header class="topo-fase1">
-                <div class="hud-container">
-                    <img
-                        class="caixa-instrucoes"
-                        src="assets/images/tela_fase1/hud_branco.png"
-                        alt="Caixa de instruções da Fase 1"
-                    />
-                    <p class="feedback-message" id="feedback-message" role="status" aria-live="polite">
-                        Arraste cada item até a cesta correta!
+            <!-- ETAPA 1: ORGANIZAÇÃO DOS OBJETOS -->
+            <div id="tela-organizacao" class="tela-organizacao">
+                <header class="topo-fase1">
+                    <div class="hud-container">
+                        <img
+                            class="caixa-instrucoes"
+                            src="assets/images/tela_fase1/hud_branco.png"
+                            alt="Caixa de instruções da Fase 1"
+                        />
+                        <p class="feedback-message" id="feedback-message" role="status" aria-live="polite">
+                            Arraste cada item até a cesta correta!
+                        </p>
+                    </div>
+                </header>
+
+                <section class="area-objetos" aria-label="Objetos da Fase 1">
+                    <div class="grupo-objetos">
+                        <button
+                            class="draggable-item"
+                            id="item-urso-1"
+                            type="button"
+                            data-category="brinquedos"
+                            data-item-name="o ursinho"
+                            aria-label="Ursinho de brinquedo. Arraste para a cesta de brinquedos."
+                        >
+                            <img
+                                class="objeto"
+                                src="assets/images/tela_fase1/uso 3.png"
+                                alt="Ursinho de brinquedo"
+                            />
+                        </button>
+
+                        <button
+                            class="draggable-item"
+                            id="item-maca"
+                            type="button"
+                            data-category="comidas"
+                            data-item-name="a maçã"
+                            aria-label="Maçã. Arraste para a cesta de comidas."
+                        >
+                            <img
+                                class="objeto"
+                                src="assets/images/tela_fase1/maça.png"
+                                alt="Maçã"
+                            />
+                        </button>
+
+                        <button
+                            class="draggable-item"
+                            id="item-lapis"
+                            type="button"
+                            data-category="materiais"
+                            data-item-name="o lápis"
+                            aria-label="Lápis. Arraste para a cesta de materiais escolares."
+                        >
+                            <img
+                                class="objeto"
+                                src="assets/images/tela_fase1/lápis.png"
+                                alt="Lápis"
+                            />
+                        </button>
+                    </div>
+
+                    <div class="grupo-objetos">
+                        <button
+                            class="draggable-item"
+                            id="item-pera"
+                            type="button"
+                            data-category="comidas"
+                            data-item-name="a pera"
+                            aria-label="Pera. Arraste para a cesta de comidas."
+                        >
+                            <img
+                                class="objeto"
+                                src="assets/images/tela_fase1/pera.png"
+                                alt="Pera"
+                            />
+                        </button>
+
+                        <button
+                            class="draggable-item"
+                            id="item-urso-2"
+                            type="button"
+                            data-category="brinquedos"
+                            data-item-name="o ursinho"
+                            aria-label="Ursinho de brinquedo. Arraste para a cesta de brinquedos."
+                        >
+                            <img
+                                class="objeto"
+                                src="assets/images/tela_fase1/uso 3.png"
+                                alt="Ursinho de brinquedo"
+                            />
+                        </button>
+
+                        <button
+                            class="draggable-item"
+                            id="item-banana"
+                            type="button"
+                            data-category="comidas"
+                            data-item-name="a banana"
+                            aria-label="Banana. Arraste para a cesta de comidas."
+                        >
+                            <img
+                                class="objeto"
+                                src="assets/images/tela_fase1/banana.png"
+                                alt="Banana"
+                            />
+                        </button>
+                    </div>
+
+                    <div class="grupo-objetos">
+                        <button
+                            class="draggable-item"
+                            id="item-borracha"
+                            type="button"
+                            data-category="materiais"
+                            data-item-name="a borracha"
+                            aria-label="Borracha. Arraste para a cesta de materiais escolares."
+                        >
+                            <img
+                                class="objeto"
+                                src="assets/images/tela_fase1/borracha.png"
+                                alt="Borracha"
+                            />
+                        </button>
+
+                        <button
+                            class="draggable-item"
+                            id="item-urso-3"
+                            type="button"
+                            data-category="brinquedos"
+                            data-item-name="o ursinho"
+                            aria-label="Ursinho de brinquedo. Arraste para a cesta de brinquedos."
+                        >
+                            <img
+                                class="objeto"
+                                src="assets/images/tela_fase1/uso 3.png"
+                                alt="Ursinho de brinquedo"
+                            />
+                        </button>
+
+                        <button
+                            class="draggable-item"
+                            id="item-apontador"
+                            type="button"
+                            data-category="materiais"
+                            data-item-name="o apontador"
+                            aria-label="Apontador. Arraste para a cesta de materiais escolares."
+                        >
+                            <img
+                                class="objeto"
+                                src="assets/images/tela_fase1/apontador.png"
+                                alt="Apontador"
+                            />
+                        </button>
+                    </div>
+                </section>
+
+                <footer class="categorias">
+                    <div
+                        class="categoria drop-zone"
+                        id="cesta-brinquedos"
+                        data-accepts="brinquedos"
+                        tabindex="0"
+                        aria-label="Cesta de brinquedos"
+                    >
+                        <strong class="sr-only">Brinquedos</strong>
+                        <span class="contador-categoria" aria-label="0 itens organizados">0</span>
+                        <img
+                            class="cesta"
+                            src="assets/images/tela_fase1/sprites_cestas/brinquedos/1_cesta_brinquedo-1.png"
+                            alt="Cesta de brinquedos com zero itens"
+                        />
+
+                        <img
+                            class="etiqueta-categoria"
+                            src="assets/images/tela_fase1/botton_brinquedos.png"
+                            alt="Categoria Brinquedos"
+                        />
+                    </div>
+
+                    <div
+                        class="categoria drop-zone"
+                        id="cesta-comidas"
+                        data-accepts="comidas"
+                        tabindex="0"
+                        aria-label="Cesta de comidas"
+                    >
+                        <strong class="sr-only">Comidas</strong>
+                        <span class="contador-categoria" aria-label="0 itens organizados">0</span>
+                        <img
+                            class="cesta"
+                            src="assets/images/tela_fase1/sprites_cestas/comidas/1_cesta_comida-1.png"
+                            alt="Cesta de comidas com zero itens"
+                        />
+
+                        <img
+                            class="etiqueta-categoria"
+                            src="assets/images/tela_fase1/botton_comida.png"
+                            alt="Categoria Comida"
+                        />
+                    </div>
+
+                    <div
+                        class="categoria drop-zone"
+                        id="cesta-materiais"
+                        data-accepts="materiais"
+                        tabindex="0"
+                        aria-label="Cesta de materiais escolares"
+                    >
+                        <strong class="sr-only">Materiais</strong>
+                        <span class="contador-categoria" aria-label="0 itens organizados">0</span>
+                        <img
+                            class="cesta"
+                            src="assets/images/tela_fase1/sprites_cestas/materiais/1_cesta_material-1.png"
+                            alt="Cesta de materiais escolares com zero itens"
+                        />
+
+                        <img
+                            class="etiqueta-categoria"
+                            src="assets/images/tela_fase1/botton_material.png"
+                            alt="Categoria Material escolar"
+                        />
+                    </div>
+                </footer>
+            </div>
+
+            <!-- ETAPA 2: DESAFIO MATEMÁTICO -->
+            <section id="tela-matematica" class="tela-matematica escondido" aria-labelledby="titulo-matematica">
+                <header class="topo-fase1">
+                    <div class="hud-container">
+                        <img
+                            class="caixa-instrucoes"
+                            src="assets/images/tela_fase1/hud_branco.png"
+                            alt="Caixa de instruções do Desafio Matemático"
+                        />
+                        <p class="feedback-message hud-texto-matematica" id="titulo-matematica">
+                            Desafio Matemático
+                        </p>
+                    </div>
+                </header>
+
+                <div class="painel-matematica">
+                    <h2 class="pergunta-matematica" id="pergunta-matematica">
+                        Quantos objetos você organizou ao todo?
+                    </h2>
+
+                    <div class="resumo-quantidades" id="resumo-quantidades" aria-label="Quantidades organizadas por categoria">
+                        <div class="item-resumo">
+                            <span class="icone-resumo" aria-hidden="true">🧸</span>
+                            <span class="nome-resumo">Brinquedos:</span>
+                            <strong class="valor-resumo" id="resumo-brinquedos">0</strong>
+                        </div>
+                        <span class="operador-soma" aria-hidden="true">+</span>
+                        <div class="item-resumo">
+                            <span class="icone-resumo" aria-hidden="true">🍎</span>
+                            <span class="nome-resumo">Comidas:</span>
+                            <strong class="valor-resumo" id="resumo-comidas">0</strong>
+                        </div>
+                        <span class="operador-soma" aria-hidden="true">+</span>
+                        <div class="item-resumo">
+                            <span class="icone-resumo" aria-hidden="true">✏️</span>
+                            <span class="nome-resumo">Materiais:</span>
+                            <strong class="valor-resumo" id="resumo-materiais">0</strong>
+                        </div>
+                    </div>
+
+                    <div class="opcoes-matematica" id="opcoes-matematica" role="group" aria-label="Alternativas de resposta">
+                        <!-- Alternativas geradas dinamicamente via math.js -->
+                    </div>
+
+                    <p class="feedback-matematica" id="feedback-matematica" role="status" aria-live="polite">
+                        Escolha uma das opções acima.
                     </p>
                 </div>
-            </header>
-
-            <section class="area-objetos" aria-label="Objetos da Fase 1">
-                <div class="grupo-objetos">
-                    <button
-                        class="draggable-item"
-                        id="item-urso-1"
-                        type="button"
-                        data-category="brinquedos"
-                        data-item-name="o ursinho"
-                        aria-label="Ursinho de brinquedo. Arraste para a cesta de brinquedos."
-                    >
-                        <img
-                            class="objeto"
-                            src="assets/images/tela_fase1/uso 3.png"
-                            alt="Ursinho de brinquedo"
-                        />
-                    </button>
-
-                    <button
-                        class="draggable-item"
-                        id="item-maca"
-                        type="button"
-                        data-category="comidas"
-                        data-item-name="a maçã"
-                        aria-label="Maçã. Arraste para a cesta de comidas."
-                    >
-                        <img
-                            class="objeto"
-                            src="assets/images/tela_fase1/maça.png"
-                            alt="Maçã"
-                        />
-                    </button>
-
-                    <button
-                        class="draggable-item"
-                        id="item-lapis"
-                        type="button"
-                        data-category="materiais"
-                        data-item-name="o lápis"
-                        aria-label="Lápis. Arraste para a cesta de materiais escolares."
-                    >
-                        <img
-                            class="objeto"
-                            src="assets/images/tela_fase1/lápis.png"
-                            alt="Lápis"
-                        />
-                    </button>
-                </div>
-
-                <div class="grupo-objetos">
-                    <button
-                        class="draggable-item"
-                        id="item-pera"
-                        type="button"
-                        data-category="comidas"
-                        data-item-name="a pera"
-                        aria-label="Pera. Arraste para a cesta de comidas."
-                    >
-                        <img
-                            class="objeto"
-                            src="assets/images/tela_fase1/pera.png"
-                            alt="Pera"
-                        />
-                    </button>
-
-                    <button
-                        class="draggable-item"
-                        id="item-urso-2"
-                        type="button"
-                        data-category="brinquedos"
-                        data-item-name="o ursinho"
-                        aria-label="Ursinho de brinquedo. Arraste para a cesta de brinquedos."
-                    >
-                        <img
-                            class="objeto"
-                            src="assets/images/tela_fase1/uso 3.png"
-                            alt="Ursinho de brinquedo"
-                        />
-                    </button>
-
-                    <button
-                        class="draggable-item"
-                        id="item-banana"
-                        type="button"
-                        data-category="comidas"
-                        data-item-name="a banana"
-                        aria-label="Banana. Arraste para a cesta de comidas."
-                    >
-                        <img
-                            class="objeto"
-                            src="assets/images/tela_fase1/banana.png"
-                            alt="Banana"
-                        />
-                    </button>
-                </div>
-
-                <div class="grupo-objetos">
-                    <button
-                        class="draggable-item"
-                        id="item-borracha"
-                        type="button"
-                        data-category="materiais"
-                        data-item-name="a borracha"
-                        aria-label="Borracha. Arraste para a cesta de materiais escolares."
-                    >
-                        <img
-                            class="objeto"
-                            src="assets/images/tela_fase1/borracha.png"
-                            alt="Borracha"
-                        />
-                    </button>
-
-                    <button
-                        class="draggable-item"
-                        id="item-urso-3"
-                        type="button"
-                        data-category="brinquedos"
-                        data-item-name="o ursinho"
-                        aria-label="Ursinho de brinquedo. Arraste para a cesta de brinquedos."
-                    >
-                        <img
-                            class="objeto"
-                            src="assets/images/tela_fase1/uso 3.png"
-                            alt="Ursinho de brinquedo"
-                        />
-                    </button>
-
-                    <button
-                        class="draggable-item"
-                        id="item-apontador"
-                        type="button"
-                        data-category="materiais"
-                        data-item-name="o apontador"
-                        aria-label="Apontador. Arraste para a cesta de materiais escolares."
-                    >
-                        <img
-                            class="objeto"
-                            src="assets/images/tela_fase1/apontador.png"
-                            alt="Apontador"
-                        />
-                    </button>
-                </div>
             </section>
-
-            <footer class="categorias">
-                <div
-                    class="categoria drop-zone"
-                    id="cesta-brinquedos"
-                    data-accepts="brinquedos"
-                    tabindex="0"
-                    aria-label="Cesta de brinquedos"
-                >
-                    <strong class="sr-only">Brinquedos</strong>
-                    <span class="contador-categoria" aria-label="0 itens organizados">0</span>
-                    <img
-                        class="cesta"
-                        src="assets/images/tela_fase1/sprites_cestas/brinquedos/1_cesta_brinquedo-1.png"
-                        alt="Cesta de brinquedos com zero itens"
-                    />
-
-                    <img
-                        class="etiqueta-categoria"
-                        src="assets/images/tela_fase1/botton_brinquedos.png"
-                        alt="Categoria Brinquedos"
-                    />
-                </div>
-
-                <div
-                    class="categoria drop-zone"
-                    id="cesta-comidas"
-                    data-accepts="comidas"
-                    tabindex="0"
-                    aria-label="Cesta de comidas"
-                >
-                    <strong class="sr-only">Comidas</strong>
-                    <span class="contador-categoria" aria-label="0 itens organizados">0</span>
-                    <img
-                        class="cesta"
-                        src="assets/images/tela_fase1/sprites_cestas/comidas/1_cesta_comida-1.png"
-                        alt="Cesta de comidas com zero itens"
-                    />
-
-                    <img
-                        class="etiqueta-categoria"
-                        src="assets/images/tela_fase1/botton_comida.png"
-                        alt="Categoria Comida"
-                    />
-                </div>
-
-                <div
-                    class="categoria drop-zone"
-                    id="cesta-materiais"
-                    data-accepts="materiais"
-                    tabindex="0"
-                    aria-label="Cesta de materiais escolares"
-                >
-                    <strong class="sr-only">Materiais</strong>
-                    <span class="contador-categoria" aria-label="0 itens organizados">0</span>
-                    <img
-                        class="cesta"
-                        src="assets/images/tela_fase1/sprites_cestas/materiais/1_cesta_material-1.png"
-                        alt="Cesta de materiais escolares com zero itens"
-                    />
-
-                    <img
-                        class="etiqueta-categoria"
-                        src="assets/images/tela_fase1/botton_material.png"
-                        alt="Categoria Material escolar"
-                    />
-                </div>
-            </footer>
         </main> 
+        <script src="js/math.js"></script>
         <script src="js/game.js"></script>
     </body>
 </html>
