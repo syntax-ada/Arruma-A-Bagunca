@@ -58,13 +58,12 @@ function startDrag(event) {
     return;
   }
 
-  const itemRect = item.getBoundingClientRect();
-
   activeDrag = {
     item,
     pointerId: event.pointerId,
-    shiftX: event.clientX - itemRect.left,
-    shiftY: event.clientY - itemRect.top,
+    // Mantém o centro visual do objeto abaixo do mouse ou toque.
+    shiftX: item.offsetWidth / 2,
+    shiftY: item.offsetHeight / 2,
   };
 
   item.setPointerCapture(event.pointerId);
@@ -152,14 +151,13 @@ function isCurrentPointer(event) {
 }
 
 function moveItemToPointer(item, clientX, clientY) {
-  const playArea = document.querySelector("#play-area");
-  const playAreaRect = playArea.getBoundingClientRect();
-  const itemRect = item.getBoundingClientRect();
+  const itemContainer = item.offsetParent;
+  const itemContainerRect = itemContainer.getBoundingClientRect();
 
-  const newLeft = clientX - playAreaRect.left - activeDrag.shiftX;
-  const newTop = clientY - playAreaRect.top - activeDrag.shiftY;
-  const maxLeft = playArea.clientWidth - itemRect.width;
-  const maxTop = playArea.clientHeight - itemRect.height;
+  const newLeft = clientX - itemContainerRect.left - activeDrag.shiftX;
+  const newTop = clientY - itemContainerRect.top - activeDrag.shiftY;
+  const maxLeft = itemContainer.clientWidth - item.offsetWidth;
+  const maxTop = itemContainer.clientHeight - item.offsetHeight;
 
   item.style.left = `${limitNumber(newLeft, 0, maxLeft)}px`;
   item.style.top = `${limitNumber(newTop, 0, maxTop)}px`;
