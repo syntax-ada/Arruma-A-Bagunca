@@ -58,6 +58,13 @@ function startDrag(event) {
     return;
   }
 
+  const itemRect = item.getBoundingClientRect();
+
+  // Durante o arraste, o objeto passa a usar a tela toda como referência.
+  item.style.position = "fixed";
+  item.style.left = `${itemRect.left}px`;
+  item.style.top = `${itemRect.top}px`;
+
   activeDrag = {
     item,
     pointerId: event.pointerId,
@@ -151,13 +158,10 @@ function isCurrentPointer(event) {
 }
 
 function moveItemToPointer(item, clientX, clientY) {
-  const itemContainer = item.offsetParent;
-  const itemContainerRect = itemContainer.getBoundingClientRect();
-
-  const newLeft = clientX - itemContainerRect.left - activeDrag.shiftX;
-  const newTop = clientY - itemContainerRect.top - activeDrag.shiftY;
-  const maxLeft = itemContainer.clientWidth - item.offsetWidth;
-  const maxTop = itemContainer.clientHeight - item.offsetHeight;
+  const newLeft = clientX - activeDrag.shiftX;
+  const newTop = clientY - activeDrag.shiftY;
+  const maxLeft = window.innerWidth - item.offsetWidth;
+  const maxTop = window.innerHeight - item.offsetHeight;
 
   item.style.left = `${limitNumber(newLeft, 0, maxLeft)}px`;
   item.style.top = `${limitNumber(newTop, 0, maxTop)}px`;
@@ -214,8 +218,10 @@ function showFeedbackForIncorrectDrop(item) {
 }
 
 function placeItemInsideDropZone(item, dropZone) {
-  const playArea = document.querySelector("#play-area");
-  const playAreaRect = playArea.getBoundingClientRect();
+  restoreItemPositioning(item);
+
+  const itemContainer = item.offsetParent;
+  const itemContainerRect = itemContainer.getBoundingClientRect();
   const dropZoneRect = dropZone.getBoundingClientRect();
   const itemRect = item.getBoundingClientRect();
   const placedItems = Array.from(draggableItems).filter((placedItem) => {
@@ -226,8 +232,8 @@ function placeItemInsideDropZone(item, dropZone) {
   const column = placedItems % itemsPerRow;
   const row = Math.floor(placedItems / itemsPerRow);
   const rowWidth = itemsPerRow * itemRect.width + gap;
-  const left = dropZoneRect.left - playAreaRect.left + (dropZoneRect.width - rowWidth) / 2 + column * (itemRect.width + gap);
-  const top = dropZoneRect.top - playAreaRect.top + 72 + row * (itemRect.height + gap);
+  const left = dropZoneRect.left - itemContainerRect.left + (dropZoneRect.width - rowWidth) / 2 + column * (itemRect.width + gap);
+  const top = dropZoneRect.top - itemContainerRect.top + 72 + row * (itemRect.height + gap);
 
   item.style.left = `${left}px`;
   item.style.top = `${top}px`;
@@ -257,8 +263,13 @@ function updateDropZoneCounter(dropZone) {
 }
 
 function returnItemToStart(item) {
+  restoreItemPositioning(item);
   item.style.left = `${item.dataset.startLeft}px`;
   item.style.top = `${item.dataset.startTop}px`;
+}
+
+function restoreItemPositioning(item) {
+  item.style.position = "";
 }
 
 function updateDropZoneHighlight(clientX, clientY) {
