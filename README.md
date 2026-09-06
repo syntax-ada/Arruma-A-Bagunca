@@ -1,52 +1,137 @@
-**Status do documento:** contexto atual do projeto. Algumas decisões ainda estão em discussão e podem ser alteradas pela equipe.
+# Arruma a Bagunça
 
-**Importante:** este documento representa o estado atual das decisões da equipe. Algumas decisões ainda estão em discussão e podem ser alteradas. Não trate hipóteses futuras como funcionalidades já implementadas.
+Jogo educativo digital desenvolvido para a disciplina **Análise e Projeto de Sistemas II**, com foco no ensino de Matemática de forma lúdica, visual, interativa e acessível.
 
-**Contexto do projeto**
+O jogo é destinado a crianças de **7 a 10 anos**, aproximadamente do 2º ao 5º ano, da rede pública municipal de São Paulo.
 
-Estamos desenvolvendo, para a disciplina **Análise e Projeto de Sistemas II**, um jogo educativo digital chamado provisoriamente **“Arruma a Bagunça”**.
-
-O projeto é destinado a crianças de **7 a 10 anos**, aproximadamente do 2º ao 5º ano, da rede pública municipal de São Paulo.
-
-O objetivo geral é utilizar uma experiência de jogo para apoiar o aprendizado de Matemática de forma **lúdica, visual, interativa e acessível**, evitando transformar o jogo simplesmente em uma lista de exercícios.
-
-O projeto deverá ser integrado posteriormente ao **Cruzeiro HUB por iframe**.
+A integração com o **Cruzeiro HUB via iframe** faz parte do projeto e será realizada posteriormente.
 
 ---
 
-## Conceito do jogo
+## 1. Sobre o projeto
 
-A criança encontra diversos objetos misturados e precisa organizá-los em seus respectivos grupos utilizando principalmente **clique, arrastar e soltar**.
+O projeto utiliza uma experiência de jogo para apoiar o aprendizado de Matemática por meio de situações contextualizadas.
+
+A criança organiza objetos em categorias e, posteriormente, utiliza os resultados dessa organização para resolver um desafio matemático relacionado à atividade realizada.
+
+A proposta é evitar que o jogo funcione apenas como uma lista de exercícios, utilizando interação, feedback e elementos visuais para apoiar o aprendizado.
+
+---
+
+## 2. Conceito do jogo
+
+A criança encontra objetos misturados e deve organizá-los em seus respectivos grupos utilizando principalmente a mecânica de arrastar e soltar.
 
 Exemplo:
 
-🧸 🚗 ⚽ → Brinquedos  
-🍎 🍌 🍞 → Comidas  
+🧸 🚗 ⚽ → Brinquedos
+
+🍎 🍌 🍞 → Comidas
+
 📚 ✏️ 📓 → Materiais escolares
 
-Depois que a criança organiza os objetos, o jogo utiliza as quantidades dos grupos formados para apresentar **desafios matemáticos relacionados à situação**.
+Após a organização, as quantidades obtidas são utilizadas no desafio matemático.
 
-Fluxo principal:
+### Fluxo atual
 
-**Objeto → arrastar → área correta → feedback → organização concluída → desafio matemático → resposta → feedback**
+**Organização → contagem → conclusão → desafio matemático → resposta → feedback**
 
 ---
 
-## BNCC atualmente considerada
+## 3. Público-alvo
 
-A habilidade/conjunto de habilidades atualmente considerado pela equipe é:
+- Crianças de 7 a 10 anos;
+- aproximadamente do 2º ao 5º ano;
+- estudantes da rede pública municipal de São Paulo.
+
+A interface deve considerar crianças alfabetizadas e em processo de alfabetização.
+
+---
+
+## 4. Estado atual
+
+### MVP da Sprint 01 — Fase 1
+
+**Concluído.**
+
+A primeira versão funcional possui:
+
+- menu inicial;
+- entrada na Fase 1;
+- 9 objetos;
+- 3 categorias;
+- 3 destinos;
+- mecânica de arrastar e soltar;
+- validação por categoria;
+- feedback de acerto e erro;
+- retorno do objeto em caso de erro;
+- contador individual por categoria;
+- remoção visual dos objetos corretamente organizados;
+- conclusão da organização;
+- transição para o desafio matemático;
+- desafio matemático baseado nas quantidades reais organizadas;
+- alternativas de resposta;
+- verificação da resposta;
+- feedback matemático;
+- conclusão do desafio.
+
+### Estado pós-MVP
+
+O MVP da Sprint 01 foi concluído.
+
+O projeto encontra-se agora em etapa de evolução do produto, envolvendo melhorias técnicas, UX/UI, acessibilidade, novas fases, arquitetura e demais requisitos ainda não implementados.
+
+---
+
+## 5. Fluxo atual da Fase 1
+
+```text
+Menu
+  ↓
+Fase 1
+  ↓
+Organização dos objetos
+  ↓
+Validação da categoria
+  ↓
+Contador da categoria +1
+  ↓
+Objeto ocultado visualmente
+  ↓
+Todos os objetos organizados
+  ↓
+Feedback de conclusão
+  ↓
+Tela matemática
+  ↓
+Desafio baseado nas quantidades reais
+  ↓
+Resposta
+  ↓
+Feedback
+  ↓
+Conclusão
+```
+
+---
+
+## 6. BNCC
+
+A habilidade atualmente considerada para Matemática é:
 
 **EF02MA06 / EF03MA06 — operações e resolução de problemas com números naturais em situações do cotidiano.**
 
-**Importante:** não invente outras habilidades da BNCC nem altere essa definição sem que a equipe solicite.
+A atividade matemática deve estar relacionada à ação realizada pela criança durante o jogo.
 
-A equipe ainda poderá definir uma segunda habilidade posteriormente.
+A equipe ainda deverá definir e documentar as demais habilidades da BNCC que serão trabalhadas no produto, conforme o escopo das fases.
+
+> A definição das habilidades da BNCC deve seguir os materiais oficiais fornecidos pela faculdade. Não devem ser criadas ou alteradas habilidades sem validação da equipe.
 
 ---
 
-## Estrutura prevista do jogo
+## 7. Requisitos previstos para o produto completo
 
-O projeto completo deverá possuir:
+O projeto completo prevê:
 
 - menu inicial;
 - instruções com suporte a áudio;
@@ -55,42 +140,120 @@ O projeto completo deverá possuir:
 - 4 fases progressivas;
 - 1 fase bônus;
 - persistência básica de progresso;
-- fases concluídas;
+- registro de fases concluídas;
 - pontuação/conquistas;
 - mecânicas adequadas para crianças;
-- suporte a teclado e dispositivos móveis;
-- integração posterior com o Cruzeiro HUB via iframe.
+- suporte a teclado;
+- suporte a dispositivos móveis;
+- integração com o Cruzeiro HUB via iframe.
 
-**Porém, neste momento estamos desenvolvendo apenas o MVP da Sprint 01.**
-
----
-
-## MVP atual
-
-O MVP precisa demonstrar:
-
-1. **Menu inicial funcional**
-2. Entrada na primeira fase
-3. Objetos disponíveis para organização
-4. Áreas/categorias de destino
-5. Mecânica de arrastar e soltar
-6. Verificação de acerto/erro
-7. Feedback visual
-8. Conclusão da organização
-9. Apresentação de um desafio matemático
-10. Seleção de resposta
-11. Verificação da resposta
-12. Feedback final
-
-Não é necessário implementar agora as quatro fases, fase bônus, banco de dados completo, sistema completo de conquistas ou funcionalidades avançadas.
-
-**Prioridade absoluta: fazer o núcleo do MVP funcionar.**
+Nem todos esses requisitos estão implementados atualmente.
 
 ---
 
-## Público e UX
+## 8. Arquitetura atual
 
-O público são crianças de 7 a 10 anos.
+O projeto utiliza uma arquitetura simples baseada em HTML, CSS e JavaScript.
+
+A Fase 1 possui duas telas/estados dentro de `fase1.html`:
+
+```text
+fase1.html
+│
+├── Tela de organização
+│      ↓
+│   js/game.js
+│
+└── Tela matemática
+       ↓
+    js/math.js
+```
+
+O menu utiliza:
+
+```text
+index.html
+    ↓
+js/menu.js
+```
+
+O arquivo `main.js` existe no projeto, mas sua responsabilidade de integração ainda não está consolidada e poderá ser redefinida conforme a arquitetura evoluir.
+
+### Princípio arquitetural
+
+A equipe prioriza:
+
+**simplicidade > sofisticação**
+
+Não devem ser introduzidas abstrações, frameworks ou camadas adicionais sem necessidade técnica clara.
+
+---
+
+## 9. Estrutura do projeto
+
+```text
+Arruma-A-Bagunca/
+│
+├── index.html
+├── fase1.html
+├── global.css
+├── style-menu.css
+├── style-fase1.css
+├── README.md
+├── AGENTS.md
+│
+├── js/
+│   ├── main.js
+│   ├── menu.js
+│   ├── game.js
+│   └── math.js
+│
+└── assets/
+    ├── audio/
+    └── images/
+        ├── tela_inicial/
+        ├── tela_menu/
+        └── tela_fase1/
+            └── sprites_cestas/
+```
+
+### Principais responsabilidades atuais
+
+- `index.html` — menu inicial;
+- `fase1.html` — interface da Fase 1;
+- `global.css` — estilos globais;
+- `style-menu.css` — estilos do menu;
+- `style-fase1.css` — estilos da Fase 1;
+- `menu.js` — comportamento e navegação do menu;
+- `game.js` — mecânica de organização dos objetos;
+- `math.js` — desafio matemático;
+- `main.js` — inicialização/integração, ainda em definição.
+
+Essas responsabilidades representam a organização atual do projeto e podem evoluir conforme a arquitetura for definida.
+
+---
+
+## 10. Tecnologias
+
+Tecnologias utilizadas ou previstas:
+
+- HTML5;
+- CSS3;
+- JavaScript ES6+;
+- Node.js;
+- Git;
+- GitHub;
+- Vercel.
+
+A implementação atual utiliza principalmente **JavaScript Vanilla**.
+
+O uso de tecnologias adicionais deve ser justificado pela necessidade do projeto.
+
+---
+
+## 11. Acessibilidade e UX
+
+O jogo deve ser adequado para crianças de 7 a 10 anos.
 
 Priorizar:
 
@@ -104,181 +267,106 @@ Priorizar:
 - alto contraste;
 - fontes legíveis;
 - cores não devem ser o único meio de identificação;
-- interação simples;
+- suporte a teclado;
+- suporte a dispositivos móveis;
 - prevenção de frustração;
-- erro como oportunidade de aprendizado, não como punição agressiva.
+- erros tratados como oportunidade de aprendizado.
 
-Não utilizar:
-
-- violência;
-- armas;
-- linguagem ofensiva;
-- punições severas;
-- coleta desnecessária de dados pessoais.
+A acessibilidade deve ser considerada durante o desenvolvimento, e não somente como uma etapa final.
 
 ---
 
-## Tecnologia
+## 12. LGPD
 
-A stack prevista permite:
+O jogo não deve coletar dados pessoais reais de crianças sem necessidade.
 
-- HTML5;
-- CSS3;
-- JavaScript ES6+;
-- Node.js;
-- Vanilla JavaScript ou frameworks/bibliotecas permitidos pelo projeto.
+Evitar:
 
-Para o MVP, **preferimos HTML + CSS + JavaScript Vanilla**, salvo motivo técnico claro para utilizar outra tecnologia.
+- nome completo;
+- documentos;
+- e-mail;
+- fotos;
+- localização;
+- outras informações pessoais desnecessárias.
 
-Não criar arquitetura complexa sem necessidade.
-
-A equipe possui pouca experiência em desenvolvimento e duas pessoas estão tendo contato com programação pela primeira vez.
-
-Portanto:
-
-**simplicidade > sofisticação.**
+Quando for necessário identificar o jogador, utilizar mecanismos genéricos, como avatar, apelido lúdico ou código/token.
 
 ---
 
-## Regras para ajudar no desenvolvimento
+## 13. Tipos de tarefa
 
-1. Não criar funcionalidades que não foram solicitadas.
-2. Não transformar o MVP em um sistema complexo.
-3. Explicar o código antes ou junto da implementação.
-4. Evitar frameworks desnecessários.
-5. Reutilizar componentes e funções.
-6. Priorizar código simples e legível.
-7. Não assumir que a equipe conhece conceitos avançados.
-8. Se houver mais de uma solução, apresentar primeiro a mais simples.
-9. Se uma decisão puder afetar o restante do projeto, avisar antes de implementá-la.
-10. Não inventar requisitos da faculdade.
+As tarefas do projeto são classificadas como:
 
----
+### Correção
 
-## Arquitetura inicial desejada
+Corrige um comportamento existente que está errado ou quebrado.
 
-Queremos manter uma estrutura simples e organizada, separando as principais responsabilidades do jogo para facilitar o desenvolvimento simultâneo da equipe.
+### Melhoria
 
-```text
-Arruma-A-Bagunca/
-├── index.html
-├── style.css
-│
-├── js/
-│   ├── main.js
-│   ├── menu.js
-│   ├── game.js
-│   └── math.js
-│
-├── assets/
-│   ├── images/
-│   └── audio/
-│
-├── docs/
-│
-├── README.md
-```
+Aprimora uma implementação existente ou reduz dívida técnica sem representar uma nova funcionalidade.
 
-> **A estrutura acima é uma sugestão inicial, não uma exigência.**
+### Feature
 
-## Responsabilidades de Desenvolvimento
+Adiciona uma nova funcionalidade ao produto.
 
-### Pessoa 1 — Estrutura e Menu
+### UX/UI
 
-Principais arquivos:
+Altera interface, experiência de uso, acessibilidade ou apresentação visual.
 
-- `index.html`
-- `style.css`
-- `js/menu.js`
+### Arquitetura
 
-Responsável por:
-
-- estrutura das telas;
-- menu inicial;
-- botão "Jogar";
-- navegação para a primeira fase;
-- estrutura visual básica;
-- elementos de interface.
-
-Pode utilizar:
-
-- `assets/images/` para elementos visuais do menu;
-- `assets/audio/` para instruções ou áudio do menu, quando necessário.
+Altera responsabilidades, estrutura, comunicação ou organização técnica do sistema.
 
 ---
 
-### Pessoa 2 — Mecânica Principal
+## 14. Desenvolvimento e Git
 
-Principal arquivo:
+O projeto utiliza Git e GitHub para controle de versão.
 
-- `js/game.js`
+O desenvolvimento deve evitar alterações simultâneas desnecessárias nos mesmos arquivos.
 
-Responsável por:
+Antes de integrar alterações:
 
-- objetos da fase;
-- categorias;
-- mecânica de arrastar e soltar;
-- identificação do destino correto;
-- feedback de acerto/erro;
-- conclusão da etapa de organização.
+1. atualizar a branch;
+2. verificar conflitos;
+3. testar;
+4. revisar as alterações;
+5. realizar o commit;
+6. enviar para o GitHub.
 
-Pode utilizar:
-
-- `assets/images/` para objetos e elementos visuais da fase;
-- `assets/audio/` para feedbacks relacionados à organização.
+O deploy atual utiliza Vercel.
 
 ---
 
-### Pessoa 3 — Desafio Matemático
+## 15. Pendências conhecidas
 
-Principal arquivo:
+Entre os pontos identificados atualmente:
 
-- `js/math.js`
+- corrigir o deslocamento do objeto em relação ao cursor durante o arraste;
+- revisar suporte de teclado para múltiplos objetos;
+- revisar responsividade e interação em dispositivos móveis;
+- avaliar o papel definitivo do `main.js`;
+- revisar código que deixou de ser necessário após mudanças na mecânica;
+- continuar evolução da acessibilidade;
+- implementar requisitos ainda não contemplados nas próximas fases.
 
-Responsável por:
-
-- apresentação da pergunta;
-- alternativas de resposta;
-- verificação da resposta;
-- feedback de acerto/erro;
-- conclusão do desafio matemático.
-
-Pode utilizar:
-
-- `assets/images/` para elementos visuais das perguntas;
-- `assets/audio/` para instruções e feedbacks matemáticos.
+Esses itens são pendências atuais e não devem ser tratados automaticamente como prioridade sem avaliação da equipe.
 
 ---
 
-### Integração
+## 16. Próximos objetivos
 
-O `js/main.js` será utilizado para a inicialização e integração das principais partes do jogo.
+Após a conclusão do MVP da Sprint 01, o foco passa a ser a evolução do produto.
 
-As alterações que afetarem diretamente outra responsabilidade devem ser comunicadas ao integrante responsável antes de serem realizadas.
+As próximas prioridades serão definidas pela equipe considerando:
 
----
+- requisitos da faculdade;
+- impacto no produto;
+- UX/UI;
+- acessibilidade;
+- qualidade técnica;
+- prazo;
+- dependências entre tarefas;
+- capacidade da equipe.
 
-## Forma de trabalhar
-
-Somos uma equipe iniciante.
-
-Quando eu pedir código:
-
-- explique o que ele faz;
-- explique onde colocar;
-- explique como testar;
-- explique erros comuns;
-- não entregue uma arquitetura gigante;
-- não esconda decisões importantes.
-
-Se eu estiver fazendo algo desnecessariamente complexo, questione.
-
-Se minha ideia estiver tecnicamente ruim, explique por quê e proponha uma alternativa mais simples.
-
-**Não assuma que uma funcionalidade existe só porque aparece no planejamento futuro.**
-
-Diferencie sempre:
-
-- requisito da faculdade;
-- decisão atual da equipe;
-- recomendação técnica sua.
+Novas funcionalidades não devem ser implementadas apenas porque foram previstas para o futuro. Cada incremento deve ser avaliado antes do desenvolvimento.
