@@ -10,63 +10,73 @@
   </head>
 
   <body>
-    <main>
+    <main class="game-container">
+      <div class="controles-topo" id="controles-iniciais">
+        <button class="btn-icone" id="btn-som" type="button" aria-label="Ativar ou desativar som">
+          <img src="assets/images/tela_inicial/volume_solid_full_1.png" alt="Ícone de som" />
+        </button>
+        <button class="btn-icone" id="btn-config" type="button" aria-label="Configurações">
+          <img src="assets/images/tela_inicial/engrenagem.png" alt="Ícone de configurações" />
+        </button>
+      </div>
+
       <section id="tela-inicial">
         <img
           src="assets/images/tela_inicial/logotipo_arruma _a_bagunça.png"
           alt="Logotipo do jogo Arruma a Bagunça"
         />
 
-        <button id="botao-jogar" type="button">
-          <img
-            src="assets/images/tela_inicial/botão_jogar.png"
-            alt="Jogar"
-          />
-        </button>
+        <button class="btn-jogar" id="botao-jogar" type="button"><span>JOGAR</span></button>
       </section>
 
-      <section id="tela-fases" class="escondido">
-        <img
-          class="logotipo-fases"
-          src="assets/images/tela_menu/logotipo_arruma_a_Bagunça.png"
-          alt="Logotipo do jogo Arruma a Bagunça"
-        />
+      <section id="menu-fases" class="escondido" aria-label="Seleção de mundos">
+        <header class="topo-mundos">
+          <div class="pílula-controles">
+            <div class="perfil-usuario">
+              <span class="avatar-usuario" aria-hidden="true">👤</span>
+              <span>Jogador</span>
+            </div>
+            <button class="controle-mundo" type="button" aria-label="Volume">
+              <img src="assets/images/tela_inicial/volume_solid_full_1.png" alt="" />
+              <span>Volume</span>
+            </button>
+            <button class="controle-mundo" type="button" aria-label="Configurações">
+              <img src="assets/images/tela_inicial/engrenagem.png" alt="" />
+              <span>Configurações</span>
+            </button>
+          </div>
+          <button class="btn-voltar" id="btn-voltar" type="button">Voltar</button>
+        </header>
 
-        <div class="botoes-fases">
-          <button  id="botao-fase1" type="button" aria-label="Selecionar Fase 1">
-            <img
-              src="assets/images/tela_menu/fase_1.png"
-              alt="Botão da Fase 1"
-            />
+        <main class="carrossel-mundos" aria-label="Mundos do jogo">
+          <button class="btn-seta" type="button" aria-label="Mundo anterior">←</button>
+
+          <button class="card-mundo mundo-disponivel" id="botao-fase1" type="button" aria-label="Entrar no Mundo 1, A Casa">
+            <img src="assets/images/nova_tela_menu de_fases/mundo_1.png" alt="Ilustração do Mundo 1, A Casa" />
+            <span class="legenda-mundo">Mundo: 1 - A Casa</span>
           </button>
 
-          <button type="button" aria-label="Selecionar Fase 2">
-            <img
-              src="assets/images/tela_menu/fase_2.png"
-              alt="Botão da Fase 2"
-            />
-          </button>
+          <article class="card-mundo mundo-bloqueado" aria-label="Mundo 2, Escola, bloqueado">
+            <img src="assets/images/nova_tela_menu de_fases/mundo_2.png" alt="" />
+            <span class="overlay-bloqueado" aria-hidden="true">🔒</span>
+            <span class="legenda-mundo">Mundo: 2 - Escola</span>
+          </article>
 
-          <button type="button" aria-label="Selecionar Fase 3">
-            <img
-              src="assets/images/tela_menu/fase_3.png"
-              alt="Botão da Fase 3"
-            />
-          </button>
+          <article class="card-mundo mundo-bloqueado" aria-label="Mundo 3, Petshop, bloqueado">
+            <img src="assets/images/nova_tela_menu de_fases/mundo_3.png" alt="" />
+            <span class="overlay-bloqueado" aria-hidden="true">🔒</span>
+            <span class="legenda-mundo">Mundo: 3 - Petshop</span>
+          </article>
 
-          <button type="button" aria-label="Selecionar Fase 4">
-            <img
-              src="assets/images/tela_menu/fase_4.png"
-              alt="Botão da Fase 4"
-            />
-          </button>
-        </div>
+          <button class="btn-seta" type="button" aria-label="Próximo mundo">→</button>
+        </main>
 
-        <img
-          class="barra-progresso"
-          src="assets/images/tela_menu/bar.png"
-          alt="Barra de progresso das fases"
-        />
+        <footer class="progresso-mundos">
+          <div class="trilho-progresso" role="progressbar" aria-label="Progresso do jogo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="10">
+            <span class="preenchimento-progresso"></span>
+          </div>
+          <span class="porcentagem-progresso">10%</span>
+        </footer>
       </section>
     </main>
     <script src="js/menu.js"></script>

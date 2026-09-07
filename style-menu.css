@@ -6,6 +6,10 @@ body {
   background-repeat: no-repeat;
 }
 
+.game-container {
+  position: relative;
+}
+
 .escondido {
   display: none !important;
 }
@@ -17,6 +21,36 @@ body {
   align-items: center;
   justify-content: center;
   gap: 16px;
+}
+
+.controles-topo {
+  position: absolute;
+  top: 40px;
+  right: 85px;
+  display: flex;
+  gap: 13px;
+  z-index: 10;
+}
+
+.btn-icone {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.btn-icone:hover {
+  transform: scale(1.15);
+}
+
+.btn-icone img {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
 }
 
 img {
@@ -44,56 +78,301 @@ button {
   max-width: 85%;
 }
 
+.btn-jogar {
+  position: relative;
+  margin-top: 30px;
+  background-color: #000000;
+  color: #ffffff;
+  font-size: 38px;
+  font-weight: 700;
+  padding: 18px 90px;
+  min-width: 280px;
+  border: none;
+  border-radius: 24px;
+  cursor: pointer;
+  z-index: 1;
+  overflow: hidden;
+  transform: skewX(-12deg);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn-jogar span {
+  display: inline-block;
+  transform: skewX(12deg);
+}
+
+.btn-jogar::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #ff3377 0%, #ff7744 50%, #ffcc33 100%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: -1;
+  border-radius: inherit;
+}
+
+.btn-jogar:hover::before {
+  opacity: 1;
+}
+
+.btn-jogar:hover {
+  transform: skewX(-12deg) scale(1.05);
+}
+
 #tela-inicial button img {
   max-width: 100%;
   height: auto;
 }
 
-#tela-fases {
+#menu-fases {
   min-height: 100vh;
-  background-image: url("assets/images/tela_inicial/fundo.png");
-  background-position: center;
-  background-size: 100% 100%;
-  background-repeat: no-repeat;
+  padding: 26px 5vw 34px;
+  background: url("assets/images/nova_tela_menu de_fases/fundo.png") center / cover no-repeat;
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: space-between;
-  padding: 24px;
+  gap: 28px;
 }
 
-.logotipo-fases {
-  max-width: min(80%, 420px);
-  height: auto;
-  margin-top: 40px;
-}
-
-.botoes-fases {
+.topo-mundos {
+  position: relative;
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
   align-items: center;
-  width: 85%;
-  margin: 2rem auto;
+  min-height: 64px;
 }
 
-.botoes-fases button:nth-child(1) {
-  transform: translateY(-50px);
+.pílula-controles {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #ffffff;
+  border-radius: 999px;
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.16);
 }
 
-.botoes-fases button:nth-child(2) {
-  transform: translateY(45px);
+.perfil-usuario,
+.controle-mundo {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 40px;
+  padding: 0 14px;
+  color: #252525;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
 }
 
-.botoes-fases button:nth-child(3) {
-  transform: translateY(-35px);
+.controle-mundo {
+  border-left: 1px solid #e5e5e5;
+  border-radius: 999px;
 }
 
-.botoes-fases button:nth-child(4) {
-  transform: translateY(80px);
+.controle-mundo:hover {
+  background: #fff1f6;
 }
 
-.barra-progresso {
-  max-width: min(90%, 600px);
-  height: auto;
-  margin-bottom: 30px;
+.avatar-usuario {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  background: #ff5f95;
+  border-radius: 50%;
+}
+
+.controle-mundo img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.btn-voltar {
+  position: absolute;
+  right: 0;
+  padding: 12px 22px;
+  color: #ffffff;
+  background: #151515;
+  border-radius: 999px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  box-shadow: 0 4px 0 #000000;
+  transition: transform 0.2s ease;
+}
+
+.btn-voltar:hover,
+.btn-seta:hover,
+.mundo-disponivel:hover {
+  transform: translateY(-3px);
+}
+
+.carrossel-mundos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(12px, 2vw, 30px);
+  width: 100%;
+}
+
+.btn-seta {
+  flex: 0 0 auto;
+  width: 58px;
+  height: 58px;
+  color: #ffffff;
+  background: #151515;
+  border-radius: 50%;
+  font-size: 2rem;
+  font-weight: 700;
+  box-shadow: 0 4px 0 #000000;
+  transition: transform 0.2s ease;
+}
+
+.card-mundo {
+  position: relative;
+  flex: 0 1 285px;
+  width: min(25vw, 285px);
+  min-width: 180px;
+  height: clamp(270px, 33vw, 370px);
+  overflow: hidden;
+  border: 6px solid #ffffff;
+  border-radius: 30px;
+  background: #ffffff;
+  box-shadow: 0 7px 18px rgba(0, 0, 0, 0.22);
+}
+
+.card-mundo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mundo-disponivel {
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.mundo-disponivel:hover {
+  box-shadow: 0 11px 24px rgba(0, 0, 0, 0.28);
+}
+
+.mundo-bloqueado {
+  cursor: not-allowed;
+}
+
+.mundo-bloqueado::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.overlay-bloqueado {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  z-index: 1;
+  font-size: clamp(3rem, 6vw, 5rem);
+  transform: translate(-50%, -50%);
+}
+
+.legenda-mundo {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 2;
+  padding: 16px 10px;
+  color: #ffffff;
+  background: #f2538a;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: clamp(0.8rem, 1.5vw, 1rem);
+  font-weight: 800;
+  text-align: center;
+}
+
+.progresso-mundos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+
+.trilho-progresso {
+  width: min(70vw, 640px);
+  height: 25px;
+  padding: 5px;
+  overflow: hidden;
+  background: #ffffff;
+  border-radius: 999px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.14), 0 3px 8px rgba(0, 0, 0, 0.18);
+}
+
+.preenchimento-progresso {
+  display: block;
+  width: 10%;
+  height: 100%;
+  background: #f2538a;
+  border-radius: inherit;
+}
+
+.porcentagem-progresso {
+  padding: 8px 15px;
+  color: #ffffff;
+  background: #f2538a;
+  border-radius: 999px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 800;
+}
+
+@media (max-width: 850px) {
+  #menu-fases {
+    padding: 18px 20px 28px;
+  }
+
+  .topo-mundos {
+    justify-content: flex-start;
+  }
+
+  .pílula-controles {
+    max-width: calc(100% - 92px);
+    gap: 0;
+  }
+
+  .perfil-usuario,
+  .controle-mundo {
+    padding: 0 8px;
+    font-size: 0.8rem;
+  }
+
+  .controle-mundo img {
+    width: 20px;
+    height: 20px;
+  }
+
+  .btn-voltar {
+    padding: 10px 14px;
+    font-size: 0.85rem;
+  }
+
+  .carrossel-mundos {
+    align-items: stretch;
+    overflow-x: auto;
+    justify-content: flex-start;
+    padding: 8px 2px;
+  }
+
+  .btn-seta {
+    display: none;
+  }
+
+  .card-mundo {
+    flex-basis: min(68vw, 285px);
+  }
 }
