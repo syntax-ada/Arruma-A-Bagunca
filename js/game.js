@@ -674,4 +674,5 @@ if (typeof window !== "undefined") {
   window.startGame = startGame;
 }
 
-startGame(CONFIG_FASE_1);
+startGame(CONFIG_FASE_1); // para testar a fase 2, basta alterar para startGame(CONFIG_FASE_2) e vise e versa
+
