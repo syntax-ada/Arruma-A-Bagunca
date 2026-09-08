@@ -1,10 +1,100 @@
 let draggableItems = [];
-const dropZones = document.querySelectorAll(".drop-zone");
+let dropZones = [];
 const feedbackMessage = document.querySelector("#feedback-message");
 
 let activeDrag = null;
 
+// ==========================================================
+// CONFIGURAÇÃO DA NOVA FASE 1 (Mundo 1 — Adição)
+// 2 Categorias (Brinquedos e Comidas) | 5 Objetos no total
+// ==========================================================
 const ITENS_FASE_1 = [
+  {
+    id: "item-urso-1",
+    category: "brinquedos",
+    itemName: "o ursinho",
+    ariaLabel: "Ursinho de brinquedo. Arraste para a cesta de brinquedos.",
+    imgSrc: "assets/images/tela_fase1/uso 3.png",
+    imgAlt: "Ursinho de brinquedo",
+  },
+  {
+    id: "item-urso-2",
+    category: "brinquedos",
+    itemName: "o ursinho",
+    ariaLabel: "Ursinho de brinquedo. Arraste para a cesta de brinquedos.",
+    imgSrc: "assets/images/tela_fase1/uso 3.png",
+    imgAlt: "Ursinho de brinquedo",
+  },
+  {
+    id: "item-urso-3",
+    category: "brinquedos",
+    itemName: "o ursinho",
+    ariaLabel: "Ursinho de brinquedo. Arraste para a cesta de brinquedos.",
+    imgSrc: "assets/images/tela_fase1/uso 3.png",
+    imgAlt: "Ursinho de brinquedo",
+  },
+  {
+    id: "item-banana",
+    category: "comidas",
+    itemName: "a banana",
+    ariaLabel: "Banana. Arraste para a cesta de comidas.",
+    imgSrc: "assets/images/tela_fase1/banana.png",
+    imgAlt: "Banana",
+  },
+  {
+    id: "item-maca",
+    category: "comidas",
+    itemName: "a maçã",
+    ariaLabel: "Maçã. Arraste para a cesta de comidas.",
+    imgSrc: "assets/images/tela_fase1/maça.png",
+    imgAlt: "Maçã",
+  },
+];
+
+const CONFIG_FASE_1 = {
+  id: "fase1",
+  objetos: ITENS_FASE_1,
+  categorias: [
+    {
+      id: "cesta-brinquedos",
+      accepts: "brinquedos",
+      nome: "Brinquedos",
+      ariaLabel: "Cesta de brinquedos",
+      icone: "🧸",
+      posicao: "esq-centro",
+      etiquetaImgSrc: "assets/images/tela_fase1/botton_brinquedos.png",
+      etiquetaImgAlt: "Categoria Brinquedos",
+      sprites: [
+        "assets/images/tela_fase1/sprites_cestas/brinquedos/1_cesta_brinquedo-1.png",
+        "assets/images/tela_fase1/sprites_cestas/brinquedos/1_cesta_brinquedo.png",
+        "assets/images/tela_fase1/sprites_cestas/brinquedos/2_cesta_brinquedo.png",
+        "assets/images/tela_fase1/sprites_cestas/brinquedos/3_cesta_brinquedo.png",
+      ],
+    },
+    {
+      id: "cesta-comidas",
+      accepts: "comidas",
+      nome: "Comidas",
+      ariaLabel: "Cesta de comidas",
+      icone: "🍎",
+      posicao: "dir-centro",
+      etiquetaImgSrc: "assets/images/tela_fase1/botton_comida.png",
+      etiquetaImgAlt: "Categoria Comida",
+      sprites: [
+        "assets/images/tela_fase1/sprites_cestas/comidas/1_cesta_comida-1.png",
+        "assets/images/tela_fase1/sprites_cestas/comidas/1_cesta_comida.png",
+        "assets/images/tela_fase1/sprites_cestas/comidas/2_cesta_comida.png",
+        "assets/images/tela_fase1/sprites_cestas/comidas/3_cesta_comida.png",
+      ],
+    },
+  ],
+};
+
+// ==========================================================
+// CONFIGURAÇÃO DA FASE 2 (Fase anterior preservada integralmente)
+// 3 Categorias | 9 Objetos no total
+// ==========================================================
+const ITENS_FASE_2 = [
   {
     id: "item-urso-1",
     category: "brinquedos",
@@ -79,26 +169,117 @@ const ITENS_FASE_1 = [
   },
 ];
 
-const basketSprites = {
-  brinquedos: [
-    "assets/images/tela_fase1/sprites_cestas/brinquedos/1_cesta_brinquedo-1.png",
-    "assets/images/tela_fase1/sprites_cestas/brinquedos/1_cesta_brinquedo.png",
-    "assets/images/tela_fase1/sprites_cestas/brinquedos/2_cesta_brinquedo.png",
-    "assets/images/tela_fase1/sprites_cestas/brinquedos/3_cesta_brinquedo.png",
-  ],
-  comidas: [
-    "assets/images/tela_fase1/sprites_cestas/comidas/1_cesta_comida-1.png",
-    "assets/images/tela_fase1/sprites_cestas/comidas/1_cesta_comida.png",
-    "assets/images/tela_fase1/sprites_cestas/comidas/2_cesta_comida.png",
-    "assets/images/tela_fase1/sprites_cestas/comidas/3_cesta_comida.png",
-  ],
-  materiais: [
-    "assets/images/tela_fase1/sprites_cestas/materiais/1_cesta_material-1.png",
-    "assets/images/tela_fase1/sprites_cestas/materiais/1_cesta_material.png",
-    "assets/images/tela_fase1/sprites_cestas/materiais/2_cesta_material.png",
-    "assets/images/tela_fase1/sprites_cestas/materiais/3_cesta_material.png",
+const CONFIG_FASE_2 = {
+  id: "fase2",
+  objetos: ITENS_FASE_2,
+  categorias: [
+    {
+      id: "cesta-brinquedos",
+      accepts: "brinquedos",
+      nome: "Brinquedos",
+      ariaLabel: "Cesta de brinquedos",
+      icone: "🧸",
+      posicao: "esq-topo",
+      etiquetaImgSrc: "assets/images/tela_fase1/botton_brinquedos.png",
+      etiquetaImgAlt: "Categoria Brinquedos",
+      sprites: [
+        "assets/images/tela_fase1/sprites_cestas/brinquedos/1_cesta_brinquedo-1.png",
+        "assets/images/tela_fase1/sprites_cestas/brinquedos/1_cesta_brinquedo.png",
+        "assets/images/tela_fase1/sprites_cestas/brinquedos/2_cesta_brinquedo.png",
+        "assets/images/tela_fase1/sprites_cestas/brinquedos/3_cesta_brinquedo.png",
+      ],
+    },
+    {
+      id: "cesta-comidas",
+      accepts: "comidas",
+      nome: "Comidas",
+      ariaLabel: "Cesta de comidas",
+      icone: "🍎",
+      posicao: "esq-base",
+      etiquetaImgSrc: "assets/images/tela_fase1/botton_comida.png",
+      etiquetaImgAlt: "Categoria Comida",
+      sprites: [
+        "assets/images/tela_fase1/sprites_cestas/comidas/1_cesta_comida-1.png",
+        "assets/images/tela_fase1/sprites_cestas/comidas/1_cesta_comida.png",
+        "assets/images/tela_fase1/sprites_cestas/comidas/2_cesta_comida.png",
+        "assets/images/tela_fase1/sprites_cestas/comidas/3_cesta_comida.png",
+      ],
+    },
+    {
+      id: "cesta-materiais",
+      accepts: "materiais",
+      nome: "Materiais",
+      ariaLabel: "Cesta de materiais escolares",
+      icone: "✏️",
+      posicao: "dir-centro",
+      etiquetaImgSrc: "assets/images/tela_fase1/botton_material.png",
+      etiquetaImgAlt: "Categoria Material escolar",
+      sprites: [
+        "assets/images/tela_fase1/sprites_cestas/materiais/1_cesta_material-1.png",
+        "assets/images/tela_fase1/sprites_cestas/materiais/1_cesta_material.png",
+        "assets/images/tela_fase1/sprites_cestas/materiais/2_cesta_material.png",
+        "assets/images/tela_fase1/sprites_cestas/materiais/3_cesta_material.png",
+      ],
+    },
   ],
 };
+
+const FASES = {
+  fase1: CONFIG_FASE_1,
+  fase2: CONFIG_FASE_2,
+};
+
+let activeConfig = CONFIG_FASE_1;
+let basketSprites = {};
+
+function renderizarCestas(listaCategorias = CONFIG_FASE_1.categorias) {
+  const containerCategorias = document.querySelector(".categorias");
+  if (!containerCategorias) {
+    return;
+  }
+
+  containerCategorias.innerHTML = "";
+  basketSprites = {};
+
+  listaCategorias.forEach((cat) => {
+    basketSprites[cat.accepts] = cat.sprites || [];
+
+    const dropZone = document.createElement("div");
+    dropZone.className = `categoria drop-zone${cat.posicao ? ` posicao-${cat.posicao}` : ""}`;
+    dropZone.id = cat.id;
+    dropZone.dataset.accepts = cat.accepts;
+    dropZone.tabIndex = 0;
+    dropZone.setAttribute("aria-label", cat.ariaLabel);
+
+    const srOnly = document.createElement("strong");
+    srOnly.className = "sr-only";
+    srOnly.textContent = cat.nome;
+
+    const contador = document.createElement("span");
+    contador.className = "contador-categoria";
+    contador.setAttribute("aria-label", "0 itens organizados");
+    contador.textContent = "0";
+
+    const imgCesta = document.createElement("img");
+    imgCesta.className = "cesta";
+    imgCesta.src = cat.sprites && cat.sprites.length > 0 ? cat.sprites[0] : "";
+    imgCesta.alt = `${cat.ariaLabel} com zero itens`;
+
+    const imgEtiqueta = document.createElement("img");
+    imgEtiqueta.className = "etiqueta-categoria";
+    imgEtiqueta.src = cat.etiquetaImgSrc;
+    imgEtiqueta.alt = cat.etiquetaImgAlt;
+
+    dropZone.appendChild(srOnly);
+    dropZone.appendChild(contador);
+    dropZone.appendChild(imgCesta);
+    dropZone.appendChild(imgEtiqueta);
+
+    containerCategorias.appendChild(dropZone);
+  });
+
+  dropZones = document.querySelectorAll(".drop-zone");
+}
 
 function renderizarGradeObjetos(listaObjetos = ITENS_FASE_1) {
   const containerGrid = document.querySelector("#grid-objetos");
@@ -133,8 +314,20 @@ function renderizarGradeObjetos(listaObjetos = ITENS_FASE_1) {
   draggableItems = document.querySelectorAll(".draggable-item");
 }
 
-function startGame(listaObjetos = ITENS_FASE_1) {
-  renderizarGradeObjetos(listaObjetos);
+function startGame(config = CONFIG_FASE_1) {
+  if (typeof config === "string" && FASES[config]) {
+    activeConfig = FASES[config];
+  } else if (Array.isArray(config)) {
+    activeConfig = {
+      ...CONFIG_FASE_1,
+      objetos: config,
+    };
+  } else {
+    activeConfig = config || CONFIG_FASE_1;
+  }
+
+  renderizarCestas(activeConfig.categorias);
+  renderizarGradeObjetos(activeConfig.objetos);
 
   if (draggableItems.length === 0 || dropZones.length === 0 || !feedbackMessage) {
     return;
@@ -213,10 +406,10 @@ function finishDrag(event) {
     if (isOrganizationComplete()) {
       showFeedback("Parabéns! Você organizou todos os objetos!", "success");
 
-      const dadosQuantidades = getCategoryCounts();
+      const resumoCategorias = getCategorySummary();
       setTimeout(() => {
         if (typeof iniciarDesafioMatematico === "function") {
-          iniciarDesafioMatematico(dadosQuantidades);
+          iniciarDesafioMatematico(resumoCategorias);
         }
       }, 1000);
     } else {
@@ -228,6 +421,22 @@ function finishDrag(event) {
   }
 
   activeDrag = null;
+}
+
+function getCategorySummary() {
+  const categorias = activeConfig?.categorias || [];
+  return categorias.map((cat) => {
+    const count = Array.from(draggableItems).filter((item) => {
+      return item.dataset.dropZoneId === cat.id && item.classList.contains("is-correct");
+    }).length;
+
+    return {
+      key: cat.accepts,
+      nome: cat.nome,
+      icone: cat.icone || "",
+      quantidade: count,
+    };
+  });
 }
 
 function getCategoryCounts() {
@@ -362,10 +571,13 @@ function updateDropZoneCounter(dropZone) {
 
   const category = dropZone.dataset.accepts;
   const cestaImg = dropZone.querySelector(".cesta");
-  if (cestaImg && basketSprites[category]) {
-    const maxSpriteIndex = basketSprites[category].length - 1;
+  const catConfig = activeConfig?.categorias?.find((c) => c.accepts === category);
+  const sprites = catConfig?.sprites || basketSprites[category];
+
+  if (cestaImg && sprites && sprites.length > 0) {
+    const maxSpriteIndex = sprites.length - 1;
     const spriteIndex = Math.min(placedCount, maxSpriteIndex);
-    cestaImg.src = basketSprites[category][spriteIndex];
+    cestaImg.src = sprites[spriteIndex];
   }
 }
 
@@ -441,10 +653,10 @@ function handleDropZoneKeyboard(event) {
     if (isOrganizationComplete()) {
       showFeedback("Parabéns! Você organizou todos os objetos!", "success");
 
-      const dadosQuantidades = getCategoryCounts();
+      const resumoCategorias = getCategorySummary();
       setTimeout(() => {
         if (typeof iniciarDesafioMatematico === "function") {
-          iniciarDesafioMatematico(dadosQuantidades);
+          iniciarDesafioMatematico(resumoCategorias);
         }
       }, 1000);
     } else {
@@ -455,4 +667,11 @@ function handleDropZoneKeyboard(event) {
   }
 }
 
-startGame();
+if (typeof window !== "undefined") {
+  window.CONFIG_FASE_1 = CONFIG_FASE_1;
+  window.CONFIG_FASE_2 = CONFIG_FASE_2;
+  window.FASES = FASES;
+  window.startGame = startGame;
+}
+
+startGame(CONFIG_FASE_1);

@@ -1,156 +1,74 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Arruma a Bagunça - Fase 1</title>
-        <link rel="stylesheet" href="global.css" />
-        <link rel="stylesheet" href="style-fase1.css" />
-    </head>
 
-    <body class="pagina-fase1">
-        <main class="tela-fase1" id="play-area">
-            <!-- ETAPA 1: ORGANIZAÇÃO DOS OBJETOS -->
-            <div id="tela-organizacao" class="tela-organizacao">
-                <header class="topo-fase1">
-                    <div class="hud-container">
-                        <img
-                            class="caixa-instrucoes"
-                            src="assets/images/tela_fase1/hud_branco.png"
-                            alt="Caixa de instruções da Fase 1"
-                        />
-                        <p class="feedback-message" id="feedback-message" role="status" aria-live="polite">
-                            Arraste cada item até a cesta correta!
-                        </p>
-                    </div>
-                </header>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Arruma a Bagunça - Fase 1</title>
+    <link rel="stylesheet" href="global.css" />
+    <link rel="stylesheet" href="style-fase1.css" />
+</head>
 
-                <section class="area-objetos" aria-label="Objetos da Fase 1">
-                    <div class="grid-objetos" id="grid-objetos" role="region" aria-label="Área de organização dos objetos">
-                        <!-- Slots e objetos gerados dinamicamente via game.js -->
-                    </div>
-                </section>
-
-                <footer class="categorias">
-                    <div
-                        class="categoria drop-zone"
-                        id="cesta-brinquedos"
-                        data-accepts="brinquedos"
-                        tabindex="0"
-                        aria-label="Cesta de brinquedos"
-                    >
-                        <strong class="sr-only">Brinquedos</strong>
-                        <span class="contador-categoria" aria-label="0 itens organizados">0</span>
-                        <img
-                            class="cesta"
-                            src="assets/images/tela_fase1/sprites_cestas/brinquedos/1_cesta_brinquedo-1.png"
-                            alt="Cesta de brinquedos com zero itens"
-                        />
-
-                        <img
-                            class="etiqueta-categoria"
-                            src="assets/images/tela_fase1/botton_brinquedos.png"
-                            alt="Categoria Brinquedos"
-                        />
-                    </div>
-
-                    <div
-                        class="categoria drop-zone"
-                        id="cesta-comidas"
-                        data-accepts="comidas"
-                        tabindex="0"
-                        aria-label="Cesta de comidas"
-                    >
-                        <strong class="sr-only">Comidas</strong>
-                        <span class="contador-categoria" aria-label="0 itens organizados">0</span>
-                        <img
-                            class="cesta"
-                            src="assets/images/tela_fase1/sprites_cestas/comidas/1_cesta_comida-1.png"
-                            alt="Cesta de comidas com zero itens"
-                        />
-
-                        <img
-                            class="etiqueta-categoria"
-                            src="assets/images/tela_fase1/botton_comida.png"
-                            alt="Categoria Comida"
-                        />
-                    </div>
-
-                    <div
-                        class="categoria drop-zone"
-                        id="cesta-materiais"
-                        data-accepts="materiais"
-                        tabindex="0"
-                        aria-label="Cesta de materiais escolares"
-                    >
-                        <strong class="sr-only">Materiais</strong>
-                        <span class="contador-categoria" aria-label="0 itens organizados">0</span>
-                        <img
-                            class="cesta"
-                            src="assets/images/tela_fase1/sprites_cestas/materiais/1_cesta_material-1.png"
-                            alt="Cesta de materiais escolares com zero itens"
-                        />
-
-                        <img
-                            class="etiqueta-categoria"
-                            src="assets/images/tela_fase1/botton_material.png"
-                            alt="Categoria Material escolar"
-                        />
-                    </div>
-                </footer>
-            </div>
-
-            <!-- ETAPA 2: DESAFIO MATEMÁTICO -->
-            <section id="tela-matematica" class="tela-matematica escondido" aria-labelledby="titulo-matematica">
-                <header class="topo-fase1">
-                    <div class="hud-container">
-                        <img
-                            class="caixa-instrucoes"
-                            src="assets/images/tela_fase1/hud_branco.png"
-                            alt="Caixa de instruções do Desafio Matemático"
-                        />
-                        <p class="feedback-message hud-texto-matematica" id="titulo-matematica">
-                            Desafio Matemático
-                        </p>
-                    </div>
-                </header>
-
-                <div class="painel-matematica">
-                    <h2 class="pergunta-matematica" id="pergunta-matematica">
-                        Quantos objetos você organizou ao todo?
-                    </h2>
-
-                    <div class="resumo-quantidades" id="resumo-quantidades" aria-label="Quantidades organizadas por categoria">
-                        <div class="item-resumo">
-                            <span class="icone-resumo" aria-hidden="true">🧸</span>
-                            <span class="nome-resumo">Brinquedos:</span>
-                            <strong class="valor-resumo" id="resumo-brinquedos">0</strong>
-                        </div>
-                        <span class="operador-soma" aria-hidden="true">+</span>
-                        <div class="item-resumo">
-                            <span class="icone-resumo" aria-hidden="true">🍎</span>
-                            <span class="nome-resumo">Comidas:</span>
-                            <strong class="valor-resumo" id="resumo-comidas">0</strong>
-                        </div>
-                        <span class="operador-soma" aria-hidden="true">+</span>
-                        <div class="item-resumo">
-                            <span class="icone-resumo" aria-hidden="true">✏️</span>
-                            <span class="nome-resumo">Materiais:</span>
-                            <strong class="valor-resumo" id="resumo-materiais">0</strong>
-                        </div>
-                    </div>
-
-                    <div class="opcoes-matematica" id="opcoes-matematica" role="group" aria-label="Alternativas de resposta">
-                        <!-- Alternativas geradas dinamicamente via math.js -->
-                    </div>
-
-                    <p class="feedback-matematica" id="feedback-matematica" role="status" aria-live="polite">
-                        Escolha uma das opções acima.
+<body class="pagina-fase1">
+    <main class="tela-fase1" id="play-area">
+        <!-- ETAPA 1: ORGANIZAÇÃO DOS OBJETOS -->
+        <div id="tela-organizacao" class="tela-organizacao">
+            <header class="topo-fase1">
+                <div class="hud-container">
+                    <img class="caixa-instrucoes" src="assets/images/tela_fase1/hud_branco.png"
+                        alt="Caixa de instruções da Fase 1" />
+                    <p class="feedback-message" id="feedback-message" role="status" aria-live="polite">
+                        Arraste cada item até a cesta correta!
                     </p>
                 </div>
+            </header>
+
+            <section class="area-objetos" aria-label="Objetos da Fase 1">
+                <div class="grid-objetos" id="grid-objetos" role="region" aria-label="Área de organização dos objetos">
+                    <!-- Slots e objetos gerados dinamicamente via game.js -->
+                </div>
             </section>
-        </main>
-        <script src="js/math.js"></script>
-        <script src="js/game.js"></script>
-    </body>
+
+            <footer class="categorias" id="area-categorias">
+                <!-- Cestas geradas dinamicamente via game.js a partir da configuração da fase -->
+            </footer>
+        </div>
+
+        <!-- ETAPA 2: DESAFIO MATEMÁTICO -->
+        <section id="tela-matematica" class="tela-matematica escondido" aria-labelledby="titulo-matematica">
+            <header class="topo-fase1">
+                <div class="hud-container">
+                    <img class="caixa-instrucoes" src="assets/images/tela_fase1/hud_branco.png"
+                        alt="Caixa de instruções do Desafio Matemático" />
+                    <p class="feedback-message hud-texto-matematica" id="titulo-matematica">
+                        Desafio Matemático
+                    </p>
+                </div>
+            </header>
+
+            <div class="painel-matematica">
+                <h2 class="pergunta-matematica" id="pergunta-matematica">
+                    Quantos objetos você organizou ao todo?
+                </h2>
+
+                <div class="resumo-quantidades" id="resumo-quantidades"
+                    aria-label="Quantidades organizadas por categoria">
+                    <!-- Itens de resumo gerados dinamicamente via math.js -->
+                </div>
+
+                <div class="opcoes-matematica" id="opcoes-matematica" role="group"
+                    aria-label="Alternativas de resposta">
+                    <!-- Alternativas geradas dinamicamente via math.js -->
+                </div>
+
+                <p class="feedback-matematica" id="feedback-matematica" role="status" aria-live="polite">
+                    Escolha uma das opções acima.
+                </p>
+            </div>
+        </section>
+    </main>
+    <script src="js/math.js"></script>
+    <script src="js/game.js"></script>
+</body>
+
 </html>
