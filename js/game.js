@@ -224,9 +224,188 @@ const CONFIG_FASE_2 = {
   ],
 };
 
+// ==========================================================
+// CONFIGURAÇÃO DA FASE 3 (Randomização por ciclos)
+// 3 Categorias | 14 Objetos: 2 Brinquedos, 5 Comidas, 7 Materiais
+// ==========================================================
+const MODELOS_BRINQUEDOS = [
+  {
+    baseId: "urso",
+    category: "brinquedos",
+    itemName: "o ursinho",
+    ariaLabel: "Ursinho de brinquedo. Arraste para a cesta de brinquedos.",
+    imgSrc: "assets/images/tela_fase1/uso 3.png",
+    imgAlt: "Ursinho de brinquedo",
+  },
+];
+
+const MODELOS_COMIDAS = [
+  {
+    baseId: "banana",
+    category: "comidas",
+    itemName: "a banana",
+    ariaLabel: "Banana. Arraste para a cesta de comidas.",
+    imgSrc: "assets/images/tela_fase1/banana.png",
+    imgAlt: "Banana",
+  },
+  {
+    baseId: "maca",
+    category: "comidas",
+    itemName: "a maçã",
+    ariaLabel: "Maçã. Arraste para a cesta de comidas.",
+    imgSrc: "assets/images/tela_fase1/maça.png",
+    imgAlt: "Maçã",
+  },
+  {
+    baseId: "pera",
+    category: "comidas",
+    itemName: "a pera",
+    ariaLabel: "Pera. Arraste para a cesta de comidas.",
+    imgSrc: "assets/images/tela_fase1/pera.png",
+    imgAlt: "Pera",
+  },
+];
+
+const MODELOS_MATERIAIS = [
+  {
+    baseId: "lapis",
+    category: "materiais",
+    itemName: "o lápis",
+    ariaLabel: "Lápis. Arraste para a cesta de materiais escolares.",
+    imgSrc: "assets/images/tela_fase1/lápis.png",
+    imgAlt: "Lápis",
+  },
+  {
+    baseId: "borracha",
+    category: "materiais",
+    itemName: "a borracha",
+    ariaLabel: "Borracha. Arraste para a cesta de materiais escolares.",
+    imgSrc: "assets/images/tela_fase1/borracha.png",
+    imgAlt: "Borracha",
+  },
+  {
+    baseId: "apontador",
+    category: "materiais",
+    itemName: "o apontador",
+    ariaLabel: "Apontador. Arraste para a cesta de materiais escolares.",
+    imgSrc: "assets/images/tela_fase1/apontador.png",
+    imgAlt: "Apontador",
+  },
+];
+
+function embaralharArray(array) {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function selecionarItensPorCiclos(modelos, quantidade) {
+  const selecionados = [];
+  while (selecionados.length < quantidade) {
+    const ciclo = embaralharArray(modelos);
+    for (const modelo of ciclo) {
+      if (selecionados.length < quantidade) {
+        selecionados.push(modelo);
+      } else {
+        break;
+      }
+    }
+  }
+  return selecionados;
+}
+
+function gerarItensFase3() {
+  const cotas = [
+    { categoria: "brinquedos", quantidade: 2, modelos: MODELOS_BRINQUEDOS },
+    { categoria: "comidas", quantidade: 5, modelos: MODELOS_COMIDAS },
+    { categoria: "materiais", quantidade: 7, modelos: MODELOS_MATERIAIS },
+  ];
+
+  let todosItens = [];
+  let contadorId = 1;
+
+  cotas.forEach(({ modelos, quantidade }) => {
+    const itensEscolhidos = selecionarItensPorCiclos(modelos, quantidade);
+    itensEscolhidos.forEach((modelo) => {
+      todosItens.push({
+        id: `item-${modelo.baseId}-${contadorId++}`,
+        category: modelo.category,
+        itemName: modelo.itemName,
+        ariaLabel: modelo.ariaLabel,
+        imgSrc: modelo.imgSrc,
+        imgAlt: modelo.imgAlt,
+      });
+    });
+  });
+
+  return embaralharArray(todosItens);
+}
+
+const CONFIG_FASE_3 = {
+  id: "fase3",
+  gerarObjetos: gerarItensFase3,
+  get objetos() {
+    return gerarItensFase3();
+  },
+  categorias: [
+    {
+      id: "cesta-brinquedos",
+      accepts: "brinquedos",
+      nome: "Brinquedos",
+      ariaLabel: "Cesta de brinquedos",
+      icone: "🧸",
+      posicao: "esq-topo",
+      etiquetaImgSrc: "assets/images/tela_fase1/botton_brinquedos.png",
+      etiquetaImgAlt: "Categoria Brinquedos",
+      sprites: [
+        "assets/images/tela_fase1/sprites_cestas/brinquedos/1_cesta_brinquedo-1.png",
+        "assets/images/tela_fase1/sprites_cestas/brinquedos/1_cesta_brinquedo.png",
+        "assets/images/tela_fase1/sprites_cestas/brinquedos/2_cesta_brinquedo.png",
+        "assets/images/tela_fase1/sprites_cestas/brinquedos/3_cesta_brinquedo.png",
+      ],
+    },
+    {
+      id: "cesta-comidas",
+      accepts: "comidas",
+      nome: "Comidas",
+      ariaLabel: "Cesta de comidas",
+      icone: "🍎",
+      posicao: "esq-base",
+      etiquetaImgSrc: "assets/images/tela_fase1/botton_comida.png",
+      etiquetaImgAlt: "Categoria Comida",
+      sprites: [
+        "assets/images/tela_fase1/sprites_cestas/comidas/1_cesta_comida-1.png",
+        "assets/images/tela_fase1/sprites_cestas/comidas/1_cesta_comida.png",
+        "assets/images/tela_fase1/sprites_cestas/comidas/2_cesta_comida.png",
+        "assets/images/tela_fase1/sprites_cestas/comidas/3_cesta_comida.png",
+      ],
+    },
+    {
+      id: "cesta-materiais",
+      accepts: "materiais",
+      nome: "Materiais",
+      ariaLabel: "Cesta de materiais escolares",
+      icone: "✏️",
+      posicao: "dir-centro",
+      etiquetaImgSrc: "assets/images/tela_fase1/botton_material.png",
+      etiquetaImgAlt: "Categoria Material escolar",
+      sprites: [
+        "assets/images/tela_fase1/sprites_cestas/materiais/1_cesta_material-1.png",
+        "assets/images/tela_fase1/sprites_cestas/materiais/1_cesta_material.png",
+        "assets/images/tela_fase1/sprites_cestas/materiais/2_cesta_material.png",
+        "assets/images/tela_fase1/sprites_cestas/materiais/3_cesta_material.png",
+      ],
+    },
+  ],
+};
+
 const FASES = {
   fase1: CONFIG_FASE_1,
   fase2: CONFIG_FASE_2,
+  fase3: CONFIG_FASE_3,
 };
 
 let activeConfig = CONFIG_FASE_1;
@@ -326,8 +505,21 @@ function startGame(config = CONFIG_FASE_1) {
     activeConfig = config || CONFIG_FASE_1;
   }
 
+  const telaOrganizacao = document.querySelector("#tela-organizacao");
+  const telaMatematica = document.querySelector("#tela-matematica");
+  if (telaOrganizacao) {
+    telaOrganizacao.classList.remove("escondido");
+  }
+  if (telaMatematica) {
+    telaMatematica.classList.add("escondido");
+  }
+
+  const listaObjetos = typeof activeConfig.gerarObjetos === "function"
+    ? activeConfig.gerarObjetos()
+    : activeConfig.objetos;
+
   renderizarCestas(activeConfig.categorias);
-  renderizarGradeObjetos(activeConfig.objetos);
+  renderizarGradeObjetos(listaObjetos);
 
   if (draggableItems.length === 0 || dropZones.length === 0 || !feedbackMessage) {
     return;
@@ -670,9 +862,9 @@ function handleDropZoneKeyboard(event) {
 if (typeof window !== "undefined") {
   window.CONFIG_FASE_1 = CONFIG_FASE_1;
   window.CONFIG_FASE_2 = CONFIG_FASE_2;
+  window.CONFIG_FASE_3 = CONFIG_FASE_3;
   window.FASES = FASES;
   window.startGame = startGame;
 }
 
-startGame(CONFIG_FASE_1); // para testar a fase 2, basta alterar para startGame(CONFIG_FASE_2) e vise e versa
-
+startGame(CONFIG_FASE_3); // Para testar: startGame(CONFIG_FASE_1), startGame(CONFIG_FASE_2) ou startGame(CONFIG_FASE_3)
