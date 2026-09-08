@@ -1,9 +1,83 @@
-const draggableItems = document.querySelectorAll(".draggable-item");
-const draggableItem = draggableItems[0];
+let draggableItems = [];
 const dropZones = document.querySelectorAll(".drop-zone");
 const feedbackMessage = document.querySelector("#feedback-message");
 
 let activeDrag = null;
+
+const ITENS_FASE_1 = [
+  {
+    id: "item-urso-1",
+    category: "brinquedos",
+    itemName: "o ursinho",
+    ariaLabel: "Ursinho de brinquedo. Arraste para a cesta de brinquedos.",
+    imgSrc: "assets/images/tela_fase1/uso 3.png",
+    imgAlt: "Ursinho de brinquedo",
+  },
+  {
+    id: "item-maca",
+    category: "comidas",
+    itemName: "a maçã",
+    ariaLabel: "Maçã. Arraste para a cesta de comidas.",
+    imgSrc: "assets/images/tela_fase1/maça.png",
+    imgAlt: "Maçã",
+  },
+  {
+    id: "item-lapis",
+    category: "materiais",
+    itemName: "o lápis",
+    ariaLabel: "Lápis. Arraste para a cesta de materiais escolares.",
+    imgSrc: "assets/images/tela_fase1/lápis.png",
+    imgAlt: "Lápis",
+  },
+  {
+    id: "item-pera",
+    category: "comidas",
+    itemName: "a pera",
+    ariaLabel: "Pera. Arraste para a cesta de comidas.",
+    imgSrc: "assets/images/tela_fase1/pera.png",
+    imgAlt: "Pera",
+  },
+  {
+    id: "item-urso-2",
+    category: "brinquedos",
+    itemName: "o ursinho",
+    ariaLabel: "Ursinho de brinquedo. Arraste para a cesta de brinquedos.",
+    imgSrc: "assets/images/tela_fase1/uso 3.png",
+    imgAlt: "Ursinho de brinquedo",
+  },
+  {
+    id: "item-banana",
+    category: "comidas",
+    itemName: "a banana",
+    ariaLabel: "Banana. Arraste para a cesta de comidas.",
+    imgSrc: "assets/images/tela_fase1/banana.png",
+    imgAlt: "Banana",
+  },
+  {
+    id: "item-borracha",
+    category: "materiais",
+    itemName: "a borracha",
+    ariaLabel: "Borracha. Arraste para a cesta de materiais escolares.",
+    imgSrc: "assets/images/tela_fase1/borracha.png",
+    imgAlt: "Borracha",
+  },
+  {
+    id: "item-urso-3",
+    category: "brinquedos",
+    itemName: "o ursinho",
+    ariaLabel: "Ursinho de brinquedo. Arraste para a cesta de brinquedos.",
+    imgSrc: "assets/images/tela_fase1/uso 3.png",
+    imgAlt: "Ursinho de brinquedo",
+  },
+  {
+    id: "item-apontador",
+    category: "materiais",
+    itemName: "o apontador",
+    ariaLabel: "Apontador. Arraste para a cesta de materiais escolares.",
+    imgSrc: "assets/images/tela_fase1/apontador.png",
+    imgAlt: "Apontador",
+  },
+];
 
 const basketSprites = {
   brinquedos: [
@@ -26,13 +100,47 @@ const basketSprites = {
   ],
 };
 
-function startGame() {
+function renderizarGradeObjetos(listaObjetos = ITENS_FASE_1) {
+  const containerGrid = document.querySelector("#grid-objetos");
+  if (!containerGrid) {
+    return;
+  }
+
+  containerGrid.innerHTML = "";
+
+  listaObjetos.forEach((dados) => {
+    const slot = document.createElement("div");
+    slot.className = "slot-objeto";
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "draggable-item";
+    button.id = dados.id;
+    button.dataset.category = dados.category;
+    button.dataset.itemName = dados.itemName;
+    button.setAttribute("aria-label", dados.ariaLabel);
+
+    const img = document.createElement("img");
+    img.className = "objeto";
+    img.src = dados.imgSrc;
+    img.alt = dados.imgAlt;
+
+    button.appendChild(img);
+    slot.appendChild(button);
+    containerGrid.appendChild(slot);
+  });
+
+  draggableItems = document.querySelectorAll(".draggable-item");
+}
+
+function startGame(listaObjetos = ITENS_FASE_1) {
+  renderizarGradeObjetos(listaObjetos);
+
   if (draggableItems.length === 0 || dropZones.length === 0 || !feedbackMessage) {
     return;
   }
 
   draggableItems.forEach((item) => {
-    saveStartPosition(item);
     item.addEventListener("pointerdown", startDrag);
     item.addEventListener("pointermove", moveDrag);
     item.addEventListener("pointerup", finishDrag);
@@ -44,11 +152,6 @@ function startGame() {
     updateDropZoneCounter(dropZone);
     dropZone.addEventListener("keydown", handleDropZoneKeyboard);
   });
-}
-
-function saveStartPosition(item) {
-  item.dataset.startLeft = item.offsetLeft;
-  item.dataset.startTop = item.offsetTop;
 }
 
 function startDrag(event) {
@@ -64,6 +167,8 @@ function startDrag(event) {
   item.style.position = "fixed";
   item.style.left = `${itemRect.left}px`;
   item.style.top = `${itemRect.top}px`;
+  item.style.width = `${itemRect.width}px`;
+  item.style.height = `${itemRect.height}px`;
 
   activeDrag = {
     item,
@@ -220,7 +325,7 @@ function showFeedbackForIncorrectDrop(item) {
 function placeItemInsideDropZone(item, dropZone) {
   restoreItemPositioning(item);
 
-  const itemContainer = item.offsetParent;
+  const itemContainer = item.offsetParent || document.body;
   const itemContainerRect = itemContainer.getBoundingClientRect();
   const dropZoneRect = dropZone.getBoundingClientRect();
   const itemRect = item.getBoundingClientRect();
@@ -257,15 +362,19 @@ function updateDropZoneCounter(dropZone) {
 
   const category = dropZone.dataset.accepts;
   const cestaImg = dropZone.querySelector(".cesta");
-  if (cestaImg && basketSprites[category] && basketSprites[category][placedCount]) {
-    cestaImg.src = basketSprites[category][placedCount];
+  if (cestaImg && basketSprites[category]) {
+    const maxSpriteIndex = basketSprites[category].length - 1;
+    const spriteIndex = Math.min(placedCount, maxSpriteIndex);
+    cestaImg.src = basketSprites[category][spriteIndex];
   }
 }
 
 function returnItemToStart(item) {
   restoreItemPositioning(item);
-  item.style.left = `${item.dataset.startLeft}px`;
-  item.style.top = `${item.dataset.startTop}px`;
+  item.style.left = "";
+  item.style.top = "";
+  item.style.width = "";
+  item.style.height = "";
 }
 
 function restoreItemPositioning(item) {
@@ -315,16 +424,32 @@ function handleDropZoneKeyboard(event) {
 
   event.preventDefault();
 
-  if (draggableItem.classList.contains("is-correct")) {
-    showFeedback("O carrinho já está no lugar certo.", "success");
+  const currentAvailableItem = Array.from(draggableItems).find(
+    (item) => !item.classList.contains("is-correct")
+  );
+
+  if (!currentAvailableItem) {
+    showFeedback("Todos os objetos já estão organizados.", "success");
     return;
   }
 
-  if (isCorrectDropZone(draggableItem, event.currentTarget)) {
-    placeItemInsideDropZone(draggableItem, event.currentTarget);
-    event.currentTarget.classList.add("is-correct");
-    draggableItem.classList.add("is-correct");
-    showFeedback("Muito bem! O carrinho está no lugar certo.", "success");
+  if (isCorrectDropZone(currentAvailableItem, event.currentTarget)) {
+    placeItemInsideDropZone(currentAvailableItem, event.currentTarget);
+    currentAvailableItem.classList.add("is-correct");
+    updateDropZoneCounter(event.currentTarget);
+
+    if (isOrganizationComplete()) {
+      showFeedback("Parabéns! Você organizou todos os objetos!", "success");
+
+      const dadosQuantidades = getCategoryCounts();
+      setTimeout(() => {
+        if (typeof iniciarDesafioMatematico === "function") {
+          iniciarDesafioMatematico(dadosQuantidades);
+        }
+      }, 1000);
+    } else {
+      showFeedback(`Muito bem! ${currentAvailableItem.dataset.itemName} está em ${getDropZoneName(event.currentTarget)}.`, "success");
+    }
   } else {
     showFeedback("Quase! Esta não é a caixa certa.", "error");
   }

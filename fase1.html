@@ -26,145 +26,8 @@
                 </header>
 
                 <section class="area-objetos" aria-label="Objetos da Fase 1">
-                    <div class="grupo-objetos">
-                        <button
-                            class="draggable-item"
-                            id="item-urso-1"
-                            type="button"
-                            data-category="brinquedos"
-                            data-item-name="o ursinho"
-                            aria-label="Ursinho de brinquedo. Arraste para a cesta de brinquedos."
-                        >
-                            <img
-                                class="objeto"
-                                src="assets/images/tela_fase1/uso 3.png"
-                                alt="Ursinho de brinquedo"
-                            />
-                        </button>
-
-                        <button
-                            class="draggable-item"
-                            id="item-maca"
-                            type="button"
-                            data-category="comidas"
-                            data-item-name="a maçã"
-                            aria-label="Maçã. Arraste para a cesta de comidas."
-                        >
-                            <img
-                                class="objeto"
-                                src="assets/images/tela_fase1/maça.png"
-                                alt="Maçã"
-                            />
-                        </button>
-
-                        <button
-                            class="draggable-item"
-                            id="item-lapis"
-                            type="button"
-                            data-category="materiais"
-                            data-item-name="o lápis"
-                            aria-label="Lápis. Arraste para a cesta de materiais escolares."
-                        >
-                            <img
-                                class="objeto"
-                                src="assets/images/tela_fase1/lápis.png"
-                                alt="Lápis"
-                            />
-                        </button>
-                    </div>
-
-                    <div class="grupo-objetos">
-                        <button
-                            class="draggable-item"
-                            id="item-pera"
-                            type="button"
-                            data-category="comidas"
-                            data-item-name="a pera"
-                            aria-label="Pera. Arraste para a cesta de comidas."
-                        >
-                            <img
-                                class="objeto"
-                                src="assets/images/tela_fase1/pera.png"
-                                alt="Pera"
-                            />
-                        </button>
-
-                        <button
-                            class="draggable-item"
-                            id="item-urso-2"
-                            type="button"
-                            data-category="brinquedos"
-                            data-item-name="o ursinho"
-                            aria-label="Ursinho de brinquedo. Arraste para a cesta de brinquedos."
-                        >
-                            <img
-                                class="objeto"
-                                src="assets/images/tela_fase1/uso 3.png"
-                                alt="Ursinho de brinquedo"
-                            />
-                        </button>
-
-                        <button
-                            class="draggable-item"
-                            id="item-banana"
-                            type="button"
-                            data-category="comidas"
-                            data-item-name="a banana"
-                            aria-label="Banana. Arraste para a cesta de comidas."
-                        >
-                            <img
-                                class="objeto"
-                                src="assets/images/tela_fase1/banana.png"
-                                alt="Banana"
-                            />
-                        </button>
-                    </div>
-
-                    <div class="grupo-objetos">
-                        <button
-                            class="draggable-item"
-                            id="item-borracha"
-                            type="button"
-                            data-category="materiais"
-                            data-item-name="a borracha"
-                            aria-label="Borracha. Arraste para a cesta de materiais escolares."
-                        >
-                            <img
-                                class="objeto"
-                                src="assets/images/tela_fase1/borracha.png"
-                                alt="Borracha"
-                            />
-                        </button>
-
-                        <button
-                            class="draggable-item"
-                            id="item-urso-3"
-                            type="button"
-                            data-category="brinquedos"
-                            data-item-name="o ursinho"
-                            aria-label="Ursinho de brinquedo. Arraste para a cesta de brinquedos."
-                        >
-                            <img
-                                class="objeto"
-                                src="assets/images/tela_fase1/uso 3.png"
-                                alt="Ursinho de brinquedo"
-                            />
-                        </button>
-
-                        <button
-                            class="draggable-item"
-                            id="item-apontador"
-                            type="button"
-                            data-category="materiais"
-                            data-item-name="o apontador"
-                            aria-label="Apontador. Arraste para a cesta de materiais escolares."
-                        >
-                            <img
-                                class="objeto"
-                                src="assets/images/tela_fase1/apontador.png"
-                                alt="Apontador"
-                            />
-                        </button>
+                    <div class="grid-objetos" id="grid-objetos" role="region" aria-label="Área de organização dos objetos">
+                        <!-- Slots e objetos gerados dinamicamente via game.js -->
                     </div>
                 </section>
 
@@ -286,7 +149,7 @@
                     </p>
                 </div>
             </section>
-        </main> 
+        </main>
         <script src="js/math.js"></script>
         <script src="js/game.js"></script>
     </body>

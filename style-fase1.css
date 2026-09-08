@@ -65,17 +65,38 @@
   position: relative;
   width: 100%;
   flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+  overflow: hidden;
 }
 
-.grupo-objetos {
-  display: contents;
+.grid-objetos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(8px, 1.8vw, 20px);
+  max-width: min(92vw, 860px);
+  width: 100%;
+  margin: auto;
+}
+
+.slot-objeto {
+  width: clamp(60px, 10vw, 86px);
+  height: clamp(60px, 10vw, 86px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
 }
 
 .draggable-item {
-  position: absolute;
-  z-index: 10;
-  width: 86px;
-  height: 86px;
+  width: 100%;
+  height: 100%;
+  max-width: 86px;
+  max-height: 86px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -140,52 +161,6 @@
   pointer-events: none;
 }
 
-/* Posições iniciais dos 9 objetos */
-#item-urso-1 {
-  left: 8%;
-  top: 24%;
-}
-
-#item-maca {
-  left: 27%;
-  top: 22%;
-}
-
-#item-lapis {
-  left: 46%;
-  top: 25%;
-}
-
-#item-pera {
-  left: 65%;
-  top: 22%;
-}
-
-#item-urso-2 {
-  left: 84%;
-  top: 24%;
-}
-
-#item-banana {
-  left: 17%;
-  top: 42%;
-}
-
-#item-borracha {
-  left: 36%;
-  top: 40%;
-}
-
-#item-urso-3 {
-  left: 56%;
-  top: 43%;
-}
-
-#item-apontador {
-  left: 75%;
-  top: 41%;
-}
-
 .area-cestas,
 .categorias {
   display: flex;
@@ -225,6 +200,86 @@
   margin-top: -12px;
   max-width: 300px;
   height: auto;
+}
+
+/* ==========================================================
+   LAYOUT DAS CESTAS: LATERAIS (DESKTOP) E RESPONSIVO (MOBILE)
+   ========================================================== */
+
+@media (min-width: 769px) {
+  .area-objetos {
+    /* Reserva espaço lateral amplo para manter a grid centralizada */
+    padding: 10px clamp(170px, 21vw, 250px);
+  }
+
+  .categorias {
+    position: absolute;
+    top: 80px;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+    padding: 0;
+    margin: 0;
+    pointer-events: none;
+  }
+
+  .categoria {
+    position: absolute;
+    pointer-events: auto;
+  }
+
+  #cesta-brinquedos {
+    left: clamp(14px, 2.5vw, 40px);
+    top: 15%;
+  }
+
+  #cesta-comidas {
+    left: clamp(14px, 2.5vw, 40px);
+    bottom: 12%;
+  }
+
+  #cesta-materiais {
+    right: clamp(14px, 2.5vw, 40px);
+    top: 36%;
+  }
+
+  .cesta {
+    width: clamp(145px, 16vw, 210px);
+  }
+
+  .etiqueta-categoria {
+    max-width: clamp(145px, 16vw, 210px);
+  }
+}
+
+@media (max-width: 768px) {
+  .area-objetos {
+    padding: 8px 12px;
+  }
+
+  .categorias {
+    position: static;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 8px;
+    width: 100%;
+    padding-bottom: 16px;
+    pointer-events: auto;
+  }
+
+  .categoria {
+    position: static;
+  }
+
+  .cesta {
+    width: min(29vw, 120px);
+  }
+
+  .etiqueta-categoria {
+    max-width: min(29vw, 120px);
+  }
 }
 
 .pagina-fase1 img {
@@ -413,4 +468,145 @@
   background: #fde8e4;
   color: #b9442a;
   border: 2px solid #b9442a;
+}
+
+/* ==========================================================
+   RESPONSIVIDADE (TABLETS E SMARTPHONES)
+   ========================================================== */
+
+@media (max-width: 900px) {
+  .categorias {
+    gap: 16px;
+    padding-bottom: 20px;
+  }
+
+  .cesta {
+    width: min(29vw, 180px);
+  }
+
+  .etiqueta-categoria {
+    max-width: min(29vw, 180px);
+  }
+
+  .contador-categoria {
+    top: 4px;
+    right: 8px;
+    min-width: 32px;
+    height: 32px;
+    font-size: 1.1rem;
+  }
+
+  .feedback-message {
+    font-size: 1rem;
+    padding: 4px 12px;
+    bottom: 10px;
+  }
+
+  .painel-matematica {
+    padding: 20px 24px;
+    gap: 16px;
+  }
+
+  .pergunta-matematica {
+    font-size: 1.3rem;
+  }
+
+  .botao-opcao-matematica {
+    width: 72px;
+    height: 72px;
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .categorias {
+    gap: 8px;
+    padding-bottom: 12px;
+  }
+
+  .cesta {
+    width: min(30vw, 120px);
+  }
+
+  .etiqueta-categoria {
+    max-width: min(30vw, 120px);
+  }
+
+  .contador-categoria {
+    top: 2px;
+    right: 4px;
+    min-width: 26px;
+    height: 26px;
+    font-size: 0.9rem;
+    border-width: 2px;
+  }
+
+  .hud-container {
+    width: min(94vw, 420px);
+  }
+
+  .feedback-message {
+    font-size: 0.85rem;
+    padding: 2px 8px;
+    bottom: 6px;
+  }
+
+  .painel-matematica {
+    padding: 14px 16px;
+    gap: 12px;
+  }
+
+  .pergunta-matematica {
+    font-size: 1.15rem;
+  }
+
+  .item-resumo {
+    font-size: 0.95rem;
+    padding: 4px 8px;
+  }
+
+  .botao-opcao-matematica {
+    width: 62px;
+    height: 62px;
+    font-size: 1.5rem;
+    border-width: 3px;
+  }
+}
+
+@media (max-height: 500px) {
+  .topo-fase1 {
+    padding-top: 4px;
+  }
+
+  .hud-container {
+    width: min(75vw, 480px);
+  }
+
+  .feedback-message {
+    font-size: 0.85rem;
+    bottom: 6px;
+  }
+
+  .categorias {
+    padding-bottom: 8px;
+    gap: 14px;
+  }
+
+  .cesta {
+    width: min(22vw, 120px);
+  }
+
+  .etiqueta-categoria {
+    max-width: min(22vw, 120px);
+  }
+
+  .slot-objeto {
+    width: clamp(52px, 8vw, 68px);
+    height: clamp(52px, 8vw, 68px);
+  }
+
+  .painel-matematica {
+    padding: 10px 16px;
+    gap: 8px;
+  }
 }
