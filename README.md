@@ -12,17 +12,95 @@ A integração com o **Cruzeiro HUB via iframe** faz parte do projeto e será re
 
 O projeto utiliza uma experiência de jogo para apoiar o aprendizado de Matemática por meio de situações contextualizadas.
 
-A criança organiza objetos em categorias e, posteriormente, utiliza os resultados dessa organização para resolver um desafio matemático relacionado à atividade realizada.
+A criança organiza objetos em categorias e, em seguida, utiliza os resultados dessa organização para resolver um desafio matemático relacionado à atividade realizada.
 
 A proposta é evitar que o jogo funcione apenas como uma lista de exercícios, utilizando interação, feedback e elementos visuais para apoiar o aprendizado.
 
+O projeto está em desenvolvimento contínuo: o Mundo 1 já possui três fases jogáveis, e a evolução do produto (novos mundos, acessibilidade, UX/UI e demais requisitos) segue em andamento.
+
 ---
 
-## 2. Conceito do jogo
+## 2. Requisitos e fundamentos
 
-A criança encontra objetos misturados e deve organizá-los em seus respectivos grupos utilizando principalmente a mecânica de arrastar e soltar.
+### Público-alvo
 
-Exemplo:
+- Crianças de 7 a 10 anos;
+
+- aproximadamente do 2º ao 5º ano;
+
+- estudantes da rede pública municipal de São Paulo;
+
+- interface deve considerar crianças alfabetizadas e em processo de alfabetização.
+
+### BNCC
+
+A habilidade atualmente considerada para Matemática é:
+
+**EF02MA06 / EF03MA06 — operações e resolução de problemas com números naturais em situações do cotidiano.**
+
+A atividade matemática deve estar relacionada à ação realizada pela criança durante o jogo.
+
+> [Requisito oficial] A definição das habilidades da BNCC deve seguir os materiais oficiais fornecidos pela faculdade. Não devem ser criadas ou alteradas habilidades sem validação da equipe.
+
+### Requisitos previstos para o produto completo
+
+O projeto completo prevê:
+
+- menu inicial; *(implementado)*
+
+- instruções com suporte a áudio; *(não implementado)*
+
+- configurações de acessibilidade; *(não implementado)*
+
+- seleção de avatar/apelido; *(não implementado)*
+
+- 4 mundos principais com fases progressivas, mais 1 mundo bônus; *(Mundo 1 em desenvolvimento — ver seção 4)*
+
+- persistência básica de progresso; *(implementado para o Mundo 1)*
+
+- registro de fases concluídas; *(implementado para o Mundo 1)*
+
+- pontuação/conquistas; *(não implementado)*
+
+- mecânicas adequadas para crianças; *(em evolução contínua)*
+
+- suporte a teclado; *(parcial — ver seção 6)*
+
+- suporte a dispositivos móveis; *(parcial — ver seção 6)*
+
+- integração com o Cruzeiro HUB via iframe. *(não implementado)*
+
+> [Requisito oficial] A existência de um mundo/fase bônus é obrigatória, conforme os requisitos da faculdade.
+
+[Decisão da equipe] A estrutura atual é de 4 mundos principais + 1 mundo bônus. O mundo bônus será voltado para todas as contas/conteúdos matemáticos trabalhados ao longo do jogo. O número exato de fases por mundo principal e os temas ainda não definidos seguem conforme o Plano de desenvolvimento (seção 3) evolui — não presuma quantidades ou temas além do que está documentado ali.
+
+---
+
+## 3. Plano de desenvolvimento
+
+[Decisão da equipe] A estrutura definida é de **4 mundos principais + 1 mundo bônus** (este último obrigatório, conforme requisito da faculdade — ver seção 2). Só é preenchido abaixo o que já está definido no projeto — o restante permanece em aberto até decisão da equipe.
+
+| Mundo | Tema | Fases | Estado |
+
+|---|---|---|---|
+
+| Mundo 1 | A Casa | Fase 1, Fase 2, Fase 3 | Em desenvolvimento |
+
+| Mundo 2 | Ainda não definido | Ainda não definidas | Planejado |
+
+| Mundo 3 | Ainda não definido | Ainda não definidas | Planejado |
+
+| Mundo 4 | Ainda não definido | Ainda não definidas | Planejado |
+
+| Mundo bônus | Ainda não definido | Todas as contas/conteúdos matemáticos trabalhados no jogo | Planejado |
+
+A interface atual já exibe, no menu de seleção de mundos, nomes provisórios como "Escola" e "Petshop" para os mundos ainda bloqueados. Esses nomes são elementos provisórios da implementação visual e **não** representam decisões definitivas de tema da equipe.
+
+---
+
+## 4. Conceito e fluxo do jogo
+
+A criança encontra objetos misturados e deve organizá-los em seus respectivos grupos, principalmente com a mecânica de arrastar e soltar (mouse/toque). Exemplo:
 
 🧸 🚗 ⚽ → Brinquedos
 
@@ -32,152 +110,211 @@ Exemplo:
 
 Após a organização, as quantidades obtidas são utilizadas no desafio matemático.
 
-### Fluxo atual
-
-**Organização → contagem → conclusão → desafio matemático → resposta → feedback**
-
----
-
-## 3. Público-alvo
-
-- Crianças de 7 a 10 anos;
-- aproximadamente do 2º ao 5º ano;
-- estudantes da rede pública municipal de São Paulo.
-
-A interface deve considerar crianças alfabetizadas e em processo de alfabetização.
-
----
-
-## 4. Estado atual
-
-### MVP da Sprint 01 — Fase 1
-
-**Concluído.**
-
-A primeira versão funcional possui:
-
-- menu inicial;
-- entrada na Fase 1;
-- 9 objetos;
-- 3 categorias;
-- 3 destinos;
-- mecânica de arrastar e soltar;
-- validação por categoria;
-- feedback de acerto e erro;
-- retorno do objeto em caso de erro;
-- contador individual por categoria;
-- remoção visual dos objetos corretamente organizados;
-- conclusão da organização;
-- transição para o desafio matemático;
-- desafio matemático baseado nas quantidades reais organizadas;
-- alternativas de resposta;
-- verificação da resposta;
-- feedback matemático;
-- conclusão do desafio.
-
-### Estado pós-MVP
-
-O MVP da Sprint 01 foi concluído.
-
-O projeto encontra-se agora em etapa de evolução do produto, envolvendo melhorias técnicas, UX/UI, acessibilidade, novas fases, arquitetura e demais requisitos ainda não implementados.
-
----
-
-## 5. Fluxo atual da Fase 1
+### Fluxo completo
 
 ```text
-Menu
-  ↓
-Fase 1
-  ↓
-Organização dos objetos
-  ↓
-Validação da categoria
-  ↓
-Contador da categoria +1
-  ↓
-Objeto ocultado visualmente
-  ↓
-Todos os objetos organizados
-  ↓
-Feedback de conclusão
-  ↓
-Tela matemática
-  ↓
-Desafio baseado nas quantidades reais
-  ↓
-Resposta
-  ↓
-Feedback
-  ↓
-Conclusão
+
+Tela inicial
+
+  ↓
+
+Menu de mundos
+
+  ↓
+
+Seleção de fase (dentro do Mundo 1)
+
+  ↓
+
+Organização dos objetos (arrastar e soltar; seleção por teclado parcial)
+
+  ↓
+
+Validação por categoria
+
+  ↓
+
+Contador da categoria +1 e atualização visual da cesta
+
+  ↓
+
+Objeto organizado é ocultado da área de arraste
+
+  ↓
+
+Todos os objetos organizados → feedback de conclusão
+
+  ↓
+
+Desafio matemático (soma das quantidades reais organizadas)
+
+  ↓
+
+Resposta entre alternativas embaralhadas
+
+  ↓
+
+Feedback de acerto ou erro
+
+  ↓
+
+Desbloqueio da próxima fase (ou do próximo mundo, ao concluir a última fase)
+
+  ↓
+
+Navegação: voltar ao menu ou seguir para a próxima fase
+
 ```
 
 ---
 
-## 6. BNCC
+## 5. Estado atual do produto
 
-A habilidade atualmente considerada para Matemática é:
+Esta seção é uma fotografia do desenvolvimento real, refletindo o código atual do repositório.
 
-**EF02MA06 / EF03MA06 — operações e resolução de problemas com números naturais em situações do cotidiano.**
+### Mundo 1 e navegação
 
-A atividade matemática deve estar relacionada à ação realizada pela criança durante o jogo.
+- Tela inicial com acesso ao menu de mundos.
 
-A equipe ainda deverá definir e documentar as demais habilidades da BNCC que serão trabalhadas no produto, conforme o escopo das fases.
+- Menu de mundos em formato de carrossel: Mundo 1 (A Casa) disponível; Mundos 2 e 3 exibidos como bloqueados, atualmente com nomes provisórios ("Escola" e "Petshop") na interface, ainda não confirmados como tema definitivo pela equipe (ver seção 3).
 
-> A definição das habilidades da BNCC deve seguir os materiais oficiais fornecidos pela faculdade. Não devem ser criadas ou alteradas habilidades sem validação da equipe.
+- Modal de seleção de fases dentro do Mundo 1, com Fases 1, 2 e 3.
+
+- Progressão de fases: Fase 2 e Fase 3 ficam bloqueadas até a conclusão da fase anterior.
+
+### Fases 1, 2 e 3
+
+As três fases usam o mesmo motor de jogo (`game.js`), com configurações próprias:
+
+| Fase | Categorias | Total de objetos |
+
+|---|---|---|
+
+| Fase 1 | Brinquedos, Comidas | 5 (3 brinquedos + 2 comidas) |
+
+| Fase 2 | Brinquedos, Comidas, Materiais | 9 (3 + 3 + 3) |
+
+| Fase 3 | Brinquedos, Comidas, Materiais | 14 (2 brinquedos + 5 comidas + 7 materiais) |
+
+### Mecânica de organização
+
+- Mecânica principal: arrastar e soltar via ponteiro (mouse/toque), com o objeto centralizado sob o cursor durante o arraste.
+
+- Suporte a teclado é parcial: existe uma seleção assistida, em que Enter/Espaço sobre uma cesta posiciona nela o próximo objeto disponível. Não existe, atualmente, movimentação/arraste dos objetos pelo teclado — o teclado não é uma alternativa completa ao arrastar e soltar.
+
+- Validação por categoria, com retorno do objeto à posição inicial em caso de erro.
+
+- Feedback textual imediato de acerto e erro.
+
+- Contador individual por categoria, atualizado em tempo real.
+
+- Sprite da cesta muda conforme a quantidade de itens organizados.
+
+- Objetos organizados corretamente são ocultados/removidos da área de arraste.
+
+### Randomização
+
+- Os objetos de cada fase são sorteados a partir de um catálogo de modelos por categoria, variando a cada execução.
+
+- As alternativas do desafio matemático são embaralhadas a cada tentativa.
+
+### Desafio matemático
+
+- Baseado na soma real das quantidades organizadas pela criança (não em valores fixos).
+
+- Alternativas de resposta geradas dinamicamente (resposta correta + distratores).
+
+- Verificação da resposta com feedback de acerto/erro.
+
+- Ao final: botão para voltar ao menu de mundos e, quando ainda houver próxima fase, botão para avançar diretamente a ela.
+
+### Persistência e desbloqueio de progresso
+
+- Progresso salvo em `localStorage` (fases concluídas, fase máxima liberada, mundos desbloqueados).
+
+- Conclusão de uma fase libera a próxima fase do Mundo 1; conclusão da Fase 3 libera o Mundo 2.
+
+- Persistência limitada ao navegador local — ainda não há integração com backend externo.
+
+### Responsividade
+
+- Regras de layout responsivo já implementadas para o menu e para a tela de fase, cobrindo diferentes larguras de tela (incluindo dispositivos móveis). Ajustes finos e testes em mais dispositivos seguem em andamento.
+
+### Ainda não implementado
+
+- Áudio e configurações de acessibilidade (botões existem na interface, sem funcionalidade associada).
+
+- Seleção de avatar/apelido (interface exibe um avatar/nome fixo).
+
+- Pontuação ou sistema de conquistas.
+
+- Integração com o Cruzeiro HUB via iframe.
 
 ---
 
-## 7. Requisitos previstos para o produto completo
+## 6. Arquitetura e estrutura do projeto
 
-O projeto completo prevê:
-
-- menu inicial;
-- instruções com suporte a áudio;
-- configurações de acessibilidade;
-- seleção de avatar/apelido;
-- 4 fases progressivas;
-- 1 fase bônus;
-- persistência básica de progresso;
-- registro de fases concluídas;
-- pontuação/conquistas;
-- mecânicas adequadas para crianças;
-- suporte a teclado;
-- suporte a dispositivos móveis;
-- integração com o Cruzeiro HUB via iframe.
-
-Nem todos esses requisitos estão implementados atualmente.
-
----
-
-## 8. Arquitetura atual
-
-O projeto utiliza uma arquitetura simples baseada em HTML, CSS e JavaScript.
-
-A Fase 1 possui duas telas/estados dentro de `fase1.html`:
+O projeto utiliza uma arquitetura simples baseada em HTML, CSS e JavaScript, sem frameworks.
 
 ```text
-fase1.html
+
+Arruma-A-Bagunca/
+
 │
-├── Tela de organização
-│      ↓
-│   js/game.js
+
+├── index.html          → tela inicial e menu de mundos/fases
+
+├── fase1.html           → tela de organização + tela de desafio matemático
+
+├── global.css           → estilos globais
+
+├── style-menu.css       → estilos do menu
+
+├── style-fase1.css      → estilos da tela de fase
+
+├── README.md
+
+├── AGENTS.md
+
 │
-└── Tela matemática
-       ↓
-    js/math.js
+
+├── js/
+
+│   ├── menu.js           → navegação do menu, mundos e fases
+
+│   ├── game.js           → mecânica de organização dos objetos, compartilhada
+
+│   │                        pelas Fases 1, 2 e 3 via CONFIG_FASE_1/2/3
+
+│   ├── math.js            → desafio matemático
+
+│   ├── progresso.js       → serviço de persistência de progresso (localStorage);
+
+│   │                        usado por menu.js e math.js para desbloquear fases/mundos
+
+│   └── main.js            → responsabilidade ainda não definida
+
+│
+
+└── assets/
+
+    ├── audio/
+
+    └── images/
+
+        ├── tela_inicial/
+
+        ├── tela_fase1/
+
+        │   └── sprites_cestas/
+
+        ├── mundo_1/                     → botões de fase do modal de seleção
+
+        └── nova_tela_menu de_fases/     → menu de mundos (carrossel, progresso)
+
 ```
 
-O menu utiliza:
-
-```text
-index.html
-    ↓
-js/menu.js
-```
-
-O arquivo `main.js` existe no projeto, mas sua responsabilidade de integração ainda não está consolidada e poderá ser redefinida conforme a arquitetura evoluir.
+Essa organização reflete o estado atual do projeto e pode evoluir conforme a arquitetura for definida.
 
 ### Princípio arquitetural
 
@@ -189,184 +326,100 @@ Não devem ser introduzidas abstrações, frameworks ou camadas adicionais sem n
 
 ---
 
-## 9. Estrutura do projeto
-
-```text
-Arruma-A-Bagunca/
-│
-├── index.html
-├── fase1.html
-├── global.css
-├── style-menu.css
-├── style-fase1.css
-├── README.md
-├── AGENTS.md
-│
-├── js/
-│   ├── main.js
-│   ├── menu.js
-│   ├── game.js
-│   └── math.js
-│
-└── assets/
-    ├── audio/
-    └── images/
-        ├── tela_inicial/
-        ├── tela_menu/
-        └── tela_fase1/
-            └── sprites_cestas/
-```
-
-### Principais responsabilidades atuais
-
-- `index.html` — menu inicial;
-- `fase1.html` — interface da Fase 1;
-- `global.css` — estilos globais;
-- `style-menu.css` — estilos do menu;
-- `style-fase1.css` — estilos da Fase 1;
-- `menu.js` — comportamento e navegação do menu;
-- `game.js` — mecânica de organização dos objetos;
-- `math.js` — desafio matemático;
-- `main.js` — inicialização/integração, ainda em definição.
-
-Essas responsabilidades representam a organização atual do projeto e podem evoluir conforme a arquitetura for definida.
-
----
-
-## 10. Tecnologias
+## 7. Tecnologias
 
 Tecnologias utilizadas ou previstas:
 
 - HTML5;
-- CSS3;
-- JavaScript ES6+;
-- Node.js;
-- Git;
-- GitHub;
-- Vercel.
 
-A implementação atual utiliza principalmente **JavaScript Vanilla**.
+- CSS3;
+
+- JavaScript ES6+;
+
+- Git;
+
+- GitHub;
+
+- Vercel (deploy).
+
+A implementação atual utiliza **JavaScript Vanilla**, sem build tooling, gerenciador de pacotes ou dependências externas no repositório.
 
 O uso de tecnologias adicionais deve ser justificado pela necessidade do projeto.
 
 ---
 
-## 11. Acessibilidade e UX
+## 8. UX, acessibilidade e LGPD
 
-O jogo deve ser adequado para crianças de 7 a 10 anos.
+### Diretrizes gerais
 
-Priorizar:
+O jogo deve ser adequado para crianças de 7 a 10 anos. Priorizar:
 
-- interface simples;
-- botões grandes;
-- elementos visuais claros;
-- pouco texto;
-- instruções objetivas;
-- feedback imediato;
-- suporte a áudio;
-- alto contraste;
-- fontes legíveis;
+- interface simples, botões grandes, elementos visuais claros e pouco texto;
+
+- instruções objetivas e feedback imediato;
+
+- alto contraste e fontes legíveis;
+
 - cores não devem ser o único meio de identificação;
-- suporte a teclado;
-- suporte a dispositivos móveis;
-- prevenção de frustração;
-- erros tratados como oportunidade de aprendizado.
+
+- suporte a teclado e a dispositivos móveis;
+
+- prevenção de frustração — erros tratados como oportunidade de aprendizado, nunca punição.
 
 A acessibilidade deve ser considerada durante o desenvolvimento, e não somente como uma etapa final.
 
----
+### O que já está implementado
 
-## 12. LGPD
+- Feedback imediato de acerto/erro na organização e no desafio matemático;
 
-O jogo não deve coletar dados pessoais reais de crianças sem necessidade.
+- objeto retorna à posição inicial em caso de erro (sem penalidade);
 
-Evitar:
+- contador de categoria com número e ícone (não depende só de cor);
 
-- nome completo;
-- documentos;
-- e-mail;
-- fotos;
-- localização;
-- outras informações pessoais desnecessárias.
+- seleção assistida por teclado nas cestas;
 
-Quando for necessário identificar o jogador, utilizar mecanismos genéricos, como avatar, apelido lúdico ou código/token.
+- layout responsivo para diferentes tamanhos de tela.
 
----
+### O que ainda é diretriz/requisito em aberto
 
-## 13. Tipos de tarefa
+- Suporte completo a teclado (incluir arrastar objetos, não só selecionar cesta);
 
-As tarefas do projeto são classificadas como:
+- suporte a áudio;
 
-### Correção
+- configurações de acessibilidade (contraste, tamanho de fonte, etc.);
 
-Corrige um comportamento existente que está errado ou quebrado.
+- revisão e testes mais amplos de responsividade em dispositivos móveis reais.
 
-### Melhoria
+### LGPD
 
-Aprimora uma implementação existente ou reduz dívida técnica sem representar uma nova funcionalidade.
+O jogo não deve coletar dados pessoais reais de crianças sem necessidade. Evitar nome completo, documentos, e-mail, fotos, localização ou outras informações pessoais desnecessárias.
 
-### Feature
-
-Adiciona uma nova funcionalidade ao produto.
-
-### UX/UI
-
-Altera interface, experiência de uso, acessibilidade ou apresentação visual.
-
-### Arquitetura
-
-Altera responsabilidades, estrutura, comunicação ou organização técnica do sistema.
+Quando for necessário identificar o jogador, utilizar mecanismos genéricos, como avatar, apelido lúdico ou código/token. Atualmente, o progresso é salvo localmente (`localStorage`) e não contém nenhum dado pessoal.
 
 ---
 
-## 14. Desenvolvimento e Git
+## 9. Processo de desenvolvimento
 
-O projeto utiliza Git e GitHub para controle de versão.
+O projeto utiliza Git e GitHub para controle de versão, com deploy atual via Vercel.
 
-O desenvolvimento deve evitar alterações simultâneas desnecessárias nos mesmos arquivos.
+As tarefas do projeto são classificadas como Correção, Melhoria, Feature, UX/UI ou Arquitetura.
 
-Antes de integrar alterações:
-
-1. atualizar a branch;
-2. verificar conflitos;
-3. testar;
-4. revisar as alterações;
-5. realizar o commit;
-6. enviar para o GitHub.
-
-O deploy atual utiliza Vercel.
+Regras detalhadas de fluxo de trabalho, revisão e comportamento esperado de agentes/IA ao alterar o código estão documentadas em `AGENTS.md` e não são repetidas aqui.
 
 ---
 
-## 15. Pendências conhecidas
+## 10. Pendências e próximos objetivos
 
-Entre os pontos identificados atualmente:
+Pontos identificados atualmente que ainda merecem atenção:
 
-- corrigir o deslocamento do objeto em relação ao cursor durante o arraste;
-- revisar suporte de teclado para múltiplos objetos;
-- revisar responsividade e interação em dispositivos móveis;
 - avaliar o papel definitivo do `main.js`;
-- revisar código que deixou de ser necessário após mudanças na mecânica;
-- continuar evolução da acessibilidade;
-- implementar requisitos ainda não contemplados nas próximas fases.
 
-Esses itens são pendências atuais e não devem ser tratados automaticamente como prioridade sem avaliação da equipe.
+- revisar suporte de teclado para arrastar objetos (hoje só a seleção por cesta é assistida);
 
----
+- ampliar testes de responsividade em dispositivos móveis reais;
 
-## 16. Próximos objetivos
+- implementar áudio, configurações de acessibilidade e seleção de avatar/apelido;
 
-Após a conclusão do MVP da Sprint 01, o foco passa a ser a evolução do produto.
+- definir tema e fases dos Mundos 2, 3 e 4, conforme o Plano de desenvolvimento evoluir.
 
-As próximas prioridades serão definidas pela equipe considerando:
-
-- requisitos da faculdade;
-- impacto no produto;
-- UX/UI;
-- acessibilidade;
-- qualidade técnica;
-- prazo;
-- dependências entre tarefas;
-- capacidade da equipe.
-
-Novas funcionalidades não devem ser implementadas apenas porque foram previstas para o futuro. Cada incremento deve ser avaliado antes do desenvolvimento.
+As próximas prioridades serão definidas pela equipe considerando requisitos da faculdade, impacto no produto, UX/UI, acessibilidade, qualidade técnica e capacidade da equipe. Novas funcionalidades não devem ser implementadas apenas porque foram previstas para o futuro — cada incremento deve ser avaliado antes do desenvolvimento.
