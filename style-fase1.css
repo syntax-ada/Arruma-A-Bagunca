@@ -8,6 +8,14 @@
     overflow: hidden;
 }
 
+.pagina-fase1.cenario-arrumado,
+.cenario-arrumado {
+    background-image: url("assets/images/tela_fase1/fundo_arrumado.png");
+    background-position: center;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+
 .cenario-fase,
 .tela-fase1 {
     position: relative;
@@ -650,5 +658,54 @@
     .painel-matematica {
         padding: 10px 16px;
         gap: 8px;
+    }
+}
+
+/* ==========================================================
+   BOTÕES DE CONCLUSÃO DO DESAFIO MATEMÁTICO
+   ========================================================== */
+
+.acoes-conclusao {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.btn-conclusao {
+    padding: 14px 30px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #ffffff;
+    background: #1f7a45;
+    border: 3px solid #ffffff;
+    border-radius: 999px;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+    transition: transform 0.2s ease, background-color 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.btn-conclusao:hover {
+    transform: scale(1.06);
+    background: #156936;
+}
+
+@media (max-width: 600px) {
+    .acoes-conclusao {
+        gap: 10px;
+    }
+
+    .btn-conclusao {
+        padding: 12px 20px;
+        font-size: 1rem;
+        width: 100%;
     }
 }

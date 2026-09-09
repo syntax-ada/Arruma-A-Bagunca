@@ -1,4 +1,6 @@
 function iniciarDesafioMatematico(dadosQuantidades) {
+    document.body.classList.add("cenario-arrumado");
+
     const telaOrganizacao = document.querySelector("#tela-organizacao");
     const telaMatematica = document.querySelector("#tela-matematica");
 
@@ -143,11 +145,65 @@ function verificarRespostaMatematica(valorEscolhido, totalCorreto, botaoClicado,
             somaTexto = `${totalCorreto}`;
         }
 
+        // Gravação da persistência de dados do progresso
+        const faseAtual = typeof window.obterFaseAtiva === "function"
+            ? window.obterFaseAtiva()
+            : (new URLSearchParams(window.location.search).get("fase") || 1);
+
+        if (typeof desbloquearProximaFase === "function") {
+            desbloquearProximaFase(faseAtual);
+        }
+
         mostrarFeedbackMatematica(`Muito bem! Você acertou! ${somaTexto} objetos organizados ao todo!`, "success");
+        exibirBotoesConclusao(faseAtual);
     } else {
         botaoClicado.classList.add("is-wrong");
         mostrarFeedbackMatematica("Quase lá! Vamos contar de novo? Tente outra resposta.", "error");
     }
+}
+
+function exibirBotoesConclusao(faseAtual) {
+    const painel = document.querySelector(".painel-matematica");
+    if (!painel || document.querySelector(".acoes-conclusao")) {
+        return;
+    }
+
+    let numeroFase = 1;
+    if (typeof faseAtual === "number") {
+        numeroFase = faseAtual;
+    } else if (typeof faseAtual === "string") {
+        const match = faseAtual.match(/\d+/);
+        numeroFase = match ? parseInt(match[0], 10) : 1;
+    }
+
+    const containerAcoes = document.createElement("div");
+    containerAcoes.className = "acoes-conclusao";
+
+    // Botão Voltar para o Menu
+    const btnMenu = document.createElement("button");
+    btnMenu.type = "button";
+    btnMenu.className = "btn-conclusao";
+    btnMenu.textContent = "Voltar para o Menu";
+    btnMenu.setAttribute("aria-label", "Voltar para a seleção de mundos");
+    btnMenu.addEventListener("click", () => {
+        window.location.href = "index.html?view=mundos";
+    });
+    containerAcoes.appendChild(btnMenu);
+
+    // Se a fase for menor que 3, renderiza também o botão Próxima Fase
+    if (numeroFase < 3) {
+        const btnProxima = document.createElement("button");
+        btnProxima.type = "button";
+        btnProxima.className = "btn-conclusao";
+        btnProxima.textContent = "Próxima Fase";
+        btnProxima.setAttribute("aria-label", `Avançar para a Fase ${numeroFase + 1}`);
+        btnProxima.addEventListener("click", () => {
+            window.location.href = `fase1.html?fase=${numeroFase + 1}`;
+        });
+        containerAcoes.appendChild(btnProxima);
+    }
+
+    painel.appendChild(containerAcoes);
 }
 
 function mostrarFeedbackMatematica(mensagem, tipo) {

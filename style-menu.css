@@ -8,6 +8,17 @@ body {
 
 .game-container {
   position: relative;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.game-container::before,
+.game-container::after,
+#menu-fases::before,
+#menu-fases::after {
+  content: none !important;
+  display: none !important;
 }
 
 .escondido {
@@ -129,9 +140,10 @@ button {
 }
 
 #menu-fases {
+  position: relative;
   min-height: 100vh;
   padding: 26px 5vw 34px;
-  background: url("assets/images/nova_tela_menu de_fases/fundo.png") center / cover no-repeat;
+  background: url("assets/images/nova_tela_menu de_fases/fundo.png") center / 100% 100% no-repeat;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -150,7 +162,7 @@ button {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 12px;
+  padding: 10px 18px;
   background: #ffffff;
   border-radius: 999px;
   box-shadow: 0 5px 14px rgba(0, 0, 0, 0.16);
@@ -161,11 +173,11 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  min-height: 40px;
+  min-height: 44px;
   padding: 0 14px;
   color: #252525;
   font-family: Arial, Helvetica, sans-serif;
-  font-size: 1rem;
+  font-size: 1.15rem;
   font-weight: 700;
 }
 
@@ -180,28 +192,32 @@ button {
 
 .avatar-usuario {
   display: grid;
-  width: 30px;
-  height: 30px;
+  width: 34px;
+  height: 34px;
   place-items: center;
   background: #ff5f95;
   border-radius: 50%;
 }
 
 .controle-mundo img {
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   object-fit: contain;
 }
 
 .btn-voltar {
   position: absolute;
   right: 0;
-  padding: 12px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  padding: 14px 28px;
   color: #ffffff;
   background: #151515;
   border-radius: 999px;
   font-family: Arial, Helvetica, sans-serif;
-  font-size: 1rem;
+  font-size: 1.15rem;
   font-weight: 700;
   box-shadow: 0 4px 0 #000000;
   transition: transform 0.2s ease;
@@ -302,11 +318,12 @@ button {
   align-items: center;
   justify-content: center;
   gap: 14px;
+  margin-bottom: 22px;
 }
 
 .trilho-progresso {
   width: min(70vw, 640px);
-  height: 25px;
+  height: 32px;
   padding: 5px;
   overflow: hidden;
   background: #ffffff;
@@ -323,11 +340,12 @@ button {
 }
 
 .porcentagem-progresso {
-  padding: 8px 15px;
+  padding: 10px 20px;
   color: #ffffff;
   background: #f2538a;
   border-radius: 999px;
   font-family: Arial, Helvetica, sans-serif;
+  font-size: 1.1rem;
   font-weight: 800;
 }
 
@@ -374,5 +392,130 @@ button {
 
   .card-mundo {
     flex-basis: min(68vw, 285px);
+  }
+}
+
+/* ==========================================================
+   MODAL DE SELEÇÃO DE FASES (MUNDO 1)
+   ========================================================== */
+
+#modal-fases {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 50;
+  width: min(92vw, 660px);
+  background: #ffffff;
+  border-radius: 36px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.32);
+  padding: 38px 44px 46px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+}
+
+.btn-fechar-modal {
+  position: absolute;
+  top: -18px;
+  right: -18px;
+  width: 52px;
+  height: 52px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: 52;
+  transition: transform 0.2s ease;
+}
+
+.btn-fechar-modal:hover {
+  transform: scale(1.12);
+}
+
+.btn-fechar-modal img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.titulo-modal-fases {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: clamp(1.25rem, 2.5vw, 1.8rem);
+  font-weight: 800;
+  color: #1f2933;
+  margin: 0;
+  text-align: center;
+}
+
+.trilha-fases {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(24px, 5vw, 52px);
+  width: 100%;
+  padding: 10px 0;
+}
+
+.trilha-fases::before {
+  content: "";
+  position: absolute;
+  left: 15%;
+  right: 15%;
+  top: 50%;
+  height: 12px;
+  background: #f2538a;
+  border-radius: 999px;
+  transform: translateY(-50%);
+  z-index: 1;
+}
+
+.btn-fase-modal {
+  position: relative;
+  z-index: 2;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.btn-fase-modal img {
+  width: clamp(75px, 12vw, 115px);
+  height: auto;
+  display: block;
+}
+
+.btn-fase-modal.fase-ativa:hover {
+  transform: scale(1.12);
+}
+
+.btn-fase-modal.fase-bloqueada {
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  #modal-fases {
+    padding: 30px 20px 34px;
+    gap: 20px;
+    border-radius: 26px;
+  }
+
+  .btn-fechar-modal {
+    top: -12px;
+    right: -12px;
+    width: 42px;
+    height: 42px;
+  }
+
+  .trilha-fases {
+    gap: 16px;
+  }
+
+  .trilha-fases::before {
+    left: 10%;
+    right: 10%;
+    height: 8px;
   }
 }

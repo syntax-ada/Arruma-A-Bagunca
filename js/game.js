@@ -468,6 +468,8 @@ function startGame(config = CONFIG_FASE_1) {
     activeConfig = config || CONFIG_FASE_1;
   }
 
+  document.body.classList.remove("cenario-arrumado");
+
   const telaOrganizacao = document.querySelector("#tela-organizacao");
   const telaMatematica = document.querySelector("#tela-matematica");
   if (telaOrganizacao) {
@@ -563,6 +565,7 @@ function finishDrag(event) {
 
       const resumoCategorias = getCategorySummary();
       setTimeout(() => {
+        document.body.classList.add("cenario-arrumado");
         if (typeof iniciarDesafioMatematico === "function") {
           iniciarDesafioMatematico(resumoCategorias);
         }
@@ -810,6 +813,7 @@ function handleDropZoneKeyboard(event) {
 
       const resumoCategorias = getCategorySummary();
       setTimeout(() => {
+        document.body.classList.add("cenario-arrumado");
         if (typeof iniciarDesafioMatematico === "function") {
           iniciarDesafioMatematico(resumoCategorias);
         }
@@ -828,6 +832,14 @@ if (typeof window !== "undefined") {
   window.CONFIG_FASE_3 = CONFIG_FASE_3;
   window.FASES = FASES;
   window.startGame = startGame;
+  window.obterFaseAtiva = function () {
+    return activeConfig?.id || "fase1";
+  };
 }
 
-startGame(CONFIG_FASE_1); // Para testar: startGame(CONFIG_FASE_1), startGame(CONFIG_FASE_2) ou startGame(CONFIG_FASE_3)
+// Inicializa a fase especificada na URL (ex: ?fase=2) ou Fase 1 por padrão
+const urlParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+const faseParam = urlParams ? urlParams.get("fase") : null;
+const faseInicial = (faseParam && FASES[`fase${faseParam}`]) ? FASES[`fase${faseParam}`] : CONFIG_FASE_1;
+
+startGame(faseInicial);

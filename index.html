@@ -56,13 +56,13 @@
             <span class="legenda-mundo">Mundo: 1 - A Casa</span>
           </button>
 
-          <article class="card-mundo mundo-bloqueado" aria-label="Mundo 2, Escola, bloqueado">
+          <article class="card-mundo mundo-bloqueado" id="card-mundo-2" aria-label="Mundo 2, Escola, bloqueado">
             <img src="assets/images/nova_tela_menu de_fases/mundo_2.png" alt="" />
             <span class="overlay-bloqueado" aria-hidden="true">🔒</span>
             <span class="legenda-mundo">Mundo: 2 - Escola</span>
           </article>
 
-          <article class="card-mundo mundo-bloqueado" aria-label="Mundo 3, Petshop, bloqueado">
+          <article class="card-mundo mundo-bloqueado" id="card-mundo-3" aria-label="Mundo 3, Petshop, bloqueado">
             <img src="assets/images/nova_tela_menu de_fases/mundo_3.png" alt="" />
             <span class="overlay-bloqueado" aria-hidden="true">🔒</span>
             <span class="legenda-mundo">Mundo: 3 - Petshop</span>
@@ -70,6 +70,24 @@
 
           <button class="btn-seta" type="button" aria-label="Próximo mundo">→</button>
         </main>
+
+        <div id="modal-fases" class="escondido" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-fases">
+          <button class="btn-fechar-modal" id="btn-fechar-modal" type="button" aria-label="Fechar seleção de fases">
+            <img src="assets/images/mundo_1/botão_fechar.png" alt="Fechar" />
+          </button>
+          <h2 id="titulo-modal-fases" class="titulo-modal-fases">Escolha uma fase para jogar!</h2>
+          <div class="trilha-fases" aria-label="Trilha de fases">
+            <button class="btn-fase-modal fase-ativa" id="btn-iniciar-fase1" type="button" aria-label="Jogar Fase 1">
+              <img src="assets/images/mundo_1/fase_1_botao.png" alt="Fase 1" />
+            </button>
+            <button class="btn-fase-modal fase-bloqueada" id="btn-iniciar-fase2" type="button" aria-label="Fase 2, bloqueada" disabled>
+              <img src="assets/images/mundo_1/fase_2_botao.png" alt="Fase 2" />
+            </button>
+            <button class="btn-fase-modal fase-bloqueada" id="btn-iniciar-fase3" type="button" aria-label="Fase 3, bloqueada" disabled>
+              <img src="assets/images/mundo_1/fase_3_botao.png" alt="Fase 3" />
+            </button>
+          </div>
+        </div>
 
         <footer class="progresso-mundos">
           <div class="trilho-progresso" role="progressbar" aria-label="Progresso do jogo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="10">
@@ -79,6 +97,7 @@
         </footer>
       </section>
     </main>
+    <script src="js/progresso.js"></script>
     <script src="js/menu.js"></script>
   </body>
 </html>
