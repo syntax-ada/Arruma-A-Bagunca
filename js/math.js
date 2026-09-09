@@ -114,7 +114,13 @@ function gerarAlternativasMatematica(totalCorreto) {
         offset++;
     }
 
-    return Array.from(opcoes).sort((a, b) => a - b);
+    const lista = Array.from(opcoes);
+    for (let i = lista.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [lista[i], lista[j]] = [lista[j], lista[i]];
+    }
+
+    return lista;
 }
 
 function verificarRespostaMatematica(valorEscolhido, totalCorreto, botaoClicado, dados) {

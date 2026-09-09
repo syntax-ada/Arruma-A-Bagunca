@@ -867,4 +867,4 @@ if (typeof window !== "undefined") {
   window.startGame = startGame;
 }
 
-startGame(CONFIG_FASE_3); // Para testar: startGame(CONFIG_FASE_1), startGame(CONFIG_FASE_2) ou startGame(CONFIG_FASE_3)
+startGame(CONFIG_FASE_1); // Para testar: startGame(CONFIG_FASE_1), startGame(CONFIG_FASE_2) ou startGame(CONFIG_FASE_3)
