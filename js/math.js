@@ -198,15 +198,27 @@ function exibirBotoesConclusao(faseAtual) {
     });
     containerAcoes.appendChild(btnMenu);
 
-    // Se a fase for menor que 3, renderiza também o botão Próxima Fase
-    if (numeroFase < 3) {
+    // Obtenção da configuração do mundo ativo para determinar se existe próxima fase
+    const mundoAtual = typeof window.obterMundoAtivo === "function"
+        ? window.obterMundoAtivo()
+        : (Number(new URLSearchParams(window.location.search).get("mundo")) || 1);
+
+    const mundos = window.MUNDOS || {};
+    const configMundo = mundos[mundoAtual];
+    const totalFases = configMundo && typeof configMundo.totalFases === "number"
+        ? configMundo.totalFases
+        : (typeof window.obterTotalFasesMundoAtivo === "function" ? window.obterTotalFasesMundoAtivo() : 3);
+
+    // Se houver próxima fase configurada no mundo, renderiza o botão Próxima Fase
+    if (numeroFase < totalFases) {
+        const proximaFase = numeroFase + 1;
         const btnProxima = document.createElement("button");
         btnProxima.type = "button";
         btnProxima.className = "btn-conclusao";
         btnProxima.textContent = "Próxima Fase";
-        btnProxima.setAttribute("aria-label", `Avançar para a Fase ${numeroFase + 1}`);
+        btnProxima.setAttribute("aria-label", `Avançar para a Fase ${proximaFase}`);
         btnProxima.addEventListener("click", () => {
-            window.location.href = `fase1.html?fase=${numeroFase + 1}`;
+            window.location.href = `fase1.html?mundo=${mundoAtual}&fase=${proximaFase}`;
         });
         containerAcoes.appendChild(btnProxima);
     }
