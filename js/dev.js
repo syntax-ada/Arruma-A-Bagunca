@@ -83,13 +83,34 @@
   // ==========================================================
   // 3. DEV 01 — ACESSO DIRETO
   // ==========================================================
+  /**
+   * Ponto único de navegação do DEV: avisa no painel e mantém a sessão DEV
+   * explícita na URL de destino. Todos os destinos (fases e menus) passam
+   * por aqui para não duplicar a montagem da URL.
+   */
+  function navegarDev(url, descricao) {
+    notificarDev(`Navegando para ${descricao}...`);
+    const separador = url.includes("?") ? "&" : "?";
+    window.location.href = `${url}${separador}dev=true`;
+  }
+
   function irPara(mundo = 1, fase = 1) {
     const mundos = obterMundosDisponiveis();
     const configMundo = mundos[mundo] || mundos[1];
     const paginaDestino = configMundo?.html || "fase1.html";
 
-    notificarDev(`Navegando para Mundo ${mundo}, Fase ${fase}...`);
-    window.location.href = `${paginaDestino}?mundo=${mundo}&fase=${fase}&dev=true`;
+    navegarDev(`${paginaDestino}?mundo=${mundo}&fase=${fase}`, `Mundo ${mundo}, Fase ${fase}`);
+  }
+
+  // Destinos de navegação que não são fases (telas de menu).
+  const DESTINOS_MENU = {
+    menu: { url: "index.html", rotulo: "Menu" },
+    mundos: { url: "index.html?view=mundos", rotulo: "Menu de Mundos" },
+  };
+
+  function irParaMenu(destino = "menu") {
+    const alvo = DESTINOS_MENU[destino] || DESTINOS_MENU.menu;
+    navegarDev(alvo.url, alvo.rotulo);
   }
 
   // ==========================================================
@@ -358,6 +379,7 @@
       "  Shift + D → Desbloquear todas as fases e mundos\n\n" +
       "Funções no console:\n" +
       "  dev.irPara(mundo, fase)\n" +
+      "  dev.irParaMenu('menu' | 'mundos')\n" +
       "  dev.completarEtapa()\n" +
       "  dev.completarFase()\n" +
       "  dev.proximaFase()\n" +
@@ -691,6 +713,11 @@
       </div>
 
       <div class="dev-grid-acoes">
+        <button type="button" class="dev-btn" id="dev-btn-ir-menu">Menu</button>
+        <button type="button" class="dev-btn" id="dev-btn-ir-mundos">Menu de Mundos</button>
+      </div>
+
+      <div class="dev-grid-acoes">
         <button type="button" class="dev-btn" id="dev-btn-completar-etapa" title="Shift + C">Completar Etapa</button>
         <button type="button" class="dev-btn" id="dev-btn-proxima-fase" title="Shift + N">Próxima Fase</button>
         <button type="button" class="dev-btn" id="dev-btn-desbloquear-tudo" title="Shift + D">Desbloquear Tudo</button>
@@ -734,6 +761,16 @@
       });
     }
 
+    const btnIrMenu = painel.querySelector("#dev-btn-ir-menu");
+    if (btnIrMenu) {
+      btnIrMenu.addEventListener("click", () => irParaMenu("menu"));
+    }
+
+    const btnIrMundos = painel.querySelector("#dev-btn-ir-mundos");
+    if (btnIrMundos) {
+      btnIrMundos.addEventListener("click", () => irParaMenu("mundos"));
+    }
+
     const btnCompletarEtapa = painel.querySelector("#dev-btn-completar-etapa");
     if (btnCompletarEtapa) {
       btnCompletarEtapa.addEventListener("click", completarEtapa);
@@ -769,6 +806,7 @@
   // ==========================================================
   window.dev = {
     irPara,
+    irParaMenu,
     desbloquearTudo,
     resetarProgresso,
     completarEtapa,
