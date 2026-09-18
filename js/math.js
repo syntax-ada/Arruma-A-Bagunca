@@ -150,8 +150,16 @@ function verificarRespostaMatematica(valorEscolhido, totalCorreto, botaoClicado,
             ? window.obterFaseAtiva()
             : (new URLSearchParams(window.location.search).get("fase") || 1);
 
+        const mundoAtual = typeof window.obterMundoAtivo === "function"
+            ? window.obterMundoAtivo()
+            : 1;
+
+        const totalFases = typeof window.obterTotalFasesMundoAtivo === "function"
+            ? window.obterTotalFasesMundoAtivo()
+            : 3;
+
         if (typeof desbloquearProximaFase === "function") {
-            desbloquearProximaFase(faseAtual);
+            desbloquearProximaFase(faseAtual, mundoAtual, totalFases);
         }
 
         mostrarFeedbackMatematica(`Muito bem! Você acertou! ${somaTexto} objetos organizados ao todo!`, "success");

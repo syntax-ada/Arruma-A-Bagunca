@@ -5,82 +5,6 @@ const feedbackMessage = document.querySelector("#feedback-message");
 let activeDrag = null;
 
 // ==========================================================
-// CATÁLOGO DE MODELOS DISPONÍVEIS POR CATEGORIA
-// ==========================================================
-const MODELOS_BRINQUEDOS = [
-  {
-    baseId: "urso",
-    category: "brinquedos",
-    itemName: "o ursinho",
-    ariaLabel: "Ursinho de brinquedo. Arraste para a cesta de brinquedos.",
-    imgSrc: "assets/images/tela_fase1/uso 3.png",
-    imgAlt: "Ursinho de brinquedo",
-  },
-  {
-    baseId: "trenzinho",
-    category: "brinquedos",
-    itemName: "o trenzinho",
-    ariaLabel: "Trenzinho de brinquedo. Arraste para a cesta de brinquedos.",
-    imgSrc: "assets/images/tela_fase1/tremzinho.png",
-    imgAlt: "Trenzinho de brinquedo",
-  },
-];
-
-const MODELOS_COMIDAS = [
-  {
-    baseId: "banana",
-    category: "comidas",
-    itemName: "a banana",
-    ariaLabel: "Banana. Arraste para a cesta de comidas.",
-    imgSrc: "assets/images/tela_fase1/banana.png",
-    imgAlt: "Banana",
-  },
-  {
-    baseId: "maca",
-    category: "comidas",
-    itemName: "a maçã",
-    ariaLabel: "Maçã. Arraste para a cesta de comidas.",
-    imgSrc: "assets/images/tela_fase1/maça.png",
-    imgAlt: "Maçã",
-  },
-  {
-    baseId: "pera",
-    category: "comidas",
-    itemName: "a pera",
-    ariaLabel: "Pera. Arraste para a cesta de comidas.",
-    imgSrc: "assets/images/tela_fase1/pera.png",
-    imgAlt: "Pera",
-  },
-];
-
-const MODELOS_MATERIAIS = [
-  {
-    baseId: "lapis",
-    category: "materiais",
-    itemName: "o lápis",
-    ariaLabel: "Lápis. Arraste para a cesta de materiais escolares.",
-    imgSrc: "assets/images/tela_fase1/lápis.png",
-    imgAlt: "Lápis",
-  },
-  {
-    baseId: "borracha",
-    category: "materiais",
-    itemName: "a borracha",
-    ariaLabel: "Borracha. Arraste para a cesta de materiais escolares.",
-    imgSrc: "assets/images/tela_fase1/borracha.png",
-    imgAlt: "Borracha",
-  },
-  {
-    baseId: "apontador",
-    category: "materiais",
-    itemName: "o apontador",
-    ariaLabel: "Apontador. Arraste para a cesta de materiais escolares.",
-    imgSrc: "assets/images/tela_fase1/apontador.png",
-    imgAlt: "Apontador",
-  },
-];
-
-// ==========================================================
 // FUNÇÕES DE RANDOMIZAÇÃO E GERAÇÃO REUTILIZÁVEL DE OBJETOS
 // ==========================================================
 function embaralharArray(array) {
@@ -128,253 +52,10 @@ function gerarItensFase(cotas) {
   return embaralharArray(todosItens);
 }
 
-function gerarItensFase1() {
-  const modelosComidasFase1 = MODELOS_COMIDAS.filter((c) => c.baseId !== "pera");
-  return gerarItensFase([
-    { categoria: "brinquedos", quantidade: 3, modelos: MODELOS_BRINQUEDOS },
-    { categoria: "comidas", quantidade: 2, modelos: modelosComidasFase1 },
-  ]);
-}
-
-function gerarItensFase2() {
-  return gerarItensFase([
-    { categoria: "brinquedos", quantidade: 3, modelos: MODELOS_BRINQUEDOS },
-    { categoria: "comidas", quantidade: 3, modelos: MODELOS_COMIDAS },
-    { categoria: "materiais", quantidade: 3, modelos: MODELOS_MATERIAIS },
-  ]);
-}
-
-function gerarItensFase3() {
-  return gerarItensFase([
-    { categoria: "brinquedos", quantidade: 2, modelos: MODELOS_BRINQUEDOS },
-    { categoria: "comidas", quantidade: 5, modelos: MODELOS_COMIDAS },
-    { categoria: "materiais", quantidade: 7, modelos: MODELOS_MATERIAIS },
-  ]);
-}
-
-const ITENS_FASE_1 = [
-  {
-    id: "item-urso-1",
-    category: "brinquedos",
-    itemName: "o ursinho",
-    ariaLabel: "Ursinho de brinquedo. Arraste para a cesta de brinquedos.",
-    imgSrc: "assets/images/tela_fase1/uso 3.png",
-    imgAlt: "Ursinho de brinquedo",
-  },
-  {
-    id: "item-trenzinho-1",
-    category: "brinquedos",
-    itemName: "o trenzinho",
-    ariaLabel: "Trenzinho de brinquedo. Arraste para a cesta de brinquedos.",
-    imgSrc: "assets/images/tela_fase1/tremzinho.png",
-    imgAlt: "Trenzinho de brinquedo",
-  },
-  {
-    id: "item-urso-2",
-    category: "brinquedos",
-    itemName: "o ursinho",
-    ariaLabel: "Ursinho de brinquedo. Arraste para a cesta de brinquedos.",
-    imgSrc: "assets/images/tela_fase1/uso 3.png",
-    imgAlt: "Ursinho de brinquedo",
-  },
-  {
-    id: "item-banana",
-    category: "comidas",
-    itemName: "a banana",
-    ariaLabel: "Banana. Arraste para a cesta de comidas.",
-    imgSrc: "assets/images/tela_fase1/banana.png",
-    imgAlt: "Banana",
-  },
-  {
-    id: "item-maca",
-    category: "comidas",
-    itemName: "a maçã",
-    ariaLabel: "Maçã. Arraste para a cesta de comidas.",
-    imgSrc: "assets/images/tela_fase1/maça.png",
-    imgAlt: "Maçã",
-  },
-];
-
-// ==========================================================
-// CONFIGURAÇÃO DA FASE 1 (Mundo 1 — Adição)
-// 2 Categorias (Brinquedos e Comidas) | 5 Objetos no total
-// ==========================================================
-const CONFIG_FASE_1 = {
-  id: "fase1",
-  gerarObjetos: gerarItensFase1,
-  get objetos() {
-    return gerarItensFase1();
-  },
-  categorias: [
-    {
-      id: "cesta-brinquedos",
-      accepts: "brinquedos",
-      nome: "Brinquedos",
-      ariaLabel: "Cesta de brinquedos",
-      icone: "🧸",
-      posicao: "esq-centro",
-      etiquetaImgSrc: "assets/images/tela_fase1/botton_brinquedos.png",
-      etiquetaImgAlt: "Categoria Brinquedos",
-      sprites: [
-        "assets/images/tela_fase1/sprites_cestas/brinquedos/1_cesta_brinquedo-1.png",
-        "assets/images/tela_fase1/sprites_cestas/brinquedos/1_cesta_brinquedo.png",
-        "assets/images/tela_fase1/sprites_cestas/brinquedos/2_cesta_brinquedo.png",
-        "assets/images/tela_fase1/sprites_cestas/brinquedos/3_cesta_brinquedo.png",
-      ],
-    },
-    {
-      id: "cesta-comidas",
-      accepts: "comidas",
-      nome: "Comidas",
-      ariaLabel: "Cesta de comidas",
-      icone: "🍎",
-      posicao: "dir-centro",
-      etiquetaImgSrc: "assets/images/tela_fase1/botton_comida.png",
-      etiquetaImgAlt: "Categoria Comida",
-      sprites: [
-        "assets/images/tela_fase1/sprites_cestas/comidas/1_cesta_comida-1.png",
-        "assets/images/tela_fase1/sprites_cestas/comidas/1_cesta_comida.png",
-        "assets/images/tela_fase1/sprites_cestas/comidas/2_cesta_comida.png",
-        "assets/images/tela_fase1/sprites_cestas/comidas/3_cesta_comida.png",
-      ],
-    },
-  ],
-};
-
-// ==========================================================
-// CONFIGURAÇÃO DA FASE 2
-// 3 Categorias | 9 Objetos no total: 3 Brinquedos, 3 Comidas, 3 Materiais
-// ==========================================================
-const CONFIG_FASE_2 = {
-  id: "fase2",
-  gerarObjetos: gerarItensFase2,
-  get objetos() {
-    return gerarItensFase2();
-  },
-  categorias: [
-    {
-      id: "cesta-brinquedos",
-      accepts: "brinquedos",
-      nome: "Brinquedos",
-      ariaLabel: "Cesta de brinquedos",
-      icone: "🧸",
-      posicao: "esq-topo",
-      etiquetaImgSrc: "assets/images/tela_fase1/botton_brinquedos.png",
-      etiquetaImgAlt: "Categoria Brinquedos",
-      sprites: [
-        "assets/images/tela_fase1/sprites_cestas/brinquedos/1_cesta_brinquedo-1.png",
-        "assets/images/tela_fase1/sprites_cestas/brinquedos/1_cesta_brinquedo.png",
-        "assets/images/tela_fase1/sprites_cestas/brinquedos/2_cesta_brinquedo.png",
-        "assets/images/tela_fase1/sprites_cestas/brinquedos/3_cesta_brinquedo.png",
-      ],
-    },
-    {
-      id: "cesta-comidas",
-      accepts: "comidas",
-      nome: "Comidas",
-      ariaLabel: "Cesta de comidas",
-      icone: "🍎",
-      posicao: "esq-base",
-      etiquetaImgSrc: "assets/images/tela_fase1/botton_comida.png",
-      etiquetaImgAlt: "Categoria Comida",
-      sprites: [
-        "assets/images/tela_fase1/sprites_cestas/comidas/1_cesta_comida-1.png",
-        "assets/images/tela_fase1/sprites_cestas/comidas/1_cesta_comida.png",
-        "assets/images/tela_fase1/sprites_cestas/comidas/2_cesta_comida.png",
-        "assets/images/tela_fase1/sprites_cestas/comidas/3_cesta_comida.png",
-      ],
-    },
-    {
-      id: "cesta-materiais",
-      accepts: "materiais",
-      nome: "Materiais",
-      ariaLabel: "Cesta de materiais escolares",
-      icone: "✏️",
-      posicao: "dir-centro",
-      etiquetaImgSrc: "assets/images/tela_fase1/botton_material.png",
-      etiquetaImgAlt: "Categoria Material escolar",
-      sprites: [
-        "assets/images/tela_fase1/sprites_cestas/materiais/1_cesta_material-1.png",
-        "assets/images/tela_fase1/sprites_cestas/materiais/1_cesta_material.png",
-        "assets/images/tela_fase1/sprites_cestas/materiais/2_cesta_material.png",
-        "assets/images/tela_fase1/sprites_cestas/materiais/3_cesta_material.png",
-      ],
-    },
-  ],
-};
-
-// ==========================================================
-// CONFIGURAÇÃO DA FASE 3
-// 3 Categorias | 14 Objetos no total: 2 Brinquedos, 5 Comidas, 7 Materiais
-// ==========================================================
-const CONFIG_FASE_3 = {
-  id: "fase3",
-  gerarObjetos: gerarItensFase3,
-  get objetos() {
-    return gerarItensFase3();
-  },
-  categorias: [
-    {
-      id: "cesta-brinquedos",
-      accepts: "brinquedos",
-      nome: "Brinquedos",
-      ariaLabel: "Cesta de brinquedos",
-      icone: "🧸",
-      posicao: "esq-topo",
-      etiquetaImgSrc: "assets/images/tela_fase1/botton_brinquedos.png",
-      etiquetaImgAlt: "Categoria Brinquedos",
-      sprites: [
-        "assets/images/tela_fase1/sprites_cestas/brinquedos/1_cesta_brinquedo-1.png",
-        "assets/images/tela_fase1/sprites_cestas/brinquedos/1_cesta_brinquedo.png",
-        "assets/images/tela_fase1/sprites_cestas/brinquedos/2_cesta_brinquedo.png",
-        "assets/images/tela_fase1/sprites_cestas/brinquedos/3_cesta_brinquedo.png",
-      ],
-    },
-    {
-      id: "cesta-comidas",
-      accepts: "comidas",
-      nome: "Comidas",
-      ariaLabel: "Cesta de comidas",
-      icone: "🍎",
-      posicao: "esq-base",
-      etiquetaImgSrc: "assets/images/tela_fase1/botton_comida.png",
-      etiquetaImgAlt: "Categoria Comida",
-      sprites: [
-        "assets/images/tela_fase1/sprites_cestas/comidas/1_cesta_comida-1.png",
-        "assets/images/tela_fase1/sprites_cestas/comidas/1_cesta_comida.png",
-        "assets/images/tela_fase1/sprites_cestas/comidas/2_cesta_comida.png",
-        "assets/images/tela_fase1/sprites_cestas/comidas/3_cesta_comida.png",
-      ],
-    },
-    {
-      id: "cesta-materiais",
-      accepts: "materiais",
-      nome: "Materiais",
-      ariaLabel: "Cesta de materiais escolares",
-      icone: "✏️",
-      posicao: "dir-centro",
-      etiquetaImgSrc: "assets/images/tela_fase1/botton_material.png",
-      etiquetaImgAlt: "Categoria Material escolar",
-      sprites: [
-        "assets/images/tela_fase1/sprites_cestas/materiais/1_cesta_material-1.png",
-        "assets/images/tela_fase1/sprites_cestas/materiais/1_cesta_material.png",
-        "assets/images/tela_fase1/sprites_cestas/materiais/2_cesta_material.png",
-        "assets/images/tela_fase1/sprites_cestas/materiais/3_cesta_material.png",
-      ],
-    },
-  ],
-};
-
-const FASES = {
-  fase1: CONFIG_FASE_1,
-  fase2: CONFIG_FASE_2,
-  fase3: CONFIG_FASE_3,
-};
-
-let activeConfig = CONFIG_FASE_1;
+let activeConfig = null;
 let basketSprites = {};
 
-function renderizarCestas(listaCategorias = CONFIG_FASE_1.categorias) {
+function renderizarCestas(listaCategorias = []) {
   const containerCategorias = document.querySelector(".categorias");
   if (!containerCategorias) {
     return;
@@ -423,7 +104,7 @@ function renderizarCestas(listaCategorias = CONFIG_FASE_1.categorias) {
   dropZones = document.querySelectorAll(".drop-zone");
 }
 
-function renderizarGradeObjetos(listaObjetos = ITENS_FASE_1) {
+function renderizarGradeObjetos(listaObjetos = []) {
   const containerGrid = document.querySelector("#grid-objetos");
   if (!containerGrid) {
     return;
@@ -456,17 +137,12 @@ function renderizarGradeObjetos(listaObjetos = ITENS_FASE_1) {
   draggableItems = document.querySelectorAll(".draggable-item");
 }
 
-function startGame(config = CONFIG_FASE_1) {
-  if (typeof config === "string" && FASES[config]) {
-    activeConfig = FASES[config];
-  } else if (Array.isArray(config)) {
-    activeConfig = {
-      ...CONFIG_FASE_1,
-      objetos: config,
-    };
-  } else {
-    activeConfig = config || CONFIG_FASE_1;
+function startGame(config) {
+  if (!config) {
+    return;
   }
+
+  activeConfig = config;
 
   document.body.classList.remove("cenario-arrumado");
 
@@ -827,19 +503,8 @@ function handleDropZoneKeyboard(event) {
 }
 
 if (typeof window !== "undefined") {
-  window.CONFIG_FASE_1 = CONFIG_FASE_1;
-  window.CONFIG_FASE_2 = CONFIG_FASE_2;
-  window.CONFIG_FASE_3 = CONFIG_FASE_3;
-  window.FASES = FASES;
   window.startGame = startGame;
-  window.obterFaseAtiva = function () {
-    return activeConfig?.id || "fase1";
-  };
 }
 
-// Inicializa a fase especificada na URL (ex: ?fase=2) ou Fase 1 por padrão
-const urlParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
-const faseParam = urlParams ? urlParams.get("fase") : null;
-const faseInicial = (faseParam && FASES[`fase${faseParam}`]) ? FASES[`fase${faseParam}`] : CONFIG_FASE_1;
-
-startGame(faseInicial);
+// A inicializacao do jogo e responsabilidade de main.js (ponto de entrada).
+// Nao inicialize aqui: isso causaria dupla inicializacao.
