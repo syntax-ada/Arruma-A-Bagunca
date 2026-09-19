@@ -99,28 +99,37 @@
     },
   ];
 
+  function getGerarItensFaseFn() {
+    if (typeof gerarItensFase === "function") return gerarItensFase;
+    if (typeof window !== "undefined" && typeof window.gerarItensFase === "function") return window.gerarItensFase;
+    return null;
+  }
+
   function gerarItensFase1() {
+    const fn = getGerarItensFaseFn();
     const modelosComidasFase1 = MODELOS_COMIDAS.filter((c) => c.baseId !== "pera");
-    return gerarItensFase([
+    return fn ? fn([
       { categoria: "brinquedos", quantidade: 3, modelos: MODELOS_BRINQUEDOS },
       { categoria: "comidas", quantidade: 2, modelos: modelosComidasFase1 },
-    ]);
+    ]) : ITENS_FASE_1;
   }
 
   function gerarItensFase2() {
-    return gerarItensFase([
+    const fn = getGerarItensFaseFn();
+    return fn ? fn([
       { categoria: "brinquedos", quantidade: 3, modelos: MODELOS_BRINQUEDOS },
       { categoria: "comidas", quantidade: 3, modelos: MODELOS_COMIDAS },
       { categoria: "materiais", quantidade: 3, modelos: MODELOS_MATERIAIS },
-    ]);
+    ]) : [];
   }
 
   function gerarItensFase3() {
-    return gerarItensFase([
+    const fn = getGerarItensFaseFn();
+    return fn ? fn([
       { categoria: "brinquedos", quantidade: 2, modelos: MODELOS_BRINQUEDOS },
       { categoria: "comidas", quantidade: 5, modelos: MODELOS_COMIDAS },
       { categoria: "materiais", quantidade: 7, modelos: MODELOS_MATERIAIS },
-    ]);
+    ]) : [];
   }
 
   const ITENS_FASE_1 = [

@@ -56,6 +56,7 @@ let activeConfig = null;
 let basketSprites = {};
 
 function renderizarCestas(listaCategorias = []) {
+  console.log("Tentando renderizar cestas:", listaCategorias);
   const containerCategorias = document.querySelector(".categorias");
   if (!containerCategorias) {
     return;
@@ -68,7 +69,7 @@ function renderizarCestas(listaCategorias = []) {
     basketSprites[cat.accepts] = cat.sprites || [];
 
     const dropZone = document.createElement("div");
-    dropZone.className = `categoria drop-zone${cat.posicao ? ` posicao-${cat.posicao}` : ""}`;
+    dropZone.className = `categoria cesta-container drop-zone${cat.posicao ? ` posicao-${cat.posicao}` : ""}`;
     dropZone.id = cat.id;
     dropZone.dataset.accepts = cat.accepts;
     dropZone.tabIndex = 0;
@@ -77,26 +78,28 @@ function renderizarCestas(listaCategorias = []) {
     const srOnly = document.createElement("strong");
     srOnly.className = "sr-only";
     srOnly.textContent = cat.nome;
+    dropZone.appendChild(srOnly);
 
-    const contador = document.createElement("span");
-    contador.className = "contador-categoria";
+    // Criação segura do elemento de contador no DOM para evitar TypeErrors em atualizações de pontuação
+    const contador = document.createElement("div");
+    contador.className = "contador contador-categoria";
     contador.setAttribute("aria-label", "0 itens organizados");
     contador.textContent = "0";
+    dropZone.appendChild(contador);
 
     const imgCesta = document.createElement("img");
-    imgCesta.className = "cesta";
+    imgCesta.className = "cesta cesta-img";
     imgCesta.src = cat.sprites && cat.sprites.length > 0 ? cat.sprites[0] : "";
     imgCesta.alt = `${cat.ariaLabel} com zero itens`;
-
-    const imgEtiqueta = document.createElement("img");
-    imgEtiqueta.className = "etiqueta-categoria";
-    imgEtiqueta.src = cat.etiquetaImgSrc;
-    imgEtiqueta.alt = cat.etiquetaImgAlt;
-
-    dropZone.appendChild(srOnly);
-    dropZone.appendChild(contador);
     dropZone.appendChild(imgCesta);
-    dropZone.appendChild(imgEtiqueta);
+
+    if (cat.etiquetaImgSrc) {
+      const imgEtiqueta = document.createElement("img");
+      imgEtiqueta.className = "etiqueta-categoria categoria-img";
+      imgEtiqueta.src = cat.etiquetaImgSrc;
+      imgEtiqueta.alt = cat.etiquetaImgAlt || `Categoria ${cat.nome}`;
+      dropZone.appendChild(imgEtiqueta);
+    }
 
     containerCategorias.appendChild(dropZone);
   });
@@ -139,12 +142,19 @@ function renderizarGradeObjetos(listaObjetos = []) {
 
 function startGame(config) {
   if (!config) {
+    console.error("[game.js] startGame chamado sem objeto de configuração.");
     return;
   }
 
   activeConfig = config;
 
   document.body.classList.remove("cenario-arrumado");
+  const fundoInicial = activeConfig.fundoBaguncado || activeConfig.fundo;
+  if (fundoInicial) {
+    document.body.style.backgroundImage = `url("${fundoInicial}")`;
+  } else {
+    document.body.style.backgroundImage = "";
+  }
 
   const telaOrganizacao = document.querySelector("#tela-organizacao");
   const telaMatematica = document.querySelector("#tela-matematica");
@@ -242,6 +252,9 @@ function finishDrag(event) {
       const resumoCategorias = getCategorySummary();
       setTimeout(() => {
         document.body.classList.add("cenario-arrumado");
+        if (activeConfig?.fundoArrumado) {
+          document.body.style.backgroundImage = `url("${activeConfig.fundoArrumado}")`;
+        }
         if (typeof iniciarDesafioMatematico === "function") {
           iniciarDesafioMatematico(resumoCategorias);
         }
@@ -397,7 +410,7 @@ function updateDropZoneCounter(dropZone) {
     return item.dataset.dropZoneId === dropZone.id && item.classList.contains("is-correct");
   }).length;
 
-  const counter = dropZone.querySelector(".contador-categoria");
+  const counter = dropZone.querySelector(".contador") || dropZone.querySelector(".contador-categoria");
   if (counter) {
     counter.textContent = placedCount;
     counter.setAttribute("aria-label", `${placedCount} itens organizados`);
@@ -490,6 +503,9 @@ function handleDropZoneKeyboard(event) {
       const resumoCategorias = getCategorySummary();
       setTimeout(() => {
         document.body.classList.add("cenario-arrumado");
+        if (activeConfig?.fundoArrumado) {
+          document.body.style.backgroundImage = `url("${activeConfig.fundoArrumado}")`;
+        }
         if (typeof iniciarDesafioMatematico === "function") {
           iniciarDesafioMatematico(resumoCategorias);
         }
@@ -504,7 +520,7 @@ function handleDropZoneKeyboard(event) {
 
 if (typeof window !== "undefined") {
   window.startGame = startGame;
+  window.gerarItensFase = gerarItensFase;
+  window.embaralharArray = embaralharArray;
+  window.findCorrectDropZone = findCorrectDropZone;
 }
-
-// A inicializacao do jogo e responsabilidade de main.js (ponto de entrada).
-// Nao inicialize aqui: isso causaria dupla inicializacao.

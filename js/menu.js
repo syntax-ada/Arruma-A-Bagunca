@@ -13,6 +13,42 @@ const btnIniciarFase2 = document.querySelector("#btn-iniciar-fase2");
 const btnIniciarFase3 = document.querySelector("#btn-iniciar-fase3");
 const trilhoPreenchimento = document.querySelector(".preenchimento-progresso");
 const textoProgresso = document.querySelector(".porcentagem-progresso");
+const carrosselMundos = document.querySelector(".carrossel-mundos");
+const btnSetaEsquerda = document.querySelector('.btn-seta[aria-label="Mundo anterior"]');
+const btnSetaDireita = document.querySelector('.btn-seta[aria-label="Próximo mundo"]');
+
+/**
+ * Obtém a largura de um card incluindo o gap do carrossel para o passo de rolagem.
+ */
+function obterLarguraPassoCarrossel() {
+  if (!carrosselMundos) {
+    return 300;
+  }
+  const primeiroCard = carrosselMundos.querySelector(".card-mundo");
+  if (!primeiroCard) {
+    return 300;
+  }
+
+  const cardRect = primeiroCard.getBoundingClientRect();
+  const estiloCarrossel = window.getComputedStyle(carrosselMundos);
+  const gap = parseFloat(estiloCarrossel.gap) || parseFloat(estiloCarrossel.columnGap) || 0;
+
+  return cardRect.width + gap;
+}
+
+if (btnSetaEsquerda && carrosselMundos) {
+  btnSetaEsquerda.addEventListener("click", function () {
+    const larguraDoCard = obterLarguraPassoCarrossel();
+    carrosselMundos.scrollBy({ left: -larguraDoCard, behavior: "smooth" });
+  });
+}
+
+if (btnSetaDireita && carrosselMundos) {
+  btnSetaDireita.addEventListener("click", function () {
+    const larguraDoCard = obterLarguraPassoCarrossel();
+    carrosselMundos.scrollBy({ left: larguraDoCard, behavior: "smooth" });
+  });
+}
 
 /**
  * Atualiza a interface do menu de acordo com os dados de progresso salvos.
@@ -29,7 +65,7 @@ function atualizarInterfaceProgresso() {
   // 1. Atualização dos botões da trilha de fases do Mundo 1
   if (btnIniciarFase1) {
     btnIniciarFase1.onclick = function () {
-      window.location.href = "fase1.html?fase=1";
+      window.location.href = "fase1.html?mundo=1&fase=1";
     };
   }
 
@@ -40,7 +76,7 @@ function atualizarInterfaceProgresso() {
       btnIniciarFase2.classList.add("fase-ativa");
       btnIniciarFase2.setAttribute("aria-label", "Jogar Fase 2");
       btnIniciarFase2.onclick = function () {
-        window.location.href = "fase1.html?fase=2";
+        window.location.href = "fase1.html?mundo=1&fase=2";
       };
     } else {
       btnIniciarFase2.disabled = true;
@@ -58,7 +94,7 @@ function atualizarInterfaceProgresso() {
       btnIniciarFase3.classList.add("fase-ativa");
       btnIniciarFase3.setAttribute("aria-label", "Jogar Fase 3");
       btnIniciarFase3.onclick = function () {
-        window.location.href = "fase1.html?fase=3";
+        window.location.href = "fase1.html?mundo=1&fase=3";
       };
     } else {
       btnIniciarFase3.disabled = true;
@@ -77,17 +113,17 @@ function atualizarInterfaceProgresso() {
     if (mundo2Liberado) {
       cardMundo2.classList.remove("mundo-bloqueado");
       cardMundo2.classList.add("mundo-disponivel");
-      cardMundo2.setAttribute("aria-label", "Mundo 2, Escola, liberado");
+      cardMundo2.setAttribute("aria-label", "Mundo 2, Parque, liberado");
       if (overlay2) {
         overlay2.classList.add("escondido");
       }
       cardMundo2.onclick = function () {
-        alert("Mundo 2 (Escola) em breve!");
+        window.location.href = "fase1.html?mundo=2&fase=1";
       };
     } else {
       cardMundo2.classList.add("mundo-bloqueado");
       cardMundo2.classList.remove("mundo-disponivel");
-      cardMundo2.setAttribute("aria-label", "Mundo 2, Escola, bloqueado");
+      cardMundo2.setAttribute("aria-label", "Mundo 2, Parque, bloqueado");
       if (overlay2) {
         overlay2.classList.remove("escondido");
       }
@@ -95,14 +131,41 @@ function atualizarInterfaceProgresso() {
     }
   }
 
+  if (cardMundo3) {
+    const mundo3Liberado = mundosLiberados.includes(3);
+    const overlay3 = cardMundo3.querySelector(".overlay-bloqueado");
+
+    if (mundo3Liberado) {
+      cardMundo3.classList.remove("mundo-bloqueado");
+      cardMundo3.classList.add("mundo-disponivel");
+      cardMundo3.setAttribute("aria-label", "Mundo 3, Praia, liberado");
+      if (overlay3) {
+        overlay3.classList.add("escondido");
+      }
+      cardMundo3.onclick = function () {
+        window.location.href = "fase1.html?mundo=3&fase=1";
+      };
+    } else {
+      cardMundo3.classList.add("mundo-bloqueado");
+      cardMundo3.classList.remove("mundo-disponivel");
+      cardMundo3.setAttribute("aria-label", "Mundo 3, Praia, bloqueado");
+      if (overlay3) {
+        overlay3.classList.remove("escondido");
+      }
+      cardMundo3.onclick = null;
+    }
+  }
+
   // 3. Atualização visual da barra de progresso
   let porcentagem = 10;
-  if (mundosLiberados.includes(2)) {
+  if (mundosLiberados.includes(3)) {
     porcentagem = 100;
-  } else if (faseMaximaMundo1 >= 3) {
+  } else if (mundosLiberados.includes(2)) {
     porcentagem = 66;
+  } else if (faseMaximaMundo1 >= 3) {
+    porcentagem = 45;
   } else if (faseMaximaMundo1 >= 2) {
-    porcentagem = 33;
+    porcentagem = 25;
   }
 
   if (trilhoPreenchimento) {

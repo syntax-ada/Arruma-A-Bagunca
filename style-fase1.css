@@ -147,25 +147,13 @@
     display: none;
 }
 
-.contador-categoria {
-    position: absolute;
-    top: 10px;
-    right: 24px;
-    z-index: 10;
-    min-width: 38px;
-    height: 38px;
-    padding: 0 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #24577a;
-    color: #ffffff;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 1.25rem;
-    font-weight: 800;
-    border: 3px solid #ffffff;
-    border-radius: 20px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+/* Oculta visualmente a bolinha azul do contador de forma segura sem quebrar o JS */
+.cesta-container .contador,
+.categoria .contador,
+.cesta-container .contador-categoria,
+.categoria .contador-categoria {
+    display: none !important;
+    visibility: hidden;
     pointer-events: none;
 }
 
@@ -185,6 +173,11 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    text-align: center;
+    width: max-content;
+    width: fit-content;
+    gap: 5px;
     position: relative;
     transition: transform 0.15s ease;
 }
@@ -199,15 +192,51 @@
     border-radius: 12px;
 }
 
-.cesta {
-    width: 300px;
-    height: auto;
-}
-
-.etiqueta-categoria {
-    margin-top: -12px;
+.cesta,
+.cesta-img {
+    width: 100%;
     max-width: 300px;
     height: auto;
+    display: block;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    position: static;
+    left: auto;
+    right: auto;
+    transform: none;
+}
+
+.etiqueta-categoria,
+.categoria-img {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+    display: block;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    position: static;
+    left: auto;
+    right: auto;
+    transform: none;
+}
+
+.etiqueta-texto-categoria {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 18px;
+    background: #ff5f95;
+    color: #ffffff;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 1.05rem;
+    font-weight: 800;
+    border: 3px solid #ffffff;
+    border-radius: 999px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-align: center;
+    user-select: none;
 }
 
 /* ==========================================================
@@ -231,9 +260,12 @@
         pointer-events: none;
     }
 
-    .categoria {
+    .categoria,
+    .cesta-container {
         position: absolute;
         pointer-events: auto;
+        width: clamp(145px, 16vw, 210px);
+        max-width: clamp(145px, 16vw, 210px);
     }
 
     .categoria.posicao-esq-topo {
@@ -293,12 +325,20 @@
         top: 36%;
     }
 
-    .cesta {
-        width: clamp(145px, 16vw, 210px);
+    .cesta,
+    .cesta-img {
+        width: 100%;
+        max-width: clamp(145px, 16vw, 210px);
+        margin: 0 auto !important;
+        padding: 0 !important;
     }
 
-    .etiqueta-categoria {
+    .etiqueta-categoria,
+    .categoria-img {
+        width: 100%;
         max-width: clamp(145px, 16vw, 210px);
+        margin: 0 auto !important;
+        padding: 0 !important;
     }
 }
 
@@ -319,16 +359,27 @@
         pointer-events: auto;
     }
 
-    .categoria {
+    .categoria,
+    .cesta-container {
         position: static;
-    }
-
-    .cesta {
         width: min(29vw, 120px);
+        max-width: min(29vw, 120px);
     }
 
-    .etiqueta-categoria {
+    .cesta,
+    .cesta-img {
+        width: 100%;
         max-width: min(29vw, 120px);
+        margin: 0 auto !important;
+        padding: 0 !important;
+    }
+
+    .etiqueta-categoria,
+    .categoria-img {
+        width: 100%;
+        max-width: min(29vw, 120px);
+        margin: 0 auto !important;
+        padding: 0 !important;
     }
 }
 
@@ -520,165 +571,11 @@
     border: 2px solid #b9442a;
 }
 
-/* ==========================================================
-   RESPONSIVIDADE (TABLETS E SMARTPHONES)
-   ========================================================== */
-
-@media (max-width: 900px) {
-    .categorias {
-        gap: 16px;
-        padding-bottom: 20px;
-    }
-
-    .cesta {
-        width: min(29vw, 180px);
-    }
-
-    .etiqueta-categoria {
-        max-width: min(29vw, 180px);
-    }
-
-    .contador-categoria {
-        top: 4px;
-        right: 8px;
-        min-width: 32px;
-        height: 32px;
-        font-size: 1.1rem;
-    }
-
-    .feedback-message {
-        font-size: 1rem;
-        padding: 4px 12px;
-        bottom: 10px;
-    }
-
-    .painel-matematica {
-        padding: 20px 24px;
-        gap: 16px;
-    }
-
-    .pergunta-matematica {
-        font-size: 1.3rem;
-    }
-
-    .botao-opcao-matematica {
-        width: 72px;
-        height: 72px;
-        font-size: 1.8rem;
-    }
-}
-
-@media (max-width: 600px) {
-    .categorias {
-        gap: 8px;
-        padding-bottom: 12px;
-    }
-
-    .cesta {
-        width: min(30vw, 120px);
-    }
-
-    .etiqueta-categoria {
-        max-width: min(30vw, 120px);
-    }
-
-    .contador-categoria {
-        top: 2px;
-        right: 4px;
-        min-width: 26px;
-        height: 26px;
-        font-size: 0.9rem;
-        border-width: 2px;
-    }
-
-    .hud-container {
-        width: min(94vw, 420px);
-    }
-
-    .feedback-message {
-        font-size: 0.85rem;
-        padding: 2px 8px;
-        bottom: 6px;
-    }
-
-    .painel-matematica {
-        padding: 14px 16px;
-        gap: 12px;
-    }
-
-    .pergunta-matematica {
-        font-size: 1.15rem;
-    }
-
-    .item-resumo {
-        font-size: 0.95rem;
-        padding: 4px 8px;
-    }
-
-    .botao-opcao-matematica {
-        width: 62px;
-        height: 62px;
-        font-size: 1.5rem;
-        border-width: 3px;
-    }
-}
-
-@media (max-height: 500px) {
-    .topo-fase1 {
-        padding-top: 4px;
-    }
-
-    .hud-container {
-        width: min(75vw, 480px);
-    }
-
-    .feedback-message {
-        font-size: 0.85rem;
-        bottom: 6px;
-    }
-
-    .categorias {
-        padding-bottom: 8px;
-        gap: 14px;
-    }
-
-    .cesta {
-        width: min(22vw, 120px);
-    }
-
-    .etiqueta-categoria {
-        max-width: min(22vw, 120px);
-    }
-
-    .slot-objeto {
-        width: clamp(52px, 8vw, 68px);
-        height: clamp(52px, 8vw, 68px);
-    }
-
-    .painel-matematica {
-        padding: 10px 16px;
-        gap: 8px;
-    }
-}
-
-/* ==========================================================
-   BOTÕES DE CONCLUSÃO DO DESAFIO MATEMÁTICO
-   ========================================================== */
-
-.acoes-conclusao {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
-    flex-wrap: wrap;
-    width: 100%;
+.btn-continuar-menu {
     margin-top: 10px;
-}
-
-.btn-conclusao {
-    padding: 14px 30px;
+    padding: 14px 34px;
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 1.15rem;
+    font-size: 1.25rem;
     font-weight: 800;
     color: #ffffff;
     background: #1f7a45;
@@ -687,25 +584,37 @@
     cursor: pointer;
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
     transition: transform 0.2s ease, background-color 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
 }
 
-.btn-conclusao:hover {
+.btn-continuar-menu:hover {
     transform: scale(1.06);
     background: #156936;
 }
 
-@media (max-width: 600px) {
-    .acoes-conclusao {
-        gap: 10px;
-    }
+/* NOVOS BOTÕES DO FINAL DO DESAFIO MATEMÁTICO */
+.acoes-conclusao {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 20px;
+}
 
-    .btn-conclusao {
-        padding: 12px 20px;
-        font-size: 1rem;
-        width: 100%;
-    }
+.btn-conclusao {
+    background-color: #1f7a45;
+    color: white;
+    border: 2px solid white;
+    border-radius: 50px;
+    padding: 10px 20px;
+    font-size: 1.2rem;
+    font-family: inherit;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+    text-decoration: none;
+}
+
+.btn-conclusao:hover {
+    background-color: #145c32;
+    transform: scale(1.05);
 }

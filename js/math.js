@@ -23,6 +23,7 @@ function iniciarDesafioMatematico(dadosQuantidades) {
             brinquedos: "🧸",
             comidas: "🍎",
             materiais: "✏️",
+            animais: "🐶",
         };
         itensResumo = Object.entries(dadosQuantidades).map(([key, qtd]) => ({
             key,

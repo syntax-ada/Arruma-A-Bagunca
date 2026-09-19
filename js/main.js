@@ -38,33 +38,52 @@
 
   const params = new URLSearchParams(window.location.search);
 
-  // Ausência ou valor inválido cai no padrão (mantém o comportamento atual).
-  const mundoId = Number(params.get("mundo")) || MUNDO_PADRAO;
-  const faseId = Number(params.get("fase")) || FASE_PADRAO;
+  // Fallback robusto ao ler os parâmetros da URL
+  const rawMundo = params.get("mundo");
+  const rawFase = params.get("fase");
+
+  const mundoId = (rawMundo !== null && rawMundo !== undefined && rawMundo.trim() !== "")
+    ? (parseInt(rawMundo, 10) || MUNDO_PADRAO)
+    : MUNDO_PADRAO;
+
+  const faseId = (rawFase !== null && rawFase !== undefined && rawFase.trim() !== "")
+    ? (parseInt(rawFase, 10) || FASE_PADRAO)
+    : FASE_PADRAO;
 
   const mundos = window.MUNDOS || {};
   const mundo = mundos[mundoId] || mundos[MUNDO_PADRAO];
 
   if (!mundo) {
-    console.error(
-      `[main.js] Nenhum mundo registrado em MUNDOS. Verifique se o arquivo do mundo está sendo carregado no HTML antes de main.js.`
-    );
+    const msgErro = `[main.js] Erro crítico: Mundo "${mundoId}" não foi encontrado em window.MUNDOS. Verifique se o script do mundo (ex: js/mundos/mundo${mundoId}.js) foi importado antes de main.js.`;
+    console.error(msgErro);
+    const feedbackEl = document.querySelector("#feedback-message");
+    if (feedbackEl) {
+      feedbackEl.textContent = "Erro ao carregar o mundo. Retorne ao menu inicial.";
+      feedbackEl.classList.add("is-error");
+    }
     return;
   }
 
   const config = mundo.fases?.[faseId] || mundo.fases?.[FASE_PADRAO];
 
   if (!config) {
-    console.error(
-      `[main.js] Mundo ${mundo.id} não possui a fase ${faseId} nem a fase ${FASE_PADRAO}.`
-    );
+    const msgErro = `[main.js] Mundo ${mundo.id} (${mundo.nome}) não possui a fase ${faseId} nem a fase padrão ${FASE_PADRAO}.`;
+    console.error(msgErro);
+    const feedbackEl = document.querySelector("#feedback-message");
+    if (feedbackEl) {
+      feedbackEl.textContent = "Fase não encontrada neste mundo. Retorne ao menu.";
+      feedbackEl.classList.add("is-error");
+    }
     return;
   }
 
-  // Identidade do mundo ativo, consumida por math.js ao gravar o progresso.
-  // Fica aqui (e não em game.js) para que o motor continue genérico.
+  // Identidade do mundo ativo e da fase ativa
   window.obterMundoAtivo = function () {
     return mundo.id;
+  };
+
+  window.obterFaseAtiva = function () {
+    return faseId;
   };
 
   window.obterTotalFasesMundoAtivo = function () {
