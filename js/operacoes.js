@@ -31,10 +31,13 @@
   // Quantidade de botões de resposta exibidos na tela (1 correto + 2 distratores).
   const TOTAL_ALTERNATIVAS = 3;
 
-  // Teto do resultado da multiplicação. Mantém as contas em território simples
-  // para a faixa etária: 3 × 3 × 3 = 27 passa, 4 × 4 × 3 = 48 é recusado na
-  // autoria da fase em vez de virar um desafio impossível na tela.
-  const LIMITE_MULTIPLICACAO = 30;
+  // Teto do resultado da multiplicação. Vale como guarda de autoria de fase:
+  // uma conta acima do teto é recusada com erro no console, em vez de virar um
+  // desafio impossível na tela. O valor acompanha a maior conta em uso — hoje
+  // a Fase 3 do Mundo 3 (2 × 4 × 5 = 40) —, então 40 passa e 4 × 4 × 3 = 48 é
+  // recusado. É um limite técnico, não uma decisão pedagógica: ajuste-o junto
+  // com as contas se um mundo novo precisar de resultados maiores.
+  const LIMITE_MULTIPLICACAO = 40;
 
   function normalizarValores(valores) {
     return (Array.isArray(valores) ? valores : []).map((valor) => Number(valor) || 0);

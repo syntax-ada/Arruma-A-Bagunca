@@ -11,7 +11,16 @@
  * - Configurações das 3 fases progressivas;
  * - Auto-registro em window.MUNDOS[3].
  *
- * TODO: Back-end substituirá por lógica de multiplicação/divisão futuramente.
+ * OPERAÇÃO: MULTIPLICAÇÃO. Cada fase declara operacao: "multiplicacao" e
+ * math.js resolve a conta pela operação correspondente em js/operacoes.js.
+ *
+ * A ordem do array "categorias" NÃO altera o resultado aqui — a multiplicação
+ * é comutativa, diferente da subtração do Mundo 2. A ordem declarada vale
+ * apenas como organização visual das cestas na tela.
+ *
+ * As cotas de cada fase são os fatores da conta. js/operacoes.js mantém um
+ * teto técnico de resultado (LIMITE_MULTIPLICACAO) e recusa a conta com erro
+ * no console caso uma fase ultrapasse esse valor.
  * ============================================================================
  */
 
@@ -92,6 +101,9 @@
 
   // ==========================================================
   // FUNÇÕES DE GERAÇÃO DINÂMICA DE ITENS
+  // As cotas seguem a mesma ordem do array "categorias" da fase e são os
+  // fatores da multiplicação. Categorias com cota maior que o número de
+  // modelos disponíveis repetem modelos — é esperado, e o gerador cuida disso.
   // ==========================================================
   function getGerarItensFaseFn() {
     if (typeof gerarItensFase === "function") return gerarItensFase;
@@ -101,30 +113,30 @@
 
   function gerarItensMundo3Fase1() {
     const fn = getGerarItensFaseFn();
-    // Fase 1: 2 categorias (Bebidas e Comidas) com 6 itens (3 de cada)
+    // Fase 1: 2 categorias (Brinquedos e Bebidas) com 6 itens — conta 2 × 4 = 8
     return fn ? fn([
-      { categoria: "bebidas", quantidade: 3, modelos: MODELOS_BEBIDAS },
-      { categoria: "comidas", quantidade: 3, modelos: MODELOS_COMIDAS },
+      { categoria: "brinquedos", quantidade: 2, modelos: MODELOS_BRINQUEDOS },
+      { categoria: "bebidas", quantidade: 4, modelos: MODELOS_BEBIDAS },
     ]) : [];
   }
 
   function gerarItensMundo3Fase2() {
     const fn = getGerarItensFaseFn();
-    // Fase 2: 3 categorias (Bebidas, Comidas e Brinquedos) com 9 itens (3 de cada)
+    // Fase 2: 2 categorias (Bebidas e Comidas) com 10 itens — conta 5 × 5 = 25
     return fn ? fn([
-      { categoria: "bebidas", quantidade: 3, modelos: MODELOS_BEBIDAS },
-      { categoria: "comidas", quantidade: 3, modelos: MODELOS_COMIDAS },
-      { categoria: "brinquedos", quantidade: 3, modelos: MODELOS_BRINQUEDOS },
+      { categoria: "bebidas", quantidade: 5, modelos: MODELOS_BEBIDAS },
+      { categoria: "comidas", quantidade: 5, modelos: MODELOS_COMIDAS },
     ]) : [];
   }
 
   function gerarItensMundo3Fase3() {
     const fn = getGerarItensFaseFn();
-    // Fase 3: 3 categorias com 12 itens distribuídos (4 de cada)
+    // Fase 3: 3 categorias (Brinquedos, Comidas e Bebidas) com 11 itens
+    // conta 2 × 4 × 5 = 40
     return fn ? fn([
-      { categoria: "bebidas", quantidade: 4, modelos: MODELOS_BEBIDAS },
+      { categoria: "brinquedos", quantidade: 2, modelos: MODELOS_BRINQUEDOS },
       { categoria: "comidas", quantidade: 4, modelos: MODELOS_COMIDAS },
-      { categoria: "brinquedos", quantidade: 4, modelos: MODELOS_BRINQUEDOS },
+      { categoria: "bebidas", quantidade: 5, modelos: MODELOS_BEBIDAS },
     ]) : [];
   }
 
@@ -172,15 +184,57 @@
 
   // ==========================================================
   // CONFIGURAÇÃO DA FASE 1 (Mundo 3 — Praia)
-  // 2 Categorias (Bebidas e Comidas) | 6 Objetos no total
+  // 2 Categorias (Brinquedos e Bebidas) | 6 Objetos no total
+  // Multiplicação: 2 × 4 = 8
   // ==========================================================
   const CONFIG_FASE_1_MUNDO_3 = {
+    operacao: "multiplicacao",
     fundo: FUNDO_MUNDO_3_BAGUNCADO,
     fundoBaguncado: FUNDO_MUNDO_3_BAGUNCADO,
     fundoArrumado: FUNDO_MUNDO_3_ARRUMADO,
     gerarObjetos: gerarItensMundo3Fase1,
     get objetos() {
       return gerarItensMundo3Fase1();
+    },
+    categorias: [
+      {
+        id: "cesta-brinquedos",
+        accepts: "brinquedos",
+        nome: "Brinquedos",
+        ariaLabel: "Cesta de brinquedos da praia",
+        icone: "🏐",
+        posicao: "esq-centro",
+        etiquetaImgSrc: "assets/images/mundo_3/botton_brinquedos.png",
+        etiquetaImgAlt: "Categoria Brinquedos",
+        sprites: SPRITES_CESTA_BRINQUEDOS_MUNDO3,
+      },
+      {
+        id: "cesta-bebidas",
+        accepts: "bebidas",
+        nome: "Bebidas",
+        ariaLabel: "Cesta de bebidas da praia",
+        icone: "🥤",
+        posicao: "dir-centro",
+        etiquetaImgSrc: "assets/images/mundo_3/botton_bebidas.png",
+        etiquetaImgAlt: "Categoria Bebidas",
+        sprites: SPRITES_CESTA_BEBIDAS_MUNDO3,
+      },
+    ],
+  };
+
+  // ==========================================================
+  // CONFIGURAÇÃO DA FASE 2 (Mundo 3 — Praia)
+  // 2 Categorias (Bebidas e Comidas) | 10 Objetos no total
+  // Multiplicação: 5 × 5 = 25
+  // ==========================================================
+  const CONFIG_FASE_2_MUNDO_3 = {
+    operacao: "multiplicacao",
+    fundo: FUNDO_MUNDO_3_BAGUNCADO,
+    fundoBaguncado: FUNDO_MUNDO_3_BAGUNCADO,
+    fundoArrumado: FUNDO_MUNDO_3_ARRUMADO,
+    gerarObjetos: gerarItensMundo3Fase2,
+    get objetos() {
+      return gerarItensMundo3Fase2();
     },
     categorias: [
       {
@@ -209,59 +263,12 @@
   };
 
   // ==========================================================
-  // CONFIGURAÇÃO DA FASE 2 (Mundo 3 — Praia)
-  // 3 Categorias (Bebidas, Comidas e Brinquedos) | 9 Objetos no total
-  // ==========================================================
-  const CONFIG_FASE_2_MUNDO_3 = {
-    fundo: FUNDO_MUNDO_3_BAGUNCADO,
-    fundoBaguncado: FUNDO_MUNDO_3_BAGUNCADO,
-    fundoArrumado: FUNDO_MUNDO_3_ARRUMADO,
-    gerarObjetos: gerarItensMundo3Fase2,
-    get objetos() {
-      return gerarItensMundo3Fase2();
-    },
-    categorias: [
-      {
-        id: "cesta-bebidas",
-        accepts: "bebidas",
-        nome: "Bebidas",
-        ariaLabel: "Cesta de bebidas da praia",
-        icone: "🥤",
-        posicao: "esq-topo",
-        etiquetaImgSrc: "assets/images/mundo_3/botton_bebidas.png",
-        etiquetaImgAlt: "Categoria Bebidas",
-        sprites: SPRITES_CESTA_BEBIDAS_MUNDO3,
-      },
-      {
-        id: "cesta-comidas",
-        accepts: "comidas",
-        nome: "Comidas",
-        ariaLabel: "Cesta de comidas da praia",
-        icone: "🍦",
-        posicao: "esq-base",
-        etiquetaImgSrc: "assets/images/mundo_3/botton_comida.png",
-        etiquetaImgAlt: "Categoria Comidas",
-        sprites: SPRITES_CESTA_COMIDAS_MUNDO3,
-      },
-      {
-        id: "cesta-brinquedos",
-        accepts: "brinquedos",
-        nome: "Brinquedos",
-        ariaLabel: "Cesta de brinquedos da praia",
-        icone: "🏐",
-        posicao: "dir-centro",
-        etiquetaImgSrc: "assets/images/mundo_3/botton_brinquedos.png",
-        etiquetaImgAlt: "Categoria Brinquedos",
-        sprites: SPRITES_CESTA_BRINQUEDOS_MUNDO3,
-      },
-    ],
-  };
-
-  // ==========================================================
   // CONFIGURAÇÃO DA FASE 3 (Mundo 3 — Praia)
-  // 3 Categorias (Bebidas, Comidas e Brinquedos) | 12 Objetos no total
+  // 3 Categorias (Brinquedos, Comidas e Bebidas) | 11 Objetos no total
+  // Multiplicação: 2 × 4 × 5 = 40
   // ==========================================================
   const CONFIG_FASE_3_MUNDO_3 = {
+    operacao: "multiplicacao",
     fundo: FUNDO_MUNDO_3_BAGUNCADO,
     fundoBaguncado: FUNDO_MUNDO_3_BAGUNCADO,
     fundoArrumado: FUNDO_MUNDO_3_ARRUMADO,
@@ -271,15 +278,15 @@
     },
     categorias: [
       {
-        id: "cesta-bebidas",
-        accepts: "bebidas",
-        nome: "Bebidas",
-        ariaLabel: "Cesta de bebidas da praia",
-        icone: "🥤",
+        id: "cesta-brinquedos",
+        accepts: "brinquedos",
+        nome: "Brinquedos",
+        ariaLabel: "Cesta de brinquedos da praia",
+        icone: "🏐",
         posicao: "esq-topo",
-        etiquetaImgSrc: "assets/images/mundo_3/botton_bebidas.png",
-        etiquetaImgAlt: "Categoria Bebidas",
-        sprites: SPRITES_CESTA_BEBIDAS_MUNDO3,
+        etiquetaImgSrc: "assets/images/mundo_3/botton_brinquedos.png",
+        etiquetaImgAlt: "Categoria Brinquedos",
+        sprites: SPRITES_CESTA_BRINQUEDOS_MUNDO3,
       },
       {
         id: "cesta-comidas",
@@ -293,15 +300,15 @@
         sprites: SPRITES_CESTA_COMIDAS_MUNDO3,
       },
       {
-        id: "cesta-brinquedos",
-        accepts: "brinquedos",
-        nome: "Brinquedos",
-        ariaLabel: "Cesta de brinquedos da praia",
-        icone: "🏐",
+        id: "cesta-bebidas",
+        accepts: "bebidas",
+        nome: "Bebidas",
+        ariaLabel: "Cesta de bebidas da praia",
+        icone: "🥤",
         posicao: "dir-centro",
-        etiquetaImgSrc: "assets/images/mundo_3/botton_brinquedos.png",
-        etiquetaImgAlt: "Categoria Brinquedos",
-        sprites: SPRITES_CESTA_BRINQUEDOS_MUNDO3,
+        etiquetaImgSrc: "assets/images/mundo_3/botton_bebidas.png",
+        etiquetaImgAlt: "Categoria Bebidas",
+        sprites: SPRITES_CESTA_BEBIDAS_MUNDO3,
       },
     ],
   };
