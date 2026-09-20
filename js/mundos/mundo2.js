@@ -11,7 +11,18 @@
  * - Configurações das 3 fases progressivas;
  * - Auto-registro em window.MUNDOS[2].
  *
- * TODO: Back-end substituirá por lógica de subtração futuramente.
+ * OPERAÇÃO: SUBTRAÇÃO. Cada fase declara operacao: "subtracao" e math.js
+ * resolve a conta pela operação correspondente em js/operacoes.js.
+ *
+ * ⚠️ A ORDEM DO ARRAY "categorias" É SIGNIFICATIVA NESTE MUNDO.
+ * Diferente do Mundo 1 (soma, comutativa), aqui a ordem declarada é a ordem
+ * dos termos da subtração: a primeira categoria é o minuendo e as seguintes
+ * são subtraídas, na sequência. Reordenar as categorias muda a conta.
+ * Ex.: [brinquedos(8), animais(5), comidas(3)] → 8 − 5 − 3 = 0.
+ *
+ * As cotas de cada fase são escolhidas para que nenhum resultado — nem os
+ * intermediários — fique negativo. js/operacoes.js recusa a conta e acusa no
+ * console caso essa regra seja quebrada.
  * ============================================================================
  */
 
@@ -100,6 +111,8 @@
 
   // ==========================================================
   // FUNÇÕES DE GERAÇÃO DINÂMICA DE ITENS
+  // As cotas seguem a mesma ordem do array "categorias" da fase, que é a
+  // ordem dos termos da subtração.
   // ==========================================================
   function getGerarItensFaseFn() {
     if (typeof gerarItensFase === "function") return gerarItensFase;
@@ -109,30 +122,30 @@
 
   function gerarItensMundo2Fase1() {
     const fn = getGerarItensFaseFn();
-    // Fase 1: 2 categorias (Comidas e Animais) com 6 itens (3 de cada)
+    // Fase 1: 2 categorias (Animais e Brinquedos) com 6 itens — conta 4 − 2 = 2
     return fn ? fn([
-      { categoria: "comidas", quantidade: 3, modelos: MODELOS_COMIDAS },
-      { categoria: "animais", quantidade: 3, modelos: MODELOS_ANIMAIS },
+      { categoria: "animais", quantidade: 4, modelos: MODELOS_ANIMAIS },
+      { categoria: "brinquedos", quantidade: 2, modelos: MODELOS_BRINQUEDOS },
     ]) : [];
   }
 
   function gerarItensMundo2Fase2() {
     const fn = getGerarItensFaseFn();
-    // Fase 2: 3 categorias (Comidas, Animais e Brinquedos) com 9 itens (3 de cada)
+    // Fase 2: 2 categorias (Comidas e Animais) com 12 itens — conta 7 − 5 = 2
     return fn ? fn([
-      { categoria: "comidas", quantidade: 3, modelos: MODELOS_COMIDAS },
-      { categoria: "animais", quantidade: 3, modelos: MODELOS_ANIMAIS },
-      { categoria: "brinquedos", quantidade: 3, modelos: MODELOS_BRINQUEDOS },
+      { categoria: "comidas", quantidade: 7, modelos: MODELOS_COMIDAS },
+      { categoria: "animais", quantidade: 5, modelos: MODELOS_ANIMAIS },
     ]) : [];
   }
 
   function gerarItensMundo2Fase3() {
     const fn = getGerarItensFaseFn();
-    // Fase 3: 3 categorias com 12 itens distribuídos (4 de cada)
+    // Fase 3: 3 categorias (Brinquedos, Animais e Comidas) com 16 itens
+    // conta 8 − 5 − 3 = 0 (parcial intermediário 8 − 5 = 3, nunca negativo)
     return fn ? fn([
-      { categoria: "comidas", quantidade: 4, modelos: MODELOS_COMIDAS },
-      { categoria: "animais", quantidade: 4, modelos: MODELOS_ANIMAIS },
-      { categoria: "brinquedos", quantidade: 4, modelos: MODELOS_BRINQUEDOS },
+      { categoria: "brinquedos", quantidade: 8, modelos: MODELOS_BRINQUEDOS },
+      { categoria: "animais", quantidade: 5, modelos: MODELOS_ANIMAIS },
+      { categoria: "comidas", quantidade: 3, modelos: MODELOS_COMIDAS },
     ]) : [];
   }
 
@@ -180,15 +193,57 @@
 
   // ==========================================================
   // CONFIGURAÇÃO DA FASE 1 (Mundo 2 — Parque)
-  // 2 Categorias (Comidas e Animais) | 6 Objetos no total
+  // 2 Categorias (Animais e Brinquedos) | 6 Objetos no total
+  // Subtração: 4 − 2 = 2  (ordem: Animais, Brinquedos)
   // ==========================================================
   const CONFIG_FASE_1_MUNDO_2 = {
+    operacao: "subtracao",
     fundo: FUNDO_MUNDO_2_BAGUNCADO,
     fundoBaguncado: FUNDO_MUNDO_2_BAGUNCADO,
     fundoArrumado: FUNDO_MUNDO_2_ARRUMADO,
     gerarObjetos: gerarItensMundo2Fase1,
     get objetos() {
       return gerarItensMundo2Fase1();
+    },
+    categorias: [
+      {
+        id: "cesta-animais",
+        accepts: "animais",
+        nome: "Animais",
+        ariaLabel: "Caixa de animais de estimação",
+        icone: "🐶",
+        posicao: "esq-centro",
+        etiquetaImgSrc: "assets/images/mundo_2/botton_animais.png",
+        etiquetaImgAlt: "Categoria Animais",
+        sprites: SPRITES_CESTA_ANIMAIS_MUNDO2,
+      },
+      {
+        id: "cesta-brinquedos",
+        accepts: "brinquedos",
+        nome: "Brinquedos",
+        ariaLabel: "Cesta de brinquedos",
+        icone: "🧸",
+        posicao: "dir-centro",
+        etiquetaImgSrc: "assets/images/mundo_2/botton_brinquedos.png",
+        etiquetaImgAlt: "Categoria Brinquedos",
+        sprites: SPRITES_CESTA_BRINQUEDOS_MUNDO2,
+      },
+    ],
+  };
+
+  // ==========================================================
+  // CONFIGURAÇÃO DA FASE 2 (Mundo 2 — Parque)
+  // 2 Categorias (Comidas e Animais) | 12 Objetos no total
+  // Subtração: 7 − 5 = 2  (ordem: Comidas, Animais)
+  // ==========================================================
+  const CONFIG_FASE_2_MUNDO_2 = {
+    operacao: "subtracao",
+    fundo: FUNDO_MUNDO_2_BAGUNCADO,
+    fundoBaguncado: FUNDO_MUNDO_2_BAGUNCADO,
+    fundoArrumado: FUNDO_MUNDO_2_ARRUMADO,
+    gerarObjetos: gerarItensMundo2Fase2,
+    get objetos() {
+      return gerarItensMundo2Fase2();
     },
     categorias: [
       {
@@ -217,59 +272,12 @@
   };
 
   // ==========================================================
-  // CONFIGURAÇÃO DA FASE 2 (Mundo 2 — Parque)
-  // 3 Categorias (Comidas, Animais e Brinquedos) | 9 Objetos no total
-  // ==========================================================
-  const CONFIG_FASE_2_MUNDO_2 = {
-    fundo: FUNDO_MUNDO_2_BAGUNCADO,
-    fundoBaguncado: FUNDO_MUNDO_2_BAGUNCADO,
-    fundoArrumado: FUNDO_MUNDO_2_ARRUMADO,
-    gerarObjetos: gerarItensMundo2Fase2,
-    get objetos() {
-      return gerarItensMundo2Fase2();
-    },
-    categorias: [
-      {
-        id: "cesta-comidas",
-        accepts: "comidas",
-        nome: "Comidas",
-        ariaLabel: "Cesta de comidas do piquenique",
-        icone: "🍎",
-        posicao: "esq-topo",
-        etiquetaImgSrc: "assets/images/mundo_2/botton_comida.png",
-        etiquetaImgAlt: "Categoria Comidas",
-        sprites: SPRITES_CESTA_COMIDAS_MUNDO2,
-      },
-      {
-        id: "cesta-animais",
-        accepts: "animais",
-        nome: "Animais",
-        ariaLabel: "Caixa de animais de estimação",
-        icone: "🐶",
-        posicao: "esq-base",
-        etiquetaImgSrc: "assets/images/mundo_2/botton_animais.png",
-        etiquetaImgAlt: "Categoria Animais",
-        sprites: SPRITES_CESTA_ANIMAIS_MUNDO2,
-      },
-      {
-        id: "cesta-brinquedos",
-        accepts: "brinquedos",
-        nome: "Brinquedos",
-        ariaLabel: "Cesta de brinquedos",
-        icone: "🧸",
-        posicao: "dir-centro",
-        etiquetaImgSrc: "assets/images/mundo_2/botton_brinquedos.png",
-        etiquetaImgAlt: "Categoria Brinquedos",
-        sprites: SPRITES_CESTA_BRINQUEDOS_MUNDO2,
-      },
-    ],
-  };
-
-  // ==========================================================
   // CONFIGURAÇÃO DA FASE 3 (Mundo 2 — Parque)
-  // 3 Categorias (Comidas, Animais e Brinquedos) | 12 Objetos no total
+  // 3 Categorias (Brinquedos, Animais e Comidas) | 16 Objetos no total
+  // Subtração: 8 − 5 − 3 = 0  (ordem: Brinquedos, Animais, Comidas)
   // ==========================================================
   const CONFIG_FASE_3_MUNDO_2 = {
+    operacao: "subtracao",
     fundo: FUNDO_MUNDO_2_BAGUNCADO,
     fundoBaguncado: FUNDO_MUNDO_2_BAGUNCADO,
     fundoArrumado: FUNDO_MUNDO_2_ARRUMADO,
@@ -279,15 +287,15 @@
     },
     categorias: [
       {
-        id: "cesta-comidas",
-        accepts: "comidas",
-        nome: "Comidas",
-        ariaLabel: "Cesta de comidas do piquenique",
-        icone: "🍎",
+        id: "cesta-brinquedos",
+        accepts: "brinquedos",
+        nome: "Brinquedos",
+        ariaLabel: "Cesta de brinquedos",
+        icone: "🧸",
         posicao: "esq-topo",
-        etiquetaImgSrc: "assets/images/mundo_2/botton_comida.png",
-        etiquetaImgAlt: "Categoria Comidas",
-        sprites: SPRITES_CESTA_COMIDAS_MUNDO2,
+        etiquetaImgSrc: "assets/images/mundo_2/botton_brinquedos.png",
+        etiquetaImgAlt: "Categoria Brinquedos",
+        sprites: SPRITES_CESTA_BRINQUEDOS_MUNDO2,
       },
       {
         id: "cesta-animais",
@@ -301,15 +309,15 @@
         sprites: SPRITES_CESTA_ANIMAIS_MUNDO2,
       },
       {
-        id: "cesta-brinquedos",
-        accepts: "brinquedos",
-        nome: "Brinquedos",
-        ariaLabel: "Cesta de brinquedos",
-        icone: "🧸",
+        id: "cesta-comidas",
+        accepts: "comidas",
+        nome: "Comidas",
+        ariaLabel: "Cesta de comidas do piquenique",
+        icone: "🍎",
         posicao: "dir-centro",
-        etiquetaImgSrc: "assets/images/mundo_2/botton_brinquedos.png",
-        etiquetaImgAlt: "Categoria Brinquedos",
-        sprites: SPRITES_CESTA_BRINQUEDOS_MUNDO2,
+        etiquetaImgSrc: "assets/images/mundo_2/botton_comida.png",
+        etiquetaImgAlt: "Categoria Comidas",
+        sprites: SPRITES_CESTA_COMIDAS_MUNDO2,
       },
     ],
   };

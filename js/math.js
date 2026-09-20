@@ -1,4 +1,29 @@
-function iniciarDesafioMatematico(dadosQuantidades) {
+// Desafio em exibição. Guardado para que o DEV possa simular a resposta correta
+// sem precisar recalcular a conta por conta própria.
+let desafioMatematicoAtivo = null;
+
+// Localiza a operação declarada pela fase. A fase é a dona dessa escolha: se o
+// id vier ausente ou desconhecido, o erro é de configuração do mundo e precisa
+// aparecer no console — a soma entra apenas para a tela não ficar quebrada
+// na frente da criança.
+function obterOperacaoMatematica(operacaoId) {
+    const operacoes = (typeof window !== "undefined" && window.OPERACOES) || {};
+    const operacao = operacoes[operacaoId];
+
+    if (operacao) {
+        return operacao;
+    }
+
+    console.error(
+        `[math.js] Operação "${operacaoId}" não encontrada em window.OPERACOES. ` +
+        `Verifique se a fase declara "operacao" e se js/operacoes.js foi carregado antes de math.js. ` +
+        `Usando soma como fallback.`
+    );
+
+    return operacoes.soma || null;
+}
+
+function iniciarDesafioMatematico(dadosQuantidades, operacaoId) {
     document.body.classList.add("cenario-arrumado");
 
     const telaOrganizacao = document.querySelector("#tela-organizacao");
@@ -33,11 +58,47 @@ function iniciarDesafioMatematico(dadosQuantidades) {
         }));
     }
 
-    const totalCorreto = itensResumo.reduce((acc, item) => acc + item.quantidade, 0);
+    const operacao = obterOperacaoMatematica(operacaoId);
 
-    renderizarResumoQuantidades(itensResumo);
+    if (!operacao) {
+        desafioMatematicoAtivo = null;
+        mostrarFeedbackMatematica("Não foi possível montar o desafio desta fase.", "error");
+        return;
+    }
 
-    const opcoes = gerarAlternativasMatematica(totalCorreto);
+    const valores = itensResumo.map((item) => item.quantidade);
+    const validacao = operacao.validar(valores);
+
+    // Conta impossível só chega aqui por erro de autoria da fase (ex.: uma
+    // subtração que ficaria negativa). Acusamos no console e não montamos
+    // alternativas, em vez de exibir um resultado inválido na tela.
+    if (!validacao.valido) {
+        console.error(
+            `[math.js] Conta inválida para a operação "${operacao.id}": ${validacao.motivo} ` +
+            `Revise as quantidades/ordem das categorias desta fase.`
+        );
+        desafioMatematicoAtivo = null;
+        renderizarResumoQuantidades(itensResumo, operacao.simbolo);
+        const containerInvalido = document.querySelector("#opcoes-matematica");
+        if (containerInvalido) {
+            containerInvalido.innerHTML = "";
+        }
+        mostrarFeedbackMatematica("Não foi possível montar o desafio desta fase.", "error");
+        return;
+    }
+
+    const resultadoCorreto = operacao.calcular(valores);
+
+    const perguntaEl = document.querySelector("#pergunta-matematica");
+    if (perguntaEl) {
+        perguntaEl.textContent = operacao.pergunta;
+    }
+
+    renderizarResumoQuantidades(itensResumo, operacao.simbolo);
+
+    desafioMatematicoAtivo = { operacao, valores, resultadoCorreto };
+
+    const opcoes = embaralharAlternativas(operacao.gerarAlternativas(resultadoCorreto, valores));
     const containerOpcoes = document.querySelector("#opcoes-matematica");
 
     if (containerOpcoes) {
@@ -49,7 +110,7 @@ function iniciarDesafioMatematico(dadosQuantidades) {
             botao.textContent = valor;
             botao.setAttribute("aria-label", `Opção ${valor}`);
             botao.addEventListener("click", () => {
-                verificarRespostaMatematica(valor, totalCorreto, botao, itensResumo);
+                verificarRespostaMatematica(valor, resultadoCorreto, botao, itensResumo, operacao);
             });
             containerOpcoes.appendChild(botao);
         });
@@ -58,7 +119,12 @@ function iniciarDesafioMatematico(dadosQuantidades) {
     mostrarFeedbackMatematica("Escolha uma das opções acima.", "neutral");
 }
 
-function renderizarResumoQuantidades(itensResumo) {
+// Exposto para o DEV simular a resposta certa respeitando a operação da fase.
+function obterDesafioMatematicoAtivo() {
+    return desafioMatematicoAtivo;
+}
+
+function renderizarResumoQuantidades(itensResumo, simbolo) {
     const container = document.querySelector("#resumo-quantidades");
     if (!container) {
         return;
@@ -69,9 +135,9 @@ function renderizarResumoQuantidades(itensResumo) {
     itensResumo.forEach((item, index) => {
         if (index > 0) {
             const operador = document.createElement("span");
-            operador.className = "operador-soma";
+            operador.className = "operador-conta";
             operador.setAttribute("aria-hidden", "true");
-            operador.textContent = "+";
+            operador.textContent = simbolo;
             container.appendChild(operador);
         }
 
@@ -101,23 +167,10 @@ function renderizarResumoQuantidades(itensResumo) {
     });
 }
 
-function gerarAlternativasMatematica(totalCorreto) {
-    const opcoes = new Set();
-    opcoes.add(totalCorreto);
-
-    const distrator1 = Math.max(1, totalCorreto - 2);
-    const distrator2 = totalCorreto + 2;
-
-    opcoes.add(distrator1);
-    opcoes.add(distrator2);
-
-    let offset = 1;
-    while (opcoes.size < 3) {
-        opcoes.add(totalCorreto + offset);
-        offset++;
-    }
-
-    const lista = Array.from(opcoes);
+// Embaralhar é comum às três operações; quem escolhe os distratores é a
+// operação (js/operacoes.js).
+function embaralharAlternativas(alternativas) {
+    const lista = Array.from(alternativas);
     for (let i = lista.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [lista[i], lista[j]] = [lista[j], lista[i]];
@@ -126,24 +179,25 @@ function gerarAlternativasMatematica(totalCorreto) {
     return lista;
 }
 
-function verificarRespostaMatematica(valorEscolhido, totalCorreto, botaoClicado, dados) {
+function verificarRespostaMatematica(valorEscolhido, resultadoCorreto, botaoClicado, dados, operacao) {
     const botoes = document.querySelectorAll(".botao-opcao-matematica");
 
-    if (valorEscolhido === totalCorreto) {
+    if (valorEscolhido === resultadoCorreto) {
         botoes.forEach((b) => {
             b.disabled = true;
-            if (Number(b.textContent) === totalCorreto) {
+            if (Number(b.textContent) === resultadoCorreto) {
                 b.classList.add("is-correct");
             }
         });
 
-        let somaTexto = "";
+        const separador = ` ${operacao.simbolo} `;
+        let contaTexto = "";
         if (Array.isArray(dados)) {
-            somaTexto = `${dados.map((d) => d.quantidade).join(" + ")} = ${totalCorreto}`;
+            contaTexto = `${dados.map((d) => d.quantidade).join(separador)} = ${resultadoCorreto}`;
         } else if (dados && typeof dados === "object") {
-            somaTexto = `${Object.values(dados).join(" + ")} = ${totalCorreto}`;
+            contaTexto = `${Object.values(dados).join(separador)} = ${resultadoCorreto}`;
         } else {
-            somaTexto = `${totalCorreto}`;
+            contaTexto = `${resultadoCorreto}`;
         }
 
         // Gravação da persistência de dados do progresso
@@ -163,7 +217,7 @@ function verificarRespostaMatematica(valorEscolhido, totalCorreto, botaoClicado,
             desbloquearProximaFase(faseAtual, mundoAtual, totalFases);
         }
 
-        mostrarFeedbackMatematica(`Muito bem! Você acertou! ${somaTexto} objetos organizados ao todo!`, "success");
+        mostrarFeedbackMatematica(operacao.mensagemSucesso(contaTexto), "success");
         exibirBotoesConclusao(faseAtual);
     } else {
         botaoClicado.classList.add("is-wrong");

@@ -256,7 +256,7 @@ function finishDrag(event) {
           document.body.style.backgroundImage = `url("${activeConfig.fundoArrumado}")`;
         }
         if (typeof iniciarDesafioMatematico === "function") {
-          iniciarDesafioMatematico(resumoCategorias);
+          iniciarDesafioMatematico(resumoCategorias, activeConfig?.operacao);
         }
       }, 1000);
     } else {
@@ -507,7 +507,7 @@ function handleDropZoneKeyboard(event) {
           document.body.style.backgroundImage = `url("${activeConfig.fundoArrumado}")`;
         }
         if (typeof iniciarDesafioMatematico === "function") {
-          iniciarDesafioMatematico(resumoCategorias);
+          iniciarDesafioMatematico(resumoCategorias, activeConfig?.operacao);
         }
       }, 1000);
     } else {

@@ -180,6 +180,7 @@
   // 2 Categorias (Brinquedos e Comidas) | 5 Objetos no total
   // ==========================================================
   const CONFIG_FASE_1 = {
+    operacao: "soma",
     gerarObjetos: gerarItensFase1,
     get objetos() {
       return gerarItensFase1();
@@ -225,6 +226,7 @@
   // 3 Categorias | 9 Objetos no total: 3 Brinquedos, 3 Comidas, 3 Materiais
   // ==========================================================
   const CONFIG_FASE_2 = {
+    operacao: "soma",
     gerarObjetos: gerarItensFase2,
     get objetos() {
       return gerarItensFase2();
@@ -286,6 +288,7 @@
   // 3 Categorias | 14 Objetos no total: 2 Brinquedos, 5 Comidas, 7 Materiais
   // ==========================================================
   const CONFIG_FASE_3 = {
+    operacao: "soma",
     gerarObjetos: gerarItensFase3,
     get objetos() {
       return gerarItensFase3();

@@ -285,14 +285,25 @@
 
     // Etapa 2: Desafio Matemático
     if (telaMatematica && !telaMatematica.classList.contains("escondido")) {
-      const valoresResumo = Array.from(document.querySelectorAll(".valor-resumo"));
-      const totalCorreto = valoresResumo.reduce((acc, el) => acc + (Number(el.textContent) || 0), 0);
+      // O gabarito vem de math.js, que já resolveu a operação declarada pela
+      // fase. O DEV não recalcula a conta — assumir soma daria resposta errada
+      // em uma fase de subtração ou multiplicação.
+      const desafio = typeof obterDesafioMatematicoAtivo === "function"
+        ? obterDesafioMatematicoAtivo()
+        : null;
+
+      if (!desafio) {
+        notificarDev("Desafio matemático indisponível (math.js não expôs a operação ativa) — simulação cancelada.");
+        return;
+      }
+
+      const resultadoCorreto = desafio.resultadoCorreto;
 
       const botoes = Array.from(document.querySelectorAll(".botao-opcao-matematica"));
-      const botaoCorreto = botoes.find((b) => Number(b.textContent) === totalCorreto) || botoes[0];
+      const botaoCorreto = botoes.find((b) => Number(b.textContent) === resultadoCorreto);
 
       if (botaoCorreto) {
-        notificarDev(`Simulando resposta correta: ${botaoCorreto.textContent}`);
+        notificarDev(`Simulando resposta correta (${desafio.operacao.id}): ${botaoCorreto.textContent}`);
         botaoCorreto.click();
       } else {
         const { faseAtual, mundoAtual, totalFases } = obterMundoFaseAtivos();
