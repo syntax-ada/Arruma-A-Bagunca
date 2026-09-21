@@ -444,6 +444,7 @@
     const cardsMundo = [
       { el: document.querySelector("#card-mundo-2"), id: 2 },
       { el: document.querySelector("#card-mundo-3"), id: 3 },
+      { el: document.querySelector("#card-mundo-4"), id: 4 },
     ];
     cardsMundo.forEach(({ el, id }) => {
       if (el) {

@@ -6,6 +6,7 @@ const botaoVoltar = document.querySelector("#btn-voltar");
 const botaoFase1 = document.querySelector("#botao-fase1");
 const cardMundo2 = document.querySelector("#card-mundo-2");
 const cardMundo3 = document.querySelector("#card-mundo-3");
+const cardMundo4 = document.querySelector("#card-mundo-4");
 const modalFases = document.querySelector("#modal-fases");
 const btnFecharModal = document.querySelector("#btn-fechar-modal");
 const btnIniciarFase1 = document.querySelector("#btn-iniciar-fase1");
@@ -156,10 +157,40 @@ function atualizarInterfaceProgresso() {
     }
   }
 
+  if (cardMundo4) {
+    const mundo4Liberado = mundosLiberados.includes(4);
+    const overlay4 = cardMundo4.querySelector(".overlay-bloqueado");
+
+    if (mundo4Liberado) {
+      cardMundo4.classList.remove("mundo-bloqueado");
+      cardMundo4.classList.add("mundo-disponivel");
+      cardMundo4.setAttribute("aria-label", "Mundo 4, liberado");
+      if (overlay4) {
+        overlay4.classList.add("escondido");
+      }
+      cardMundo4.onclick = function () {
+        window.location.href = "fase1.html?mundo=4&fase=1";
+      };
+    } else {
+      cardMundo4.classList.add("mundo-bloqueado");
+      cardMundo4.classList.remove("mundo-disponivel");
+      cardMundo4.setAttribute("aria-label", "Mundo 4, bloqueado");
+      if (overlay4) {
+        overlay4.classList.remove("escondido");
+      }
+      cardMundo4.onclick = null;
+    }
+  }
+
   // 3. Atualização visual da barra de progresso
+  // Escala recalibrada para 4 mundos: os degraus do Mundo 1 (10/25/45) e o
+  // desbloqueio do Mundo 2 (66) ficam como estavam; o antigo teto do Mundo 3
+  // (100) passa a 83, e o Mundo 4 desbloqueado assume o teto de 100%.
   let porcentagem = 10;
-  if (mundosLiberados.includes(3)) {
+  if (mundosLiberados.includes(4)) {
     porcentagem = 100;
+  } else if (mundosLiberados.includes(3)) {
+    porcentagem = 83;
   } else if (mundosLiberados.includes(2)) {
     porcentagem = 66;
   } else if (faseMaximaMundo1 >= 3) {

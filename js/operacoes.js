@@ -7,7 +7,7 @@
  * ============================================================================
  * Cada operação reúne APENAS o que muda de uma conta para outra:
  *
- *   simbolo           → operador exibido entre as parcelas ("+", "−", "×")
+ *   simbolo           → operador exibido entre as parcelas ("+", "−", "×", "÷")
  *   pergunta          → enunciado do desafio
  *   calcular          → reduz as parcelas, em sequência, a um resultado
  *   validar           → diz se a conta é possível (guarda de autoria de fase)
@@ -210,6 +210,73 @@
   };
 
   // ==========================================================
+  // DIVISÃO (÷)
+  // Cálculo sequencial da esquerda para a direita. A divisão precisa ser
+  // exata: nenhum passo pode ter divisor zero nem deixar resto.
+  // ==========================================================
+  const DIVISAO = {
+    id: "divisao",
+    simbolo: "÷",
+    pergunta: "Quantos objetos ficam em cada grupo?",
+
+    calcular(valores) {
+      const numeros = normalizarValores(valores);
+      if (numeros.length === 0) {
+        return 0;
+      }
+      return numeros.slice(1).reduce((acc, numero) => acc / numero, numeros[0]);
+    },
+
+    validar(valores) {
+      const numeros = normalizarValores(valores);
+
+      if (numeros.length < 2) {
+        return { valido: false, motivo: "A divisão precisa de pelo menos dois números." };
+      }
+
+      // Confere passo a passo: divisor zero e resto quebram a conta.
+      let parcial = numeros[0];
+      for (let i = 1; i < numeros.length; i++) {
+        const divisor = numeros[i];
+
+        if (divisor === 0) {
+          return {
+            valido: false,
+            motivo: `Divisão por zero no passo ${i + 1} de ${numeros.join(" ÷ ")}.`,
+          };
+        }
+
+        if (parcial % divisor !== 0) {
+          return {
+            valido: false,
+            motivo: `Divisão não exata (${parcial} ÷ ${divisor} deixa resto) no passo ${i + 1} de ${numeros.join(" ÷ ")}.`,
+          };
+        }
+
+        parcial = parcial / divisor;
+      }
+
+      return { valido: true, motivo: "" };
+    },
+
+    // Resultados de divisão são pequenos, como os da subtração: os distratores
+    // andam de 1 em 1 e nunca descem abaixo de zero.
+    gerarAlternativas(resultado) {
+      const opcoes = new Set();
+      opcoes.add(resultado);
+      if (resultado - 1 >= 0) {
+        opcoes.add(resultado - 1);
+      }
+      opcoes.add(resultado + 1);
+      return completarAlternativas(opcoes, resultado);
+    },
+
+    mensagemSucesso(conta) {
+      return `Muito bem! Você acertou! ${conta} objetos em cada grupo!`;
+    },
+  };
+
+  // ==========================================================
   // REGISTRO DAS OPERAÇÕES
   // math.js localiza a operação da fase por OPERACOES[config.operacao].
   // ==========================================================
@@ -217,6 +284,7 @@
     [SOMA.id]: SOMA,
     [SUBTRACAO.id]: SUBTRACAO,
     [MULTIPLICACAO.id]: MULTIPLICACAO,
+    [DIVISAO.id]: DIVISAO,
   };
 
   if (typeof window !== "undefined") {
