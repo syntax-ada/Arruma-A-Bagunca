@@ -236,7 +236,7 @@ As três fases usam o mesmo motor de jogo (`game.js`), com configurações próp
 
 ### Ainda não implementado
 
-- Áudio e configurações de acessibilidade (botões existem na interface, sem funcionalidade associada).
+- Música de fundo contínua entre menu e fases, com controle para ligar/desligar e volume moderado; demais configurações de acessibilidade ainda não foram implementadas.
 
 - Seleção de avatar/apelido (interface exibe um avatar/nome fixo).
 
@@ -256,7 +256,7 @@ Arruma-A-Bagunca/
 
 │
 
-├── index.html          → tela inicial (jogar, créditos) e menu de mundos/fases
+├── index.html          → tela inicial (jogar, créditos), menu de mundos/fases e tela-base que mantém a trilha durante as fases
 ├── fase1.html          → tela de jogo genérica (organização + desafio matemático)
 ├── global.css          → estilos globais
 ├── style-menu.css      → estilos do menu e modais (fases e créditos)
@@ -273,7 +273,8 @@ Arruma-A-Bagunca/
 │   ├── math.js         → motor do desafio matemático desacoplado; consome window.OPERACOES
 │   ├── operacoes.js    → catálogo e regras das operações matemáticas (Soma, Subtração,
 │   │                     Multiplicação e Divisão)
-│   ├── progresso.js    → serviço de persistência de progresso (localStorage) multi-mundo
+│   ├── progresso.js    → serviço de persistência de progresso (localStorage) multi-mundo e multi-fase;
+│   ├── audio.js        → trilha sonora contínua, mantida pela tela-base durante as transições de fases;
 │   ├── menu.js         → navegação do menu, carrossel de mundos e modais de fases e créditos
 │   ├── dev.js          → ferramenta de desenvolvimento e testes (ativado por ?dev=true)
 │   │
@@ -365,7 +366,7 @@ A acessibilidade deve ser considerada durante o desenvolvimento, e não somente 
 
 - Suporte completo a teclado (incluir arrastar objetos, não só selecionar cesta);
 
-- suporte a áudio;
+- controles adicionais de áudio (além da trilha de fundo já implementada);
 
 - configurações de acessibilidade (contraste, tamanho de fonte, etc.);
 

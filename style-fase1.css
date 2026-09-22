@@ -8,6 +8,40 @@
     overflow: hidden;
 }
 
+.btn-som-fase {
+    position: fixed;
+    top: 14px;
+    right: 16px;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 14px;
+    color: #1f2933;
+    background: rgba(255, 255, 255, 0.92);
+    border: 3px solid #24577a;
+    border-radius: 999px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.btn-som-fase:focus-visible {
+    outline: 4px solid #e05d2f;
+    outline-offset: 3px;
+}
+
+@media (max-width: 768px) {
+    .btn-som-fase {
+        top: 8px;
+        right: 8px;
+        padding: 7px 10px;
+        font-size: 0.8rem;
+    }
+}
+
 .pagina-fase1.cenario-arrumado,
 .cenario-arrumado {
     background-image: url("assets/images/tela_fase1/fundo_arrumado.png");

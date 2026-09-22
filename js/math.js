@@ -2,6 +2,19 @@
 // sem precisar recalcular a conta por conta própria.
 let desafioMatematicoAtivo = null;
 
+function navegarEntreTelasDoJogo(destino, url) {
+    if (window.parent !== window) {
+        window.parent.postMessage({
+            tipo: "arruma-bagunca:navegacao",
+            destino,
+            url,
+        }, "*");
+        return;
+    }
+
+    window.location.href = url;
+}
+
 // Localiza a operação declarada pela fase. A fase é a dona dessa escolha: se o
 // id vier ausente ou desconhecido, o erro é de configuração do mundo e precisa
 // aparecer no console — a soma entra apenas para a tela não ficar quebrada
@@ -249,7 +262,7 @@ function exibirBotoesConclusao(faseAtual) {
     btnMenu.textContent = "Voltar para o Menu";
     btnMenu.setAttribute("aria-label", "Voltar para a seleção de mundos");
     btnMenu.addEventListener("click", () => {
-        window.location.href = "index.html?view=mundos";
+        navegarEntreTelasDoJogo("menu", "index.html?view=mundos");
     });
     containerAcoes.appendChild(btnMenu);
 
@@ -273,7 +286,7 @@ function exibirBotoesConclusao(faseAtual) {
         btnProxima.textContent = "Próxima Fase";
         btnProxima.setAttribute("aria-label", `Avançar para a Fase ${proximaFase}`);
         btnProxima.addEventListener("click", () => {
-            window.location.href = `fase1.html?mundo=${mundoAtual}&fase=${proximaFase}`;
+            navegarEntreTelasDoJogo("fase", `fase1.html?mundo=${mundoAtual}&fase=${proximaFase}`);
         });
         containerAcoes.appendChild(btnProxima);
     }

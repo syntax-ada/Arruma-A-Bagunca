@@ -20,6 +20,34 @@ const textoProgresso = document.querySelector(".porcentagem-progresso");
 const carrosselMundos = document.querySelector(".carrossel-mundos");
 const btnSetaEsquerda = document.querySelector('.btn-seta[aria-label="Mundo anterior"]');
 const btnSetaDireita = document.querySelector('.btn-seta[aria-label="Próximo mundo"]');
+const conteudoFase = document.querySelector("#conteudo-fase");
+
+/**
+ * Mantém o menu (e a trilha sonora) carregado enquanto a fase é trocada.
+ * Assim, só o conteúdo da fase é recarregado e a música não sofre cortes.
+ */
+function abrirFase(url) {
+  if (!conteudoFase) {
+    window.location.href = url;
+    return;
+  }
+
+  conteudoFase.src = url;
+  conteudoFase.classList.remove("escondido");
+}
+
+function mostrarMenuMundos() {
+  if (!conteudoFase) {
+    return;
+  }
+
+  conteudoFase.classList.add("escondido");
+  conteudoFase.src = "about:blank";
+  telaInicial?.classList.add("escondido");
+  controlesIniciais?.classList.add("escondido");
+  menuFases?.classList.remove("escondido");
+  atualizarInterfaceProgresso();
+}
 
 /**
  * Obtém a largura de um card incluindo o gap do carrossel para o passo de rolagem.
@@ -108,7 +136,7 @@ function atualizarBotoesModalFases(mundoId) {
     btnIniciarFase1.setAttribute("aria-label", `Jogar Fase 1 do Mundo ${mundoId}`);
     btnIniciarFase1.onclick = function () {
       const sufixoDev = devAtivo ? "&dev=true" : "";
-      window.location.href = `fase1.html?mundo=${mundoId}&fase=1${sufixoDev}`;
+      abrirFase(`fase1.html?mundo=${mundoId}&fase=1${sufixoDev}`);
     };
   }
 
@@ -122,7 +150,7 @@ function atualizarBotoesModalFases(mundoId) {
       btnIniciarFase2.setAttribute("aria-label", `Jogar Fase 2 do Mundo ${mundoId}`);
       btnIniciarFase2.onclick = function () {
         const sufixoDev = devAtivo ? "&dev=true" : "";
-        window.location.href = `fase1.html?mundo=${mundoId}&fase=2${sufixoDev}`;
+        abrirFase(`fase1.html?mundo=${mundoId}&fase=2${sufixoDev}`);
       };
     } else {
       btnIniciarFase2.disabled = true;
@@ -143,7 +171,7 @@ function atualizarBotoesModalFases(mundoId) {
       btnIniciarFase3.setAttribute("aria-label", `Jogar Fase 3 do Mundo ${mundoId}`);
       btnIniciarFase3.onclick = function () {
         const sufixoDev = devAtivo ? "&dev=true" : "";
-        window.location.href = `fase1.html?mundo=${mundoId}&fase=3${sufixoDev}`;
+        abrirFase(`fase1.html?mundo=${mundoId}&fase=3${sufixoDev}`);
       };
     } else {
       btnIniciarFase3.disabled = true;
@@ -315,6 +343,24 @@ document.addEventListener("keydown", function (evento) {
     if (modalFases && !modalFases.classList.contains("escondido")) {
       modalFases.classList.add("escondido");
     }
+  }
+});
+
+// Mensagens enviadas pela fase incorporada para avançar ou retornar ao menu.
+window.addEventListener("message", function (evento) {
+  if (!conteudoFase || evento.source !== conteudoFase.contentWindow) {
+    return;
+  }
+
+  const mensagem = evento.data;
+  if (!mensagem || mensagem.tipo !== "arruma-bagunca:navegacao") {
+    return;
+  }
+
+  if (mensagem.destino === "menu") {
+    mostrarMenuMundos();
+  } else if (typeof mensagem.url === "string" && mensagem.url.startsWith("fase1.html?")) {
+    abrirFase(mensagem.url);
   }
 });
 
