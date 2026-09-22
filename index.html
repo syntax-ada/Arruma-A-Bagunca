@@ -27,7 +27,17 @@
         />
 
         <button class="btn-jogar" id="botao-jogar" type="button"><span>JOGAR</span></button>
+        <button class="btn-jogar btn-creditos" id="botao-creditos" type="button"><span>CRÉDITOS</span></button>
       </section>
+
+      <div id="modal-creditos" class="modal-overlay escondido" role="dialog" aria-modal="true" aria-label="Créditos do jogo">
+        <div class="modal-creditos-conteudo">
+          <button class="btn-fechar-modal" id="btn-fechar-creditos" type="button" aria-label="Fechar créditos">
+            <img src="assets/images/tela_inicial/botão_fechar.png" alt="Fechar" />
+          </button>
+          <img class="img-creditos" src="assets/images/tela_inicial/creditos.png" alt="Créditos do jogo Arruma a Bagunça" />
+        </div>
+      </div>
 
       <section id="menu-fases" class="escondido" aria-label="Seleção de mundos">
         <header class="topo-mundos">
@@ -52,24 +62,24 @@
           <button class="btn-seta" type="button" aria-label="Mundo anterior">←</button>
 
           <main class="carrossel-mundos" aria-label="Mundos do jogo">
-            <button class="card-mundo mundo-disponivel" id="botao-fase1" type="button" aria-label="Entrar no Mundo 1, A Casa">
+            <button class="card-mundo mundo-disponivel" id="botao-fase1" data-mundo="1" type="button" aria-label="Entrar no Mundo 1, A Casa">
               <img src="assets/images/nova_tela_menu de_fases/mundo_1.png" alt="Ilustração do Mundo 1, A Casa" />
             </button>
 
-            <article class="card-mundo mundo-bloqueado" id="card-mundo-2" aria-label="Mundo 2, Parque, bloqueado">
+            <button class="card-mundo mundo-bloqueado" id="card-mundo-2" data-mundo="2" type="button" aria-label="Mundo 2, Parque, bloqueado">
               <img src="assets/images/nova_tela_menu de_fases/mundo_2.png" alt="" />
               <span class="overlay-bloqueado" aria-hidden="true">🔒</span>
-            </article>
+            </button>
 
-            <article class="card-mundo mundo-bloqueado" id="card-mundo-3" aria-label="Mundo 3, Praia, bloqueado">
+            <button class="card-mundo mundo-bloqueado" id="card-mundo-3" data-mundo="3" type="button" aria-label="Mundo 3, Praia, bloqueado">
               <img src="assets/images/nova_tela_menu de_fases/mundo_3.png" alt="" />
               <span class="overlay-bloqueado" aria-hidden="true">🔒</span>
-            </article>
+            </button>
 
-            <article class="card-mundo mundo-bloqueado" id="card-mundo-4" aria-label="Mundo 4, bloqueado">
+            <button class="card-mundo mundo-bloqueado" id="card-mundo-4" data-mundo="4" type="button" aria-label="Mundo 4, bloqueado">
               <img src="assets/images/nova_tela_menu de_fases/mundo_4.png" alt="" />
               <span class="overlay-bloqueado" aria-hidden="true">🔒</span>
-            </article>
+            </button>
           </main>
 
           <button class="btn-seta" type="button" aria-label="Próximo mundo">→</button>

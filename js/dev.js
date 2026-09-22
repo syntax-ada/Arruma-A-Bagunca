@@ -429,36 +429,10 @@
   // 7. INTERCEPTAÇÃO AMIGÁVEL NO MENU (PRESERVAR PROGRESSO DEV)
   // ==========================================================
   function desbloquearMenuVisualSeNecessario() {
-    const botoesFase = document.querySelectorAll(".btn-fase-modal");
-    botoesFase.forEach((btn, index) => {
-      btn.disabled = false;
-      btn.classList.remove("fase-bloqueada");
-      btn.classList.add("fase-ativa");
-      const numFase = index + 1;
-      btn.setAttribute("aria-label", `Jogar Fase ${numFase} (Modo DEV)`);
-      btn.onclick = () => {
-        irPara(1, numFase);
-      };
-    });
-
-    const cardsMundo = [
-      { el: document.querySelector("#card-mundo-2"), id: 2 },
-      { el: document.querySelector("#card-mundo-3"), id: 3 },
-      { el: document.querySelector("#card-mundo-4"), id: 4 },
-    ];
-    cardsMundo.forEach(({ el, id }) => {
-      if (el) {
-        el.classList.remove("mundo-bloqueado");
-        el.classList.add("mundo-disponivel");
-        const overlay = el.querySelector(".overlay-bloqueado");
-        if (overlay) {
-          overlay.classList.add("escondido");
-        }
-        el.onclick = () => {
-          irPara(id, 1);
-        };
-      }
-    });
+    // Delega ao menu.js a atualização visual e liberação de fases no Modo Dev
+    if (typeof atualizarInterfaceProgresso === "function") {
+      atualizarInterfaceProgresso();
+    }
   }
 
   const botaoJogar = document.querySelector("#botao-jogar");

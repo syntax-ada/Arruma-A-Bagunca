@@ -9,6 +9,9 @@ const cardMundo3 = document.querySelector("#card-mundo-3");
 const cardMundo4 = document.querySelector("#card-mundo-4");
 const modalFases = document.querySelector("#modal-fases");
 const btnFecharModal = document.querySelector("#btn-fechar-modal");
+const botaoCreditos = document.querySelector("#botao-creditos");
+const modalCreditos = document.querySelector("#modal-creditos");
+const btnFecharCreditos = document.querySelector("#btn-fechar-creditos");
 const btnIniciarFase1 = document.querySelector("#btn-iniciar-fase1");
 const btnIniciarFase2 = document.querySelector("#btn-iniciar-fase2");
 const btnIniciarFase3 = document.querySelector("#btn-iniciar-fase3");
@@ -51,11 +54,137 @@ if (btnSetaDireita && carrosselMundos) {
   });
 }
 
+let mundoSelecionado = 1;
+
+/**
+ * Detecta se o Modo Dev está ativo via query string (?dev=true) ou sessionStorage.
+ */
+function isModoDevAtivo() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const devParam = params.get("dev");
+    if (devParam === "false" || devParam === "0") {
+      return false;
+    }
+    if (devParam === "true" || devParam === "1" || params.has("dev")) {
+      return true;
+    }
+    if (typeof window !== "undefined" && window.sessionStorage) {
+      return window.sessionStorage.getItem("arruma_bagunca_dev") === "true";
+    }
+  } catch (e) {
+    // Tratamento defensivo caso o acesso a storage falhe
+  }
+  return false;
+}
+
+/**
+ * Atualiza as ações dos botões de fase dentro do modal com base no mundo ativo.
+ */
+function atualizarBotoesModalFases(mundoId) {
+  const devAtivo = isModoDevAtivo();
+  const progresso = typeof obterProgresso === "function"
+    ? obterProgresso()
+    : { mundosDesbloqueados: [1], faseMaximaPorMundo: { 1: 1 }, fasesConcluidas: [] };
+
+  const faseMaximaMundo = devAtivo ? 999 : (progresso.faseMaximaPorMundo?.[mundoId] || 1);
+  const mundos = window.MUNDOS || {};
+  const configMundo = mundos[mundoId];
+  const totalFasesMundo = configMundo?.totalFases || 3;
+
+  // Atualização contextual do título do modal com o nome do mundo
+  const tituloModal = document.querySelector("#titulo-modal-fases");
+  if (tituloModal && configMundo?.nome) {
+    tituloModal.textContent = `Mundo ${mundoId} — ${configMundo.nome}`;
+  } else if (tituloModal) {
+    tituloModal.textContent = "Escolha uma fase para jogar!";
+  }
+
+  // Fase 1
+  if (btnIniciarFase1) {
+    btnIniciarFase1.disabled = false;
+    btnIniciarFase1.classList.remove("fase-bloqueada");
+    btnIniciarFase1.classList.add("fase-ativa");
+    btnIniciarFase1.setAttribute("aria-label", `Jogar Fase 1 do Mundo ${mundoId}`);
+    btnIniciarFase1.onclick = function () {
+      const sufixoDev = devAtivo ? "&dev=true" : "";
+      window.location.href = `fase1.html?mundo=${mundoId}&fase=1${sufixoDev}`;
+    };
+  }
+
+  // Fase 2
+  if (btnIniciarFase2) {
+    const liberada = devAtivo || (faseMaximaMundo >= 2 && totalFasesMundo >= 2);
+    if (liberada) {
+      btnIniciarFase2.disabled = false;
+      btnIniciarFase2.classList.remove("fase-bloqueada");
+      btnIniciarFase2.classList.add("fase-ativa");
+      btnIniciarFase2.setAttribute("aria-label", `Jogar Fase 2 do Mundo ${mundoId}`);
+      btnIniciarFase2.onclick = function () {
+        const sufixoDev = devAtivo ? "&dev=true" : "";
+        window.location.href = `fase1.html?mundo=${mundoId}&fase=2${sufixoDev}`;
+      };
+    } else {
+      btnIniciarFase2.disabled = true;
+      btnIniciarFase2.classList.add("fase-bloqueada");
+      btnIniciarFase2.classList.remove("fase-ativa");
+      btnIniciarFase2.setAttribute("aria-label", `Fase 2 do Mundo ${mundoId}, bloqueada`);
+      btnIniciarFase2.onclick = null;
+    }
+  }
+
+  // Fase 3
+  if (btnIniciarFase3) {
+    const liberada = devAtivo || (faseMaximaMundo >= 3 && totalFasesMundo >= 3);
+    if (liberada) {
+      btnIniciarFase3.disabled = false;
+      btnIniciarFase3.classList.remove("fase-bloqueada");
+      btnIniciarFase3.classList.add("fase-ativa");
+      btnIniciarFase3.setAttribute("aria-label", `Jogar Fase 3 do Mundo ${mundoId}`);
+      btnIniciarFase3.onclick = function () {
+        const sufixoDev = devAtivo ? "&dev=true" : "";
+        window.location.href = `fase1.html?mundo=${mundoId}&fase=3${sufixoDev}`;
+      };
+    } else {
+      btnIniciarFase3.disabled = true;
+      btnIniciarFase3.classList.add("fase-bloqueada");
+      btnIniciarFase3.classList.remove("fase-ativa");
+      btnIniciarFase3.setAttribute("aria-label", `Fase 3 do Mundo ${mundoId}, bloqueada`);
+      btnIniciarFase3.onclick = null;
+    }
+  }
+}
+
+/**
+ * Abre o modal de seleção de fases se o mundo estiver desbloqueado (ou via bypass do Modo Dev).
+ */
+function abrirModalFases(mundoId) {
+  const devAtivo = isModoDevAtivo();
+  const progresso = typeof obterProgresso === "function"
+    ? obterProgresso()
+    : { mundosDesbloqueados: [1], faseMaximaPorMundo: { 1: 1 }, fasesConcluidas: [] };
+
+  const mundosLiberados = progresso.mundosDesbloqueados || [1];
+  const id = Number(mundoId) || 1;
+
+  // Trava de progressão com bypass do Modo Dev
+  if (!devAtivo && !mundosLiberados.includes(id)) {
+    return;
+  }
+
+  mundoSelecionado = id;
+  atualizarBotoesModalFases(mundoSelecionado);
+
+  if (modalFases) {
+    modalFases.classList.remove("escondido");
+  }
+}
+
 /**
  * Atualiza a interface do menu de acordo com os dados de progresso salvos.
  */
 function atualizarInterfaceProgresso() {
-  // Leitura da persistência de dados do progresso do jogador
+  const devAtivo = isModoDevAtivo();
   const progresso = typeof obterProgresso === "function"
     ? obterProgresso()
     : { mundosDesbloqueados: [1], faseMaximaPorMundo: { 1: 1 }, fasesConcluidas: [] };
@@ -63,124 +192,31 @@ function atualizarInterfaceProgresso() {
   const faseMaximaMundo1 = progresso.faseMaximaPorMundo?.[1] || 1;
   const mundosLiberados = progresso.mundosDesbloqueados || [1];
 
-  // 1. Atualização dos botões da trilha de fases do Mundo 1
-  if (btnIniciarFase1) {
-    btnIniciarFase1.onclick = function () {
-      window.location.href = "fase1.html?mundo=1&fase=1";
-    };
-  }
+  // 1. Atualização dos botões do modal para o mundo selecionado
+  atualizarBotoesModalFases(mundoSelecionado);
 
-  if (btnIniciarFase2) {
-    if (faseMaximaMundo1 >= 2) {
-      btnIniciarFase2.disabled = false;
-      btnIniciarFase2.classList.remove("fase-bloqueada");
-      btnIniciarFase2.classList.add("fase-ativa");
-      btnIniciarFase2.setAttribute("aria-label", "Jogar Fase 2");
-      btnIniciarFase2.onclick = function () {
-        window.location.href = "fase1.html?mundo=1&fase=2";
-      };
+  // 2. Atualização visual dos cards dos Mundos no carrossel
+  const cardsMundo = document.querySelectorAll(".card-mundo");
+  cardsMundo.forEach((card) => {
+    const rawMundo = card.dataset.mundo;
+    const id = rawMundo ? parseInt(rawMundo, 10) : 1;
+    const liberado = devAtivo || mundosLiberados.includes(id);
+    const overlay = card.querySelector(".overlay-bloqueado");
+
+    if (liberado) {
+      card.classList.remove("mundo-bloqueado");
+      card.classList.add("mundo-disponivel");
+      if (overlay) {
+        overlay.classList.add("escondido");
+      }
     } else {
-      btnIniciarFase2.disabled = true;
-      btnIniciarFase2.classList.add("fase-bloqueada");
-      btnIniciarFase2.classList.remove("fase-ativa");
-      btnIniciarFase2.setAttribute("aria-label", "Fase 2, bloqueada");
-      btnIniciarFase2.onclick = null;
+      card.classList.add("mundo-bloqueado");
+      card.classList.remove("mundo-disponivel");
+      if (overlay) {
+        overlay.classList.remove("escondido");
+      }
     }
-  }
-
-  if (btnIniciarFase3) {
-    if (faseMaximaMundo1 >= 3) {
-      btnIniciarFase3.disabled = false;
-      btnIniciarFase3.classList.remove("fase-bloqueada");
-      btnIniciarFase3.classList.add("fase-ativa");
-      btnIniciarFase3.setAttribute("aria-label", "Jogar Fase 3");
-      btnIniciarFase3.onclick = function () {
-        window.location.href = "fase1.html?mundo=1&fase=3";
-      };
-    } else {
-      btnIniciarFase3.disabled = true;
-      btnIniciarFase3.classList.add("fase-bloqueada");
-      btnIniciarFase3.classList.remove("fase-ativa");
-      btnIniciarFase3.setAttribute("aria-label", "Fase 3, bloqueada");
-      btnIniciarFase3.onclick = null;
-    }
-  }
-
-  // 2. Atualização dos cards dos Mundos
-  if (cardMundo2) {
-    const mundo2Liberado = mundosLiberados.includes(2);
-    const overlay2 = cardMundo2.querySelector(".overlay-bloqueado");
-
-    if (mundo2Liberado) {
-      cardMundo2.classList.remove("mundo-bloqueado");
-      cardMundo2.classList.add("mundo-disponivel");
-      cardMundo2.setAttribute("aria-label", "Mundo 2, Parque, liberado");
-      if (overlay2) {
-        overlay2.classList.add("escondido");
-      }
-      cardMundo2.onclick = function () {
-        window.location.href = "fase1.html?mundo=2&fase=1";
-      };
-    } else {
-      cardMundo2.classList.add("mundo-bloqueado");
-      cardMundo2.classList.remove("mundo-disponivel");
-      cardMundo2.setAttribute("aria-label", "Mundo 2, Parque, bloqueado");
-      if (overlay2) {
-        overlay2.classList.remove("escondido");
-      }
-      cardMundo2.onclick = null;
-    }
-  }
-
-  if (cardMundo3) {
-    const mundo3Liberado = mundosLiberados.includes(3);
-    const overlay3 = cardMundo3.querySelector(".overlay-bloqueado");
-
-    if (mundo3Liberado) {
-      cardMundo3.classList.remove("mundo-bloqueado");
-      cardMundo3.classList.add("mundo-disponivel");
-      cardMundo3.setAttribute("aria-label", "Mundo 3, Praia, liberado");
-      if (overlay3) {
-        overlay3.classList.add("escondido");
-      }
-      cardMundo3.onclick = function () {
-        window.location.href = "fase1.html?mundo=3&fase=1";
-      };
-    } else {
-      cardMundo3.classList.add("mundo-bloqueado");
-      cardMundo3.classList.remove("mundo-disponivel");
-      cardMundo3.setAttribute("aria-label", "Mundo 3, Praia, bloqueado");
-      if (overlay3) {
-        overlay3.classList.remove("escondido");
-      }
-      cardMundo3.onclick = null;
-    }
-  }
-
-  if (cardMundo4) {
-    const mundo4Liberado = mundosLiberados.includes(4);
-    const overlay4 = cardMundo4.querySelector(".overlay-bloqueado");
-
-    if (mundo4Liberado) {
-      cardMundo4.classList.remove("mundo-bloqueado");
-      cardMundo4.classList.add("mundo-disponivel");
-      cardMundo4.setAttribute("aria-label", "Mundo 4, liberado");
-      if (overlay4) {
-        overlay4.classList.add("escondido");
-      }
-      cardMundo4.onclick = function () {
-        window.location.href = "fase1.html?mundo=4&fase=1";
-      };
-    } else {
-      cardMundo4.classList.add("mundo-bloqueado");
-      cardMundo4.classList.remove("mundo-disponivel");
-      cardMundo4.setAttribute("aria-label", "Mundo 4, bloqueado");
-      if (overlay4) {
-        overlay4.classList.remove("escondido");
-      }
-      cardMundo4.onclick = null;
-    }
-  }
+  });
 
   // 3. Atualização visual da barra de progresso
   // Escala recalibrada para 4 mundos: os degraus do Mundo 1 (10/25/45) e o
@@ -231,18 +267,56 @@ if (botaoVoltar && telaInicial && menuFases && controlesIniciais) {
   });
 }
 
-if (botaoFase1 && modalFases) {
-  botaoFase1.addEventListener("click", function () {
-    atualizarInterfaceProgresso();
-    modalFases.classList.remove("escondido");
+// Abertura do modal de seleção de fases em todos os cards do carrossel
+const cardsCarrossel = document.querySelectorAll(".card-mundo");
+cardsCarrossel.forEach((card) => {
+  card.onclick = null;
+  card.addEventListener("click", function (event) {
+    event.preventDefault();
+    event.stopPropagation();
+    const rawMundo = card.dataset.mundo;
+    const mundoId = rawMundo ? parseInt(rawMundo, 10) : 1;
+    abrirModalFases(mundoId);
   });
-}
+});
 
 if (btnFecharModal && modalFases) {
   btnFecharModal.addEventListener("click", function () {
     modalFases.classList.add("escondido");
   });
 }
+
+// Controle do Modal de Créditos
+if (botaoCreditos && modalCreditos) {
+  botaoCreditos.addEventListener("click", function () {
+    modalCreditos.classList.remove("escondido");
+  });
+}
+
+if (btnFecharCreditos && modalCreditos) {
+  btnFecharCreditos.addEventListener("click", function () {
+    modalCreditos.classList.add("escondido");
+  });
+}
+
+if (modalCreditos) {
+  modalCreditos.addEventListener("click", function (evento) {
+    if (evento.target === modalCreditos) {
+      modalCreditos.classList.add("escondido");
+    }
+  });
+}
+
+document.addEventListener("keydown", function (evento) {
+  if (evento.key === "Escape") {
+    if (modalCreditos && !modalCreditos.classList.contains("escondido")) {
+      modalCreditos.classList.add("escondido");
+    }
+    if (modalFases && !modalFases.classList.contains("escondido")) {
+      modalFases.classList.add("escondido");
+    }
+  }
+});
 
 /**
  * Verifica se a URL contém o parâmetro ?view=mundos para exibir diretamente a seleção de mundos.

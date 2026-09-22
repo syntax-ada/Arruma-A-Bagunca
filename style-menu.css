@@ -134,6 +134,15 @@ button {
   transform: skewX(-12deg) scale(1.05);
 }
 
+.btn-creditos {
+  font-size: 20px;
+  padding: 10px 32px;
+  min-width: unset;
+  max-width: 220px;
+  border-radius: 16px;
+  margin: 16px auto 0;
+}
+
 #tela-inicial button img {
   max-width: 100%;
   height: auto;
@@ -515,6 +524,64 @@ button {
   cursor: not-allowed;
 }
 
+/* ==========================================================
+   MODAL DE CRÉDITOS
+   ========================================================== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 90;
+  backdrop-filter: blur(2px);
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.modal-creditos-conteudo {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: min(92vw, 820px);
+  max-height: 90vh;
+  background: #ffffff;
+  border-radius: 32px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+  padding: 14px;
+}
+
+.modal-creditos-conteudo .img-creditos {
+  width: 100%;
+  height: auto;
+  max-height: 80vh;
+  object-fit: contain;
+  border-radius: 20px;
+  pointer-events: auto;
+}
+
+.modal-creditos-conteudo .btn-fechar-modal {
+  position: absolute;
+  top: -18px;
+  right: -18px;
+  width: 52px;
+  height: 52px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: 95;
+  transition: transform 0.2s ease;
+}
+
+.modal-creditos-conteudo .btn-fechar-modal:hover {
+  transform: scale(1.12);
+}
+
 @media (max-width: 600px) {
   #modal-fases {
     padding: 30px 20px 34px;
@@ -522,7 +589,13 @@ button {
     border-radius: 26px;
   }
 
-  .btn-fechar-modal {
+  .modal-creditos-conteudo {
+    padding: 8px;
+    border-radius: 20px;
+  }
+
+  .btn-fechar-modal,
+  .modal-creditos-conteudo .btn-fechar-modal {
     top: -12px;
     right: -12px;
     width: 42px;
@@ -537,5 +610,11 @@ button {
     left: 10%;
     right: 10%;
     height: 8px;
+  }
+
+  .btn-creditos {
+    font-size: 16px;
+    padding: 8px 24px;
+    max-width: 180px;
   }
 }

@@ -98,30 +98,31 @@ Outras práticas:
 
 Principais responsabilidades:
 
-- `index.html` → menu inicial e seleção de mundos/fases;
-- `fase1.html` → tela de jogo (organização de objetos + desafio matemático);
-- `menu.js` → navegação do menu;
-- `game.js` → mecânica de organização dos objetos, **compartilhada pelas três
-  fases** através de `CONFIG_FASE_1`, `CONFIG_FASE_2` e `CONFIG_FASE_3`,
-  orquestradas por `startGame()`;
-- `math.js` → desafio matemático;
-- `main.js` → responsabilidade ainda não definida.
+- `index.html` → menu inicial (jogar, créditos) e seleção de mundos/fases;
+- `fase1.html` → tela de jogo genérica (organização de objetos + desafio matemático);
+- `menu.js` → navegação do menu, carrossel de mundos e modais de fases e créditos;
+- `main.js` → ponto de entrada (bootstrap) da fase: lê os parâmetros da URL (`?mundo=X&fase=Y`), resolve o mundo e a fase via `window.MUNDOS` e inicializa o motor com `startGame(config)`;
+- `game.js` → mecânica de organização dos objetos, motor compartilhado por todos os mundos e fases orquestrado por `startGame()`;
+- `math.js` → motor do desafio matemático desacoplado, resolvendo a conta via `window.OPERACOES` e disparando a progressão;
+- `operacoes.js` → catálogo e regras das operações matemáticas (Soma, Subtração, Multiplicação e Divisão);
+- `progresso.js` → serviço de persistência de progresso (`localStorage`) multi-mundo e multi-fase;
+- `dev.js` → ferramenta de desenvolvimento e painel de testes (ativado por `?dev=true` ou `sessionStorage`);
+- `js/mundos/` → arquivos declarativos de configuração de cada mundo (`mundo1.js` a `mundo4.js`), auto-registrados em `window.MUNDOS`.
 
 Não altere responsabilidades arquiteturais importantes sem sinalizar o impacto antes.
 
 ---
 
-## Estado atual das fases
+## Estado atual dos mundos e fases
 
-| Fase | Categorias | Objetos | Acessível pela UI? |
-|---|---|---|---|
-| 1 | 2 (brinquedos, comidas) | 5 — 3 brinquedos + 2 comidas (banana e maçã) | Sim |
-| 2 | 3 (brinquedos, comidas, materiais) | 9 — 3 brinquedos + 3 comidas + 3 materiais | Não |
-| 3 | 3 (brinquedos, comidas, materiais) | 14 — 2 brinquedos + 5 comidas + 7 materiais | Não |
+| Mundo | Tema | Operação | Fases | Acessível pela UI? |
+|---|---|---|---|---|
+| 1 | A Casa | Soma (`+`) | 3 fases (5, 9 e 14 objetos) | Sim (Fases 1, 2 e 3 acessíveis pela UI via modal e progressão) |
+| 2 | Parque | Subtração (`−`) | 3 fases (Comidas, Animais, Brinquedos) | Sim (desbloqueado após concluir Mundo 1) |
+| 3 | Praia | Multiplicação (`×`) | 3 fases (Bebidas, Comidas, Brinquedos) | Sim (desbloqueado após concluir Mundo 2) |
+| 4 | Estrutura provisória | Divisão (`÷`) | 3 fases (Comidas, Bebidas) | Sim (desbloqueado após concluir Mundo 3) |
 
-Fases 2 e 3 já têm a mecânica implementada no engine (`game.js`), mas a
-progressão/navegação pela UI até elas ainda está em desenvolvimento. Não
-presuma que estão prontas para o jogador final só porque o engine as suporta.
+As Fases 1, 2 e 3 do Mundo 1 estão totalmente acessíveis pela UI (a Fase 1 liberada por padrão e as Fases 2 e 3 desbloqueadas progressivamente). Os Mundos 2, 3 e 4 estão implementados no engine com suas respectivas operações matemáticas e mecânicas completas.
 
 Esta tabela reflete o estado no momento da última revisão deste documento —
 se o código mudar, atualize-a como parte da tarefa que a alterou.

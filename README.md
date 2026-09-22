@@ -80,19 +80,13 @@ O projeto completo prevê:
 
 [Decisão da equipe] A estrutura definida é de **4 mundos principais + 1 mundo bônus** (este último obrigatório, conforme requisito da faculdade — ver seção 2). Só é preenchido abaixo o que já está definido no projeto — o restante permanece em aberto até decisão da equipe.
 
-| Mundo | Tema | Fases | Estado |
-
-|---|---|---|---|
-
-| Mundo 1 | A Casa | Fase 1, Fase 2, Fase 3 | Em desenvolvimento |
-
-| Mundo 2 | Ainda não definido | Ainda não definidas | Planejado |
-
-| Mundo 3 | Ainda não definido | Ainda não definidas | Planejado |
-
-| Mundo 4 | Ainda não definido | Ainda não definidas | Planejado |
-
-| Mundo bônus | Ainda não definido | Todas as contas/conteúdos matemáticos trabalhados no jogo | Planejado |
+| Mundo | Tema | Operação | Fases | Estado |
+|---|---|---|---|---|
+| Mundo 1 | A Casa | Soma (`+`) | Fase 1, Fase 2, Fase 3 | Implementado |
+| Mundo 2 | Parque | Subtração (`−`) | Fase 1, Fase 2, Fase 3 | Implementado |
+| Mundo 3 | Praia | Multiplicação (`×`) | Fase 1, Fase 2, Fase 3 | Implementado |
+| Mundo 4 | Estrutura provisória | Divisão (`÷`) | Fase 1, Fase 2, Fase 3 | Implementado |
+| Mundo bônus | Ainda não definido | Revisão geral | Todas as contas/conteúdos matemáticos trabalhados no jogo | Planejado |
 
 A interface atual já exibe, no menu de seleção de mundos, nomes provisórios como "Escola" e "Petshop" para os mundos ainda bloqueados. Esses nomes são elementos provisórios da implementação visual e **não** representam decisões definitivas de tema da equipe.
 
@@ -262,56 +256,43 @@ Arruma-A-Bagunca/
 
 │
 
-├── index.html          → tela inicial e menu de mundos/fases
-
-├── fase1.html           → tela de organização + tela de desafio matemático
-
-├── global.css           → estilos globais
-
-├── style-menu.css       → estilos do menu
-
-├── style-fase1.css      → estilos da tela de fase
-
+├── index.html          → tela inicial (jogar, créditos) e menu de mundos/fases
+├── fase1.html          → tela de jogo genérica (organização + desafio matemático)
+├── global.css          → estilos globais
+├── style-menu.css      → estilos do menu e modais (fases e créditos)
+├── style-fase1.css     → estilos da tela de fase
 ├── README.md
-
 ├── AGENTS.md
-
 │
-
 ├── js/
-
-│   ├── menu.js           → navegação do menu, mundos e fases
-
-│   ├── game.js           → mecânica de organização dos objetos, compartilhada
-
-│   │                        pelas Fases 1, 2 e 3 via CONFIG_FASE_1/2/3
-
-│   ├── math.js            → desafio matemático
-
-│   ├── progresso.js       → serviço de persistência de progresso (localStorage);
-
-│   │                        usado por menu.js e math.js para desbloquear fases/mundos
-
-│   └── main.js            → responsabilidade ainda não definida
-
+│   ├── main.js         → ponto de entrada (bootstrap) da fase: lê parâmetros da URL
+│   │                     (?mundo=X&fase=Y), resolve o mundo/fase via window.MUNDOS e
+│   │                     chama startGame(config)
+│   ├── game.js         → mecânica de organização dos objetos, motor compartilhado por
+│   │                     todas as fases via startGame()
+│   ├── math.js         → motor do desafio matemático desacoplado; consome window.OPERACOES
+│   ├── operacoes.js    → catálogo e regras das operações matemáticas (Soma, Subtração,
+│   │                     Multiplicação e Divisão)
+│   ├── progresso.js    → serviço de persistência de progresso (localStorage) multi-mundo
+│   ├── menu.js         → navegação do menu, carrossel de mundos e modais de fases e créditos
+│   ├── dev.js          → ferramenta de desenvolvimento e testes (ativado por ?dev=true)
+│   │
+│   └── mundos/         → arquivos declarativos de configuração dos mundos (window.MUNDOS)
+│       ├── mundo1.js   → Mundo 1: A Casa (Soma)
+│       ├── mundo2.js   → Mundo 2: Parque (Subtração)
+│       ├── mundo3.js   → Mundo 3: Praia (Multiplicação)
+│       └── mundo4.js   → Mundo 4: Estrutura provisória (Divisão)
 │
-
 └── assets/
-
-    ├── audio/
-
-    └── images/
-
-        ├── tela_inicial/
-
-        ├── tela_fase1/
-
-        │   └── sprites_cestas/
-
-        ├── mundo_1/                     → botões de fase do modal de seleção
-
-        └── nova_tela_menu de_fases/     → menu de mundos (carrossel, progresso)
-
+    ├── audio/
+    └── images/
+        ├── tela_inicial/
+        ├── tela_fase1/
+        │   └── sprites_cestas/
+        ├── mundo_1/            → botões de fase do modal de seleção
+        ├── mundo_2/            → cenários, objetos e sprites_cestas_2 do Mundo 2
+        ├── mundo_3/            → cenários, objetos e sprites_cestas_3 do Mundo 3
+        └── nova_tela_menu de_fases/ → menu de mundos (carrossel, progresso)
 ```
 
 Essa organização reflete o estado atual do projeto e pode evoluir conforme a arquitetura for definida.
@@ -411,8 +392,6 @@ Regras detalhadas de fluxo de trabalho, revisão e comportamento esperado de age
 ## 10. Pendências e próximos objetivos
 
 Pontos identificados atualmente que ainda merecem atenção:
-
-- avaliar o papel definitivo do `main.js`;
 
 - revisar suporte de teclado para arrastar objetos (hoje só a seleção por cesta é assistida);
 
