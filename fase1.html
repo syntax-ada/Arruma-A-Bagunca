@@ -27,6 +27,23 @@
                 </div>
             </header>
 
+            <!-- Aviso da virada de etapa. Escondido por padrão; só aparece numa
+                 fase que enfrenta o adversário antes de arrumar a casa. -->
+            <p id="aviso-organizacao" class="aviso-organizacao escondido" role="status" aria-live="polite">
+                <span aria-hidden="true">🧹</span>
+                ARRUME A BAGUNÇA!
+            </p>
+
+            <!-- Encerramento da etapa final. Escondido por padrão; math.js revela
+                 quando a organização final termina, e os botões de conclusão são
+                 anexados aqui dentro.
+                 ⚠️ APRESENTAÇÃO PROVISÓRIA: texto, ilustração e layout podem ser
+                 trocados sem mexer na lógica de conclusão da fase. -->
+            <section id="painel-vitoria" class="painel-vitoria escondido" role="status" aria-live="polite">
+                <p class="titulo-vitoria"><span aria-hidden="true">🎉</span> CASA ORGANIZADA!</p>
+                <p class="subtitulo-vitoria"><span aria-hidden="true">⭐</span> VOCÊ VENCEU!</p>
+            </section>
+
             <section class="area-objetos" aria-label="Objetos da Fase 1">
                 <div class="grid-objetos" id="grid-objetos" role="region" aria-label="Área de organização dos objetos">
                     <!-- Slots e objetos gerados dinamicamente via game.js -->
@@ -49,6 +66,17 @@
                     </p>
                 </div>
             </header>
+
+            <!-- Adversário da fase e seus corações. Fica escondido até a fase
+                 declarar um "boss"; quem preenche e revela é js/math.js. -->
+            <section id="area-boss" class="area-boss escondido" aria-labelledby="boss-nome">
+                <img class="boss-imagem" id="boss-imagem" alt="" />
+                <p class="boss-nome" id="boss-nome"></p>
+                <p class="boss-vida" role="status" aria-live="polite">
+                    <span class="boss-coracoes" id="boss-coracoes" aria-hidden="true"></span>
+                    <span class="boss-contagem" id="boss-contagem"></span>
+                </p>
+            </section>
 
             <div class="painel-matematica">
                 <h2 class="pergunta-matematica" id="pergunta-matematica">
@@ -80,6 +108,7 @@
     <script src="js/mundos/mundo2.js"></script>
     <script src="js/mundos/mundo3.js"></script>
     <script src="js/mundos/mundo4.js"></script>
+    <script src="js/mundos/mundo5.js"></script>
     <script src="js/audio.js"></script>
     <script src="js/main.js"></script>
     <script src="js/dev.js"></script>

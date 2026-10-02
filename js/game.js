@@ -188,6 +188,15 @@ function startGame(config) {
     updateDropZoneCounter(dropZone);
     dropZone.addEventListener("keydown", handleDropZoneKeyboard);
   });
+
+  // Fase que declara um adversário inverte a ordem: a primeira etapa interativa
+  // é o desafio, não a organização. Os objetos, as cestas e os eventos acima já
+  // ficam prontos — eles só entram em cena depois que o adversário cair, e a
+  // casa segue bagunçada até lá. Quem não declara adversário começa arrumando,
+  // exatamente como antes.
+  if (activeConfig.boss && typeof iniciarEtapaMatematica === "function") {
+    iniciarEtapaMatematica(null, activeConfig);
+  }
 }
 
 function startDrag(event) {
@@ -255,8 +264,8 @@ function finishDrag(event) {
         if (activeConfig?.fundoArrumado) {
           document.body.style.backgroundImage = `url("${activeConfig.fundoArrumado}")`;
         }
-        if (typeof iniciarDesafioMatematico === "function") {
-          iniciarDesafioMatematico(resumoCategorias, activeConfig?.operacao);
+        if (typeof iniciarEtapaMatematica === "function") {
+          iniciarEtapaMatematica(resumoCategorias, activeConfig);
         }
       }, 1000);
     } else {
@@ -506,8 +515,8 @@ function handleDropZoneKeyboard(event) {
         if (activeConfig?.fundoArrumado) {
           document.body.style.backgroundImage = `url("${activeConfig.fundoArrumado}")`;
         }
-        if (typeof iniciarDesafioMatematico === "function") {
-          iniciarDesafioMatematico(resumoCategorias, activeConfig?.operacao);
+        if (typeof iniciarEtapaMatematica === "function") {
+          iniciarEtapaMatematica(resumoCategorias, activeConfig);
         }
       }, 1000);
     } else {

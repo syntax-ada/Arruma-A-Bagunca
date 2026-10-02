@@ -23,6 +23,23 @@
  * categorias estão declaradas no arquivo do mundo. Para a subtração essa ordem
  * é semântica — a primeira categoria é o minuendo.
  *
+ * ----------------------------------------------------------------------------
+ * CONTAS COMPOSTAS (vários operadores em uma só conta)
+ * ----------------------------------------------------------------------------
+ * As quatro operações acima aplicam UM operador a todas as parcelas. A entrada
+ * "composta" generaliza isso: a conta passa a declarar também os operadores de
+ * cada lacuna, e as quatro operações continuam intactas.
+ *
+ *   { valores: [2, 5, 2, 1], operadores: ["×", "+", "-"] }  →  2 × 5 + 2 − 1
+ *
+ * Para isso, "calcular" e "validar" aceitam um SEGUNDO argumento opcional com
+ * os operadores. As quatro operações simples ignoram esse argumento — em
+ * JavaScript, argumentos extras não atrapalham —, então nada muda para elas.
+ *
+ * Uma conta simples é o caso particular em que todos os operadores são iguais:
+ * não existe "sistema do Mundo 5", existe uma lista de operadores que nos
+ * Mundos 1–4 é uniforme.
+ *
  * ⚠️ ORDEM DE CARREGAMENTO: este arquivo deve vir ANTES de math.js no HTML.
  * ============================================================================
  */
@@ -277,6 +294,181 @@
   };
 
   // ==========================================================
+  // EXPRESSÃO COMPOSTA (+ − × ÷ na mesma conta)
+  // Não há aritmética nova aqui: cada passo da conta é resolvido pela operação
+  // simples correspondente, declarada acima.
+  // ==========================================================
+
+  // Operadores aceitos numa expressão, mapeados para a operação que resolve
+  // aquele passo.
+  //
+  // Os apelidos existem por um motivo prático: o símbolo de subtração do
+  // catálogo é "−" (U+2212), mas um arquivo de mundo escrito à mão normalmente
+  // traz o hífen "-" do teclado. O mesmo vale para "×"/"x" e "÷"/"/". Aceitar
+  // as duas formas evita um erro silencioso de autoria difícil de enxergar.
+  const OPERADORES_EXPRESSAO = {
+    "+": SOMA,
+    "−": SUBTRACAO,
+    "-": SUBTRACAO,
+    "×": MULTIPLICACAO,
+    "x": MULTIPLICACAO,
+    "*": MULTIPLICACAO,
+    "÷": DIVISAO,
+    "/": DIVISAO,
+  };
+
+  // Multiplicação e divisão são resolvidas antes de adição e subtração.
+  const OPERACOES_PRIORITARIAS = [MULTIPLICACAO.id, DIVISAO.id];
+
+  // Aceita tanto resolverExpressao(valores, operadores) quanto o formato
+  // estruturado resolverExpressao({ valores, operadores }), que é como as
+  // contas compostas são declaradas.
+  function normalizarExpressao(entrada, operadores) {
+    const fonte = (entrada && !Array.isArray(entrada) && typeof entrada === "object")
+      ? entrada
+      : { valores: entrada, operadores };
+
+    return {
+      numeros: normalizarValores(fonte.valores),
+      operadores: Array.isArray(fonte.operadores) ? fonte.operadores.map(String) : [],
+    };
+  }
+
+  // Resolve a expressão em DUAS PASSADAS, da esquerda para a direita:
+  //
+  //   passada 1 → colapsa × e ÷
+  //   passada 2 → acumula + e −
+  //
+  // Não há parser, AST nem eval: os dados já chegam estruturados em dois
+  // arrays, então não existe texto para interpretar.
+  //
+  // Calcular e validar percorrem ESTA MESMA rotina — calcular aproveita o
+  // resultado, validar aproveita o motivo. Assim as duas nunca divergem.
+  function resolverExpressao(entrada, operadoresDaChamada) {
+    const { numeros, operadores } = normalizarExpressao(entrada, operadoresDaChamada);
+
+    if (numeros.length < 2) {
+      return {
+        valido: false,
+        motivo: "Uma expressão composta precisa de pelo menos dois valores.",
+        resultado: 0,
+      };
+    }
+
+    if (operadores.length !== numeros.length - 1) {
+      return {
+        valido: false,
+        motivo: `São esperados ${numeros.length - 1} operador(es) para ${numeros.length} valores, mas vieram ${operadores.length}.`,
+        resultado: 0,
+      };
+    }
+
+    const naoReconhecido = operadores.find((operador) => !OPERADORES_EXPRESSAO[operador]);
+    if (naoReconhecido !== undefined) {
+      return {
+        valido: false,
+        motivo: `Operador "${naoReconhecido}" não reconhecido em ${numeros.join(" ? ")}. Use +, −, × ou ÷.`,
+        resultado: 0,
+      };
+    }
+
+    // Cópias de trabalho: a passada 1 substitui cada par de valores pelo
+    // resultado do seu passo, encurtando as duas listas juntas.
+    const valores = numeros.slice();
+    const passos = operadores.map((operador) => OPERADORES_EXPRESSAO[operador]);
+
+    let indice = 0;
+    while (indice < passos.length) {
+      if (!OPERACOES_PRIORITARIAS.includes(passos[indice].id)) {
+        indice++;
+        continue;
+      }
+
+      const esquerda = valores[indice];
+      const direita = valores[indice + 1];
+
+      // Mesmas guardas da divisão simples: divisor zero e resto quebram a conta.
+      if (passos[indice].id === DIVISAO.id) {
+        if (direita === 0) {
+          return {
+            valido: false,
+            motivo: `Divisão por zero em ${esquerda} ÷ ${direita}, dentro de ${numeros.join(" ")}.`,
+            resultado: 0,
+          };
+        }
+
+        if (esquerda % direita !== 0) {
+          return {
+            valido: false,
+            motivo: `Divisão não exata (${esquerda} ÷ ${direita} deixa resto), dentro de ${numeros.join(" ")}.`,
+            resultado: 0,
+          };
+        }
+      }
+
+      valores.splice(indice, 2, passos[indice].calcular([esquerda, direita]));
+      passos.splice(indice, 1);
+
+      // O índice NÃO avança: o próximo operador tomou esta posição e também
+      // pode ser prioritário (ex.: 12 ÷ 3 × 2).
+    }
+
+    // Passada 2: + e −, acumulando da esquerda para a direita. O parcial não
+    // pode ficar negativo — é a mesma guarda que a subtração simples já aplica,
+    // porque o jogo trabalha com números naturais.
+    let parcial = valores[0];
+    for (let i = 0; i < passos.length; i++) {
+      parcial = passos[i].calcular([parcial, valores[i + 1]]);
+
+      if (parcial < 0) {
+        return {
+          valido: false,
+          motivo: `Resultado intermediário negativo (${parcial}) no passo ${i + 1} de ${numeros.join(" ")}.`,
+          resultado: parcial,
+        };
+      }
+    }
+
+    return { valido: true, motivo: "", resultado: parcial };
+  }
+
+  const COMPOSTA = {
+    id: "composta",
+
+    // Uma expressão composta não tem um símbolo único: cada lacuna usa o seu
+    // próprio operador, declarado em "operadores". Este campo existe apenas
+    // para manter o contrato do catálogo e NÃO serve como separador da conta.
+    simbolo: "",
+
+    pergunta: "Qual é o resultado da conta?",
+
+    calcular(valores, operadores) {
+      return resolverExpressao(valores, operadores).resultado;
+    },
+
+    validar(valores, operadores) {
+      const { valido, motivo } = resolverExpressao(valores, operadores);
+      return { valido, motivo };
+    },
+
+    // Distratores de 1 em 1, sem descer abaixo de zero — mesmo critério já
+    // usado pela subtração e pela divisão.
+    gerarAlternativas(resultado) {
+      const opcoes = new Set();
+      opcoes.add(resultado);
+      if (resultado - 1 >= 0) {
+        opcoes.add(resultado - 1);
+      }
+      opcoes.add(resultado + 1);
+      return completarAlternativas(opcoes, resultado);
+    },
+
+    mensagemSucesso(conta) {
+      return `Muito bem! Você acertou! ${conta}`;
+    },
+  };
+
+  // ==========================================================
   // REGISTRO DAS OPERAÇÕES
   // math.js localiza a operação da fase por OPERACOES[config.operacao].
   // ==========================================================
@@ -285,6 +477,7 @@
     [SUBTRACAO.id]: SUBTRACAO,
     [MULTIPLICACAO.id]: MULTIPLICACAO,
     [DIVISAO.id]: DIVISAO,
+    [COMPOSTA.id]: COMPOSTA,
   };
 
   if (typeof window !== "undefined") {
