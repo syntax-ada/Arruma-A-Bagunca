@@ -187,56 +187,121 @@
   }
 
   /**
-   * Aguarda o jogo abrir o desafio matemático por conta própria.
+   * ESTADO REAL DA FASE, lido do próprio jogo.
    *
-   * O fluxo normal tem um setTimeout de 1000 ms entre o último objeto organizado
-   * e a troca de tela. O DEV respeita esse tempo em vez de contorná-lo: apenas
-   * observa a tela de matemática deixar de estar escondida.
+   * O DEV não guarda estado nem supõe a ordem das etapas. Uma fase pode começar
+   * pela organização (fluxo tradicional: organização → matemática → conclusão)
+   * ou pelo desafio (fluxo com adversário: matemática → organização →
+   * conclusão), e quem decide isso é a configuração da fase — não o DEV.
+   *
+   * Por isso aqui só existem perguntas sobre o que está acontecendo AGORA. É o
+   * que permite atravessar os dois fluxos com o mesmo código, sem nenhuma regra
+   * baseada no número do mundo e sem repetir a lógica que já vive em game.js e
+   * math.js.
    */
-  function aguardarEtapaMatematica(limiteMs = 5000) {
-    const telaMatematica = document.querySelector("#tela-matematica");
-    if (!telaMatematica) {
-      return Promise.resolve(false);
+  function etapaEstaVisivel(seletor) {
+    const tela = document.querySelector(seletor);
+    return !!tela && !tela.classList.contains("escondido");
+  }
+
+  /**
+   * A fase terminou quando o jogo monta os botões de conclusão — é o mesmo
+   * sinal que o botão "Próxima Fase" do DEV já usa. Serve para os dois fluxos:
+   * os botões aparecem no painel matemático (fluxo tradicional) ou no painel de
+   * vitória (depois da organização final do fluxo com adversário).
+   */
+  function faseFoiConcluida() {
+    return !!document.querySelector(".acoes-conclusao");
+  }
+
+  // Há uma conta aberta esperando resposta? Depois de um acerto o jogo desativa
+  // os botões, então "botão ativo" é o que distingue uma conta nova de uma
+  // conta já respondida.
+  function haDesafioParaResponder() {
+    return etapaEstaVisivel("#tela-matematica")
+      && !!document.querySelector(".botao-opcao-matematica:not([disabled])");
+  }
+
+  function haObjetoParaOrganizar() {
+    return etapaEstaVisivel("#tela-organizacao")
+      && !!document.querySelector(".draggable-item:not(.is-correct)");
+  }
+
+  /**
+   * Aguarda o jogo chegar ao próximo estado em que o DEV tenha o que fazer —
+   * ou em que a fase já tenha terminado.
+   *
+   * As pausas do jogo são respeitadas, não contornadas: entre uma conta e a
+   * próxima, entre o adversário cair e a casa entrar em cena, e entre o último
+   * objeto organizado e a troca de tela, o jogo fica alguns instantes sem nada
+   * para o DEV fazer. O limite de tempo existe só para não esperar para
+   * sempre — a prova de que algo aconteceu é sempre o estado real da tela,
+   * nunca o fim da espera.
+   */
+  function aguardarProximoEstadoDoJogo(limiteMs = 5000) {
+    const pronto = () => faseFoiConcluida() || haDesafioParaResponder() || haObjetoParaOrganizar();
+
+    if (pronto()) {
+      return Promise.resolve(true);
     }
 
-    const estaVisivel = () => !telaMatematica.classList.contains("escondido");
-    if (estaVisivel()) {
-      return Promise.resolve(true);
+    if (!document.body) {
+      return Promise.resolve(false);
     }
 
     return new Promise((resolve) => {
       let encerrado = false;
 
-      const finalizar = (abriu) => {
+      const finalizar = (avancou) => {
         if (encerrado) {
           return;
         }
         encerrado = true;
         observador.disconnect();
         clearTimeout(prazo);
-        resolve(abriu);
+        resolve(avancou);
       };
 
       const observador = new MutationObserver(() => {
-        if (estaVisivel()) {
+        if (pronto()) {
           finalizar(true);
         }
       });
       const prazo = setTimeout(() => finalizar(false), limiteMs);
 
-      observador.observe(telaMatematica, { attributes: true, attributeFilter: ["class"] });
+      // As transições observadas mexem no DOM de formas diferentes: trocar de
+      // tela mexe em "class", montar a conclusão ou uma conta nova insere
+      // elementos, e responder uma conta desativa os botões.
+      observador.observe(document.body, {
+        subtree: true,
+        childList: true,
+        attributes: true,
+        attributeFilter: ["class", "disabled"],
+      });
     });
   }
 
-  function completarEtapa() {
+  /**
+   * Completa a etapa visível na tela. Devolve true quando realmente agiu e
+   * false quando não havia o que fazer — nesse caso o motivo já foi relatado no
+   * painel, e quem chamou não deve sobrepor outra mensagem.
+   */
+  async function completarEtapa() {
+    // Fase encerrada: nao ha etapa pendente, e a tela da ultima etapa continua
+    // em cena. Sem isto o DEV anunciaria uma simulacao que nao aconteceu.
+    if (faseFoiConcluida()) {
+      notificarDev("A fase já foi concluída — não há etapa pendente para completar.");
+      return false;
+    }
+
     const telaOrganizacao = document.querySelector("#tela-organizacao");
     const telaMatematica = document.querySelector("#tela-matematica");
 
-    // Etapa 1: Organização dos Objetos
+    // Etapa de organização dos objetos
     if (telaOrganizacao && !telaOrganizacao.classList.contains("escondido")) {
       if (typeof findCorrectDropZone !== "function") {
         notificarDev("game.js não está carregado nesta tela — simulação cancelada.");
-        return;
+        return false;
       }
 
       // Limite defensivo: o laço só avança enquanto o próprio jogo confirmar
@@ -256,7 +321,7 @@
           notificarDev(
             `Nenhuma cesta aceita "${item.dataset.category}". Simulação interrompida em ${organizados} objeto(s).`
           );
-          return;
+          return false;
         }
 
         simularInteracaoComCesta(cesta);
@@ -266,7 +331,7 @@
           notificarDev(
             `O jogo não organizou "${item.id}". Simulação interrompida em ${organizados} objeto(s).`
           );
-          return;
+          return false;
         }
 
         organizados++;
@@ -274,17 +339,41 @@
 
       if (organizados === 0) {
         notificarDev("Nenhum objeto pendente para organizar nesta tela.");
-        return;
+        return false;
       }
 
-      notificarDev(
-        `${organizados} objeto(s) organizados pelo fluxo do jogo. Aguardando o desafio matemático...`
-      );
-      return;
+      notificarDev(`${organizados} objeto(s) organizados pelo fluxo do jogo.`);
+
+      // O que vem DEPOIS da organização depende da fase, e o DEV não adivinha:
+      // no fluxo tradicional abre o desafio matemático; no fluxo com adversário
+      // esta é a etapa FINAL e o próprio jogo encerra a fase. Em vez de anunciar
+      // uma espera que pode não existir, o DEV espera o jogo decidir e relata o
+      // que de fato aconteceu.
+      await aguardarProximoEstadoDoJogo();
+
+      if (faseFoiConcluida()) {
+        notificarDev(`${organizados} objeto(s) organizados. Era a etapa final: fase concluída.`);
+      } else if (haDesafioParaResponder()) {
+        notificarDev(`${organizados} objeto(s) organizados. O desafio matemático abriu.`);
+      } else {
+        notificarDev(
+          `${organizados} objeto(s) organizados, mas o jogo não apresentou a etapa seguinte no tempo esperado.`
+        );
+      }
+      return true;
     }
 
-    // Etapa 2: Desafio Matemático
+    // Etapa do desafio matemático — uma conta por vez. Numa fase com sequência
+    // de contas, quem apresenta a próxima é o jogo, depois da sua pausa.
     if (telaMatematica && !telaMatematica.classList.contains("escondido")) {
+      // Conta ja respondida: o jogo desativou os botoes e esta na pausa antes
+      // de apresentar a proxima. Clicar num botao desativado nao faria nada, e
+      // anunciar "simulando resposta" seria mentira.
+      if (!haDesafioParaResponder()) {
+        notificarDev("A conta atual já foi respondida — aguarde o jogo apresentar a próxima.");
+        return false;
+      }
+
       // O gabarito vem de math.js, que já resolveu a operação declarada pela
       // fase. O DEV não recalcula a conta — assumir soma daria resposta errada
       // em uma fase de subtração ou multiplicação.
@@ -294,7 +383,7 @@
 
       if (!desafio) {
         notificarDev("Desafio matemático indisponível (math.js não expôs a operação ativa) — simulação cancelada.");
-        return;
+        return false;
       }
 
       const resultadoCorreto = desafio.resultadoCorreto;
@@ -315,38 +404,67 @@
         }
         notificarDev("Etapa matemática concluída.");
       }
-      return;
+      return true;
     }
 
     notificarDev("Nenhuma etapa de jogo identificada para completar nesta tela.");
+    return false;
   }
+
+  // Trava contra laço infinito ao atravessar uma fase. Uma fase com adversário
+  // gasta um passo por conta, mais os passos de espera e a organização final —
+  // o limite é folgado de propósito: ele não é regra do jogo, só um freio.
+  const LIMITE_PASSOS_POR_FASE = 40;
 
   async function completarFase() {
     const { faseAtual, mundoAtual, totalFases } = obterMundoFaseAtivos();
 
-    // 1. Se estiver na etapa de organização, completa a organização.
-    //    A matemática NÃO é aberta aqui: quem abre é game.js, após o seu
-    //    próprio setTimeout de 1000 ms. Por isso aguardamos a transição em vez
-    //    de checar a tela imediatamente.
     const telaOrganizacao = document.querySelector("#tela-organizacao");
-    if (telaOrganizacao && !telaOrganizacao.classList.contains("escondido")) {
-      completarEtapa();
-
-      const abriuMatematica = await aguardarEtapaMatematica();
-      if (!abriuMatematica) {
-        notificarDev("O desafio matemático não abriu no tempo esperado. Fase não concluída.");
-        return;
-      }
-    }
-
-    // 2. Se a tela de matemática estiver ativa, completa a matemática
     const telaMatematica = document.querySelector("#tela-matematica");
-    if (telaMatematica && !telaMatematica.classList.contains("escondido")) {
-      completarEtapa();
+
+    if (telaOrganizacao || telaMatematica) {
+      // Atravessa a fase etapa por etapa SEM saber a ordem delas: a cada volta,
+      // o DEV faz o que a tela atual permite e espera o próprio jogo apresentar
+      // o estado seguinte. Isso vale igualmente para "organização → matemática"
+      // e para "adversário → organização", porque em nenhum momento se supõe
+      // qual é a próxima etapa.
+      let passos = 0;
+
+      while (passos++ < LIMITE_PASSOS_POR_FASE) {
+        if (faseFoiConcluida()) {
+          break;
+        }
+
+        // Nada a fazer neste instante: o jogo está em uma de suas pausas. Quem
+        // espera é o DEV, não o jogo.
+        if (!haDesafioParaResponder() && !haObjetoParaOrganizar()) {
+          if (!(await aguardarProximoEstadoDoJogo())) {
+            break;
+          }
+          continue;
+        }
+
+        if (!(await completarEtapa())) {
+          return;
+        }
+      }
+
+      // A conclusão é afirmada pelo estado real da fase, nunca pelo fim de uma
+      // espera: quando o jogo não chegou lá, o DEV diz isso em vez de inventar
+      // sucesso — e, quando chegou, não acusa falha só porque a etapa seguinte
+      // que ele esperava não existia.
+      if (faseFoiConcluida()) {
+        notificarDev(`Fase ${faseAtual} do Mundo ${mundoAtual} concluída.`);
+      } else {
+        notificarDev(
+          `A Fase ${faseAtual} do Mundo ${mundoAtual} não chegou à conclusão: o jogo parou em uma etapa que o DEV não conseguiu completar.`
+        );
+      }
       return;
     }
 
-    // 3. Fallback: salva progresso e exibe conclusão diretamente
+    // Fallback: tela sem as etapas do jogo (ex.: um menu). Mantém o
+    // comportamento anterior de gravar o progresso e exibir a conclusão.
     if (typeof desbloquearProximaFase === "function") {
       desbloquearProximaFase(faseAtual, mundoAtual, totalFases);
     }
