@@ -699,3 +699,200 @@
     background-color: #145c32;
     transform: scale(1.05);
 }
+
+/* ==========================================================
+   ADVERSÁRIO DA FASE (BOSS) E SEUS CORAÇÕES
+   Área exibida somente quando a fase declara um "boss" — a decisão é do dado
+   da fase, não do número do mundo (ver iniciarEtapaMatematica em js/math.js).
+   ========================================================== */
+.area-boss {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    padding: 12px 28px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 4px solid #24577a;
+    border-radius: 24px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+}
+
+.boss-imagem {
+    width: 110px;
+    height: auto;
+}
+
+.boss-nome {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #1f2933;
+    text-align: center;
+}
+
+.boss-vida {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 0;
+}
+
+.boss-coracoes {
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+}
+
+/* A contagem em texto acompanha os símbolos para que o estado dos corações não
+   dependa de enxergar a cor deles nem de contar os emojis. */
+.boss-contagem {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #24577a;
+}
+
+/* Sem corações: além do texto "0 de 5", a figura esmaece e perde a cor, para o
+   estado não ser comunicado só pela contagem de símbolos. */
+.area-boss.is-derrotado .boss-imagem {
+    opacity: 0.45;
+    filter: grayscale(1);
+}
+
+@media (max-width: 768px) {
+    .area-boss {
+        gap: 4px;
+        padding: 8px 16px;
+    }
+
+    .boss-imagem {
+        width: 72px;
+    }
+
+    .boss-nome {
+        font-size: 1rem;
+    }
+
+    .boss-coracoes {
+        font-size: 1.2rem;
+    }
+
+    .boss-contagem {
+        font-size: 0.95rem;
+    }
+}
+
+/* ==========================================================
+   AVISO DA VIRADA DE ETAPA ("ARRUME A BAGUNÇA!")
+   Aparece quando uma fase com adversário passa do desafio para a arrumação.
+   O recado é TEXTO, então não depende de cor para ser entendido — o ícone e o
+   fundo só reforçam.
+   ========================================================== */
+.aviso-organizacao {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 6px auto 0;
+    padding: 10px 28px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: clamp(1.3rem, 4vw, 2rem);
+    font-weight: 900;
+    text-align: center;
+    color: #1f2933;
+    background: #ffd966;
+    border: 4px solid #24577a;
+    border-radius: 999px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
+    animation: entrada-aviso-organizacao 600ms ease-out both;
+}
+
+/* A entrada é gradual para a troca de etapa não ser instantânea. */
+@keyframes entrada-aviso-organizacao {
+    from {
+        opacity: 0;
+        transform: scale(0.85);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .aviso-organizacao {
+        animation: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .aviso-organizacao {
+        padding: 8px 18px;
+        border-width: 3px;
+    }
+}
+
+/* ==========================================================
+   ENCERRAMENTO DA ETAPA FINAL ("CASA ORGANIZADA! / VOCÊ VENCEU!")
+   ⚠️ APRESENTAÇÃO PROVISÓRIA. Este bloco é autocontido: trocar cores, texto,
+   ilustração ou layout aqui não afeta a lógica de conclusão da fase, que vive
+   em js/math.js (concluirEtapaFinal).
+   ========================================================== */
+.painel-vitoria {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    margin: 6px auto 0;
+    padding: 16px 32px;
+    background: rgba(255, 255, 255, 0.96);
+    border: 4px solid #1f7a45;
+    border-radius: 24px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
+    animation: entrada-painel-vitoria 500ms ease-out both;
+}
+
+.titulo-vitoria,
+.subtitulo-vitoria {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 900;
+    text-align: center;
+    color: #1f2933;
+}
+
+.titulo-vitoria {
+    font-size: clamp(1.3rem, 4vw, 2rem);
+}
+
+.subtitulo-vitoria {
+    font-size: clamp(1.1rem, 3.2vw, 1.6rem);
+    color: #1f7a45;
+}
+
+@keyframes entrada-painel-vitoria {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .painel-vitoria {
+        animation: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .painel-vitoria {
+        padding: 12px 20px;
+        border-width: 3px;
+    }
+}
