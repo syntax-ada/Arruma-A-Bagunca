@@ -130,14 +130,25 @@ function atualizarBotoesModalFases(mundoId) {
 
   // Fase 1
   if (btnIniciarFase1) {
-    btnIniciarFase1.disabled = false;
-    btnIniciarFase1.classList.remove("fase-bloqueada");
-    btnIniciarFase1.classList.add("fase-ativa");
-    btnIniciarFase1.setAttribute("aria-label", `Jogar Fase 1 do Mundo ${mundoId}`);
-    btnIniciarFase1.onclick = function () {
-      const sufixoDev = devAtivo ? "&dev=true" : "";
-      abrirFase(`fase1.html?mundo=${mundoId}&fase=1${sufixoDev}`);
-    };
+    const liberada = devAtivo || (faseMaximaMundo >= 1 && totalFasesMundo >= 1);
+    if (liberada) {
+      btnIniciarFase1.disabled = false;
+      btnIniciarFase1.classList.remove("fase-bloqueada");
+      btnIniciarFase1.classList.add("fase-ativa");
+      btnIniciarFase1.innerHTML = `<img src="assets/images/mundo_1/fase_1_botao.png" alt="Fase 1" />`;
+      btnIniciarFase1.setAttribute("aria-label", `Jogar Fase 1 do Mundo ${mundoId}`);
+      btnIniciarFase1.onclick = function () {
+        const sufixoDev = devAtivo ? "&dev=true" : "";
+        abrirFase(`fase1.html?mundo=${mundoId}&fase=1${sufixoDev}`);
+      };
+    } else {
+      btnIniciarFase1.disabled = true;
+      btnIniciarFase1.classList.add("fase-bloqueada");
+      btnIniciarFase1.classList.remove("fase-ativa");
+      btnIniciarFase1.innerHTML = `<img src="assets/images/mundo_1/fase_1_botao.png" alt="Fase 1" /><span class="overlay-fase-bloqueada" aria-hidden="true">🔒</span>`;
+      btnIniciarFase1.setAttribute("aria-label", `Fase 1 do Mundo ${mundoId}, bloqueada`);
+      btnIniciarFase1.onclick = null;
+    }
   }
 
   // Fase 2
@@ -147,6 +158,7 @@ function atualizarBotoesModalFases(mundoId) {
       btnIniciarFase2.disabled = false;
       btnIniciarFase2.classList.remove("fase-bloqueada");
       btnIniciarFase2.classList.add("fase-ativa");
+      btnIniciarFase2.innerHTML = `<img src="assets/images/mundo_1/fase_2_botao.png" alt="Fase 2" />`;
       btnIniciarFase2.setAttribute("aria-label", `Jogar Fase 2 do Mundo ${mundoId}`);
       btnIniciarFase2.onclick = function () {
         const sufixoDev = devAtivo ? "&dev=true" : "";
@@ -156,6 +168,7 @@ function atualizarBotoesModalFases(mundoId) {
       btnIniciarFase2.disabled = true;
       btnIniciarFase2.classList.add("fase-bloqueada");
       btnIniciarFase2.classList.remove("fase-ativa");
+      btnIniciarFase2.innerHTML = `<img src="assets/images/mundo_1/fase_2_botao.png" alt="Fase 2" /><span class="overlay-fase-bloqueada" aria-hidden="true">🔒</span>`;
       btnIniciarFase2.setAttribute("aria-label", `Fase 2 do Mundo ${mundoId}, bloqueada`);
       btnIniciarFase2.onclick = null;
     }
@@ -168,6 +181,7 @@ function atualizarBotoesModalFases(mundoId) {
       btnIniciarFase3.disabled = false;
       btnIniciarFase3.classList.remove("fase-bloqueada");
       btnIniciarFase3.classList.add("fase-ativa");
+      btnIniciarFase3.innerHTML = `<img src="assets/images/mundo_1/fase_3_botao.png" alt="Fase 3" />`;
       btnIniciarFase3.setAttribute("aria-label", `Jogar Fase 3 do Mundo ${mundoId}`);
       btnIniciarFase3.onclick = function () {
         const sufixoDev = devAtivo ? "&dev=true" : "";
@@ -177,6 +191,7 @@ function atualizarBotoesModalFases(mundoId) {
       btnIniciarFase3.disabled = true;
       btnIniciarFase3.classList.add("fase-bloqueada");
       btnIniciarFase3.classList.remove("fase-ativa");
+      btnIniciarFase3.innerHTML = `<img src="assets/images/mundo_1/fase_3_botao.png" alt="Fase 3" /><span class="overlay-fase-bloqueada" aria-hidden="true">🔒</span>`;
       btnIniciarFase3.setAttribute("aria-label", `Fase 3 do Mundo ${mundoId}, bloqueada`);
       btnIniciarFase3.onclick = null;
     }

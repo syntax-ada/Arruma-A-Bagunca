@@ -90,9 +90,15 @@
     return mundo.totalFases;
   };
 
-  if (typeof startGame !== "function") {
-    console.error("[main.js] startGame não encontrado. game.js foi carregado antes de main.js?");
-    return;
+  const btnVoltarFase = document.querySelector("#btn-voltar-fase");
+  if (btnVoltarFase) {
+    btnVoltarFase.addEventListener("click", function () {
+      if (typeof navegarEntreTelasDoJogo === "function" && window.parent !== window) {
+        navegarEntreTelasDoJogo("menu", "index.html");
+      } else {
+        window.location.href = "index.html";
+      }
+    });
   }
 
   startGame(config);

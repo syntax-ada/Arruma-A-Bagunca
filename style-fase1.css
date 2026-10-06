@@ -7,6 +7,53 @@
     background-repeat: no-repeat;
     overflow: hidden;
 }
+.btn-voltar-fase {
+    position: fixed;
+    top: 14px;
+    left: 16px;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.btn-voltar-fase img {
+    width: 62px;
+    height: auto;
+    display: block;
+    filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.25));
+}
+
+.btn-voltar-fase:hover {
+    transform: scale(1.1);
+    filter: brightness(1.08);
+}
+
+.btn-voltar-fase:active {
+    transform: scale(0.95);
+}
+
+.btn-voltar-fase:focus-visible {
+    outline: 4px solid #e05d2f;
+    outline-offset: 3px;
+    border-radius: 50%;
+}
+
+@media (max-width: 768px) {
+    .btn-voltar-fase {
+        top: 8px;
+        left: 8px;
+    }
+
+    .btn-voltar-fase img {
+        width: 46px;
+    }
+}
 
 .btn-som-fase {
     position: fixed;

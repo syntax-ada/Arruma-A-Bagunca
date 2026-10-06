@@ -120,7 +120,7 @@ Não altere responsabilidades arquiteturais importantes sem sinalizar o impacto 
 | 1 | A Casa | Soma (`+`) | 3 fases (5, 9 e 14 objetos) | Sim (Fases 1, 2 e 3 acessíveis pela UI via modal e progressão) |
 | 2 | Parque | Subtração (`−`) | 3 fases (Comidas, Animais, Brinquedos) | Sim (desbloqueado após concluir Mundo 1) |
 | 3 | Praia | Multiplicação (`×`) | 3 fases (Bebidas, Comidas, Brinquedos) | Sim (desbloqueado após concluir Mundo 2) |
-| 4 | Estrutura provisória | Divisão (`÷`) | 3 fases (Comidas, Bebidas) | Sim (desbloqueado após concluir Mundo 3) |
+| 4 | Acampamento | Divisão (`÷`) | 3 fases (Comida, Mochila) | Sim (desbloqueado após concluir Mundo 3) |
 
 As Fases 1, 2 e 3 do Mundo 1 estão totalmente acessíveis pela UI (a Fase 1 liberada por padrão e as Fases 2 e 3 desbloqueadas progressivamente). Os Mundos 2, 3 e 4 estão implementados no engine com suas respectivas operações matemáticas e mecânicas completas.
 

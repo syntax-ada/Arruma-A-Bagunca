@@ -85,7 +85,7 @@ O projeto completo prevê:
 | Mundo 1 | A Casa | Soma (`+`) | Fase 1, Fase 2, Fase 3 | Implementado |
 | Mundo 2 | Parque | Subtração (`−`) | Fase 1, Fase 2, Fase 3 | Implementado |
 | Mundo 3 | Praia | Multiplicação (`×`) | Fase 1, Fase 2, Fase 3 | Implementado |
-| Mundo 4 | Estrutura provisória | Divisão (`÷`) | Fase 1, Fase 2, Fase 3 | Implementado |
+| Mundo 4 | Acampamento | Divisão (`÷`) | Fase 1, Fase 2, Fase 3 | Implementado |
 | Mundo bônus | Ainda não definido | Revisão geral | Todas as contas/conteúdos matemáticos trabalhados no jogo | Planejado |
 
 A interface atual já exibe, no menu de seleção de mundos, nomes provisórios como "Escola" e "Petshop" para os mundos ainda bloqueados. Esses nomes são elementos provisórios da implementação visual e **não** representam decisões definitivas de tema da equipe.
