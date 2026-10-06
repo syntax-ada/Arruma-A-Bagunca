@@ -70,9 +70,9 @@ Para qualquer tarefa:
 5. Verificar regressões em funcionalidades próximas.
 6. Relatar o resultado (ver seção **Comunicação**).
 
-Atenção especial a `game.js`: ele é compartilhado pelas três fases do jogo.
-Quando uma alteração nesse arquivo puder afetar mais de uma fase, avalie o
-impacto e sinalize antes de implementar.
+Atenção especial a `game.js`: ele é compartilhado por todos os mundos e fases
+do jogo. Quando uma alteração nesse arquivo puder afetar mais de uma fase ou
+mundo, avalie o impacto e sinalize antes de implementar.
 
 ---
 
@@ -104,10 +104,10 @@ Principais responsabilidades:
 - `main.js` → ponto de entrada (bootstrap) da fase: lê os parâmetros da URL (`?mundo=X&fase=Y`), resolve o mundo e a fase via `window.MUNDOS` e inicializa o motor com `startGame(config)`;
 - `game.js` → mecânica de organização dos objetos, motor compartilhado por todos os mundos e fases orquestrado por `startGame()`;
 - `math.js` → motor do desafio matemático desacoplado, resolvendo a conta via `window.OPERACOES` e disparando a progressão;
-- `operacoes.js` → catálogo e regras das operações matemáticas (Soma, Subtração, Multiplicação e Divisão);
+- `operacoes.js` → catálogo e regras das operações matemáticas (Soma, Subtração, Multiplicação, Divisão e contas compostas);
 - `progresso.js` → serviço de persistência de progresso (`localStorage`) multi-mundo e multi-fase;
 - `dev.js` → ferramenta de desenvolvimento e painel de testes (ativado por `?dev=true` ou `sessionStorage`);
-- `js/mundos/` → arquivos declarativos de configuração de cada mundo (`mundo1.js` a `mundo4.js`), auto-registrados em `window.MUNDOS`.
+- `js/mundos/` → arquivos declarativos de configuração de cada mundo (`mundo1.js` a `mundo5.js`), auto-registrados em `window.MUNDOS`.
 
 Não altere responsabilidades arquiteturais importantes sem sinalizar o impacto antes.
 
@@ -120,9 +120,20 @@ Não altere responsabilidades arquiteturais importantes sem sinalizar o impacto 
 | 1 | A Casa | Soma (`+`) | 3 fases (5, 9 e 14 objetos) | Sim (Fases 1, 2 e 3 acessíveis pela UI via modal e progressão) |
 | 2 | Parque | Subtração (`−`) | 3 fases (Comidas, Animais, Brinquedos) | Sim (desbloqueado após concluir Mundo 1) |
 | 3 | Praia | Multiplicação (`×`) | 3 fases (Bebidas, Comidas, Brinquedos) | Sim (desbloqueado após concluir Mundo 2) |
-| 4 | Estrutura provisória | Divisão (`÷`) | 3 fases (Comidas, Bebidas) | Sim (desbloqueado após concluir Mundo 3) |
+| 4 | Acampamento | Divisão (`÷`) | 3 fases (Comidas, Mochila) | Sim (desbloqueado após concluir Mundo 3) |
+| 5 | Desafio Final (fase bônus) | Contas compostas | 1 fase (5 desafios) | Não há card no carrossel — acesso por URL direta (`fase1.html?mundo=5&fase=1`) ou pelo painel dev |
 
-As Fases 1, 2 e 3 do Mundo 1 estão totalmente acessíveis pela UI (a Fase 1 liberada por padrão e as Fases 2 e 3 desbloqueadas progressivamente). Os Mundos 2, 3 e 4 estão implementados no engine com suas respectivas operações matemáticas e mecânicas completas.
+As Fases 1, 2 e 3 do Mundo 1 estão totalmente acessíveis pela UI (a Fase 1 liberada por padrão e as Fases 2 e 3 desbloqueadas progressivamente). Os Mundos 2, 3 e 4 estão implementados no engine com suas respectivas operações matemáticas e mecânicas completas, e são desbloqueados em sequência pelo carrossel.
+
+O Mundo 5 (`mundo5.js`) é a fase bônus / desafio final: está carregado em
+`index.html` e `fase1.html` e registrado em `window.MUNDOS[5]`, com uma única
+fase (`totalFases: 1`) que reúne cinco desafios de contas compostas e declara um
+adversário (campo `boss`), exibido por `math.js` com um coração por conta a
+acertar. O cenário e os objetos dessa fase são provisórios — reaproveitam a arte
+do Mundo 3 (Praia), conforme marcado no próprio arquivo. `progresso.js`
+desbloqueia o Mundo 5 ao concluir a Fase 3 do Mundo 4, mas o carrossel de
+`index.html` só tem cards dos Mundos 1 a 4, então o mundo ainda não é alcançável
+pela UI.
 
 Esta tabela reflete o estado no momento da última revisão deste documento —
 se o código mudar, atualize-a como parte da tarefa que a alterou.

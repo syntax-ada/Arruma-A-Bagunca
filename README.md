@@ -16,7 +16,7 @@ A criança organiza objetos em categorias e, em seguida, utiliza os resultados d
 
 A proposta é evitar que o jogo funcione apenas como uma lista de exercícios, utilizando interação, feedback e elementos visuais para apoiar o aprendizado.
 
-O projeto está em desenvolvimento contínuo: o Mundo 1 já possui três fases jogáveis, e a evolução do produto (novos mundos, acessibilidade, UX/UI e demais requisitos) segue em andamento.
+O projeto está em desenvolvimento contínuo: os Mundos 1 a 4 já possuem três fases jogáveis cada e o Mundo 5 (desafio final) já está implementado no engine, enquanto a evolução do produto (acessibilidade, UX/UI e demais requisitos) segue em andamento.
 
 ---
 
@@ -54,11 +54,11 @@ O projeto completo prevê:
 
 - seleção de avatar/apelido; *(não implementado)*
 
-- 4 mundos principais com fases progressivas, mais 1 mundo bônus; *(Mundo 1 em desenvolvimento — ver seção 4)*
+- 4 mundos principais com fases progressivas, mais 1 mundo bônus; *(Mundos 1 a 4 implementados; mundo bônus implementado no engine — ver seções 3 e 5)*
 
-- persistência básica de progresso; *(implementado para o Mundo 1)*
+- persistência básica de progresso; *(implementado, multi-mundo)*
 
-- registro de fases concluídas; *(implementado para o Mundo 1)*
+- registro de fases concluídas; *(implementado, multi-mundo)*
 
 - pontuação/conquistas; *(não implementado)*
 
@@ -72,7 +72,7 @@ O projeto completo prevê:
 
 > [Requisito oficial] A existência de um mundo/fase bônus é obrigatória, conforme os requisitos da faculdade.
 
-[Decisão da equipe] A estrutura atual é de 4 mundos principais + 1 mundo bônus. O mundo bônus será voltado para todas as contas/conteúdos matemáticos trabalhados ao longo do jogo. O número exato de fases por mundo principal e os temas ainda não definidos seguem conforme o Plano de desenvolvimento (seção 3) evolui — não presuma quantidades ou temas além do que está documentado ali.
+[Decisão da equipe] A estrutura atual é de 4 mundos principais + 1 mundo bônus. Os quatro mundos principais já têm tema e operação definidos (ver seção 3), cada um com 3 fases. O mundo bônus (Mundo 5 — Desafio Final) é voltado a todas as contas/conteúdos matemáticos trabalhados ao longo do jogo e reúne cinco desafios de contas compostas numa única fase; o cenário e a arte dele ainda são provisórios. Não presuma quantidades, temas ou arte além do que está documentado na seção 3.
 
 ---
 
@@ -85,10 +85,10 @@ O projeto completo prevê:
 | Mundo 1 | A Casa | Soma (`+`) | Fase 1, Fase 2, Fase 3 | Implementado |
 | Mundo 2 | Parque | Subtração (`−`) | Fase 1, Fase 2, Fase 3 | Implementado |
 | Mundo 3 | Praia | Multiplicação (`×`) | Fase 1, Fase 2, Fase 3 | Implementado |
-| Mundo 4 | Estrutura provisória | Divisão (`÷`) | Fase 1, Fase 2, Fase 3 | Implementado |
-| Mundo bônus | Ainda não definido | Revisão geral | Todas as contas/conteúdos matemáticos trabalhados no jogo | Planejado |
+| Mundo 4 | Acampamento | Divisão (`÷`) | Fase 1, Fase 2, Fase 3 | Implementado |
+| Mundo 5 (bônus) | Desafio Final | Contas compostas (revisão geral) | Fase única, com 5 desafios | Implementado no engine; arte provisória e sem card no carrossel |
 
-A interface atual já exibe, no menu de seleção de mundos, nomes provisórios como "Escola" e "Petshop" para os mundos ainda bloqueados. Esses nomes são elementos provisórios da implementação visual e **não** representam decisões definitivas de tema da equipe.
+O carrossel do menu de mundos tem cards para os Mundos 1 a 4, já com os temas definidos acima. O Mundo 5 ainda não tem card no carrossel: ele é carregado e registrado em `window.MUNDOS[5]`, e hoje só é alcançado por URL direta (`fase1.html?mundo=5&fase=1`) ou pelo painel dev. A arte do Mundo 5 é provisória — reaproveita o cenário do Mundo 3 (Praia) e um asset dele como adversário, conforme marcado em `js/mundos/mundo5.js`.
 
 ---
 
@@ -116,7 +116,7 @@ Menu de mundos
 
   ↓
 
-Seleção de fase (dentro do Mundo 1)
+Seleção de fase (dentro do mundo escolhido)
 
   ↓
 
@@ -166,19 +166,19 @@ Navegação: voltar ao menu ou seguir para a próxima fase
 
 Esta seção é uma fotografia do desenvolvimento real, refletindo o código atual do repositório.
 
-### Mundo 1 e navegação
+### Mundos e navegação
 
 - Tela inicial com acesso ao menu de mundos.
 
-- Menu de mundos em formato de carrossel: Mundo 1 (A Casa) disponível; Mundos 2 e 3 exibidos como bloqueados, atualmente com nomes provisórios ("Escola" e "Petshop") na interface, ainda não confirmados como tema definitivo pela equipe (ver seção 3).
+- Menu de mundos em formato de carrossel, com cards para os Mundos 1 a 4: o Mundo 1 (A Casa) começa disponível e os Mundos 2 (Parque), 3 (Praia) e 4 (Acampamento) aparecem bloqueados até serem desbloqueados pela progressão. O Mundo 5 não tem card no carrossel (ver seção 3).
 
-- Modal de seleção de fases dentro do Mundo 1, com Fases 1, 2 e 3.
+- Modal de seleção de fases do mundo escolhido, com até 3 fases — o modal respeita o `totalFases` declarado pelo mundo.
 
 - Progressão de fases: Fase 2 e Fase 3 ficam bloqueadas até a conclusão da fase anterior.
 
-### Fases 1, 2 e 3
+### Fases do Mundo 1
 
-As três fases usam o mesmo motor de jogo (`game.js`), com configurações próprias:
+Todas as fases, de todos os mundos, usam o mesmo motor de jogo (`game.js`), com configurações próprias. No Mundo 1:
 
 | Fase | Categorias | Total de objetos |
 
@@ -189,6 +189,8 @@ As três fases usam o mesmo motor de jogo (`game.js`), com configurações próp
 | Fase 2 | Brinquedos, Comidas, Materiais | 9 (3 + 3 + 3) |
 
 | Fase 3 | Brinquedos, Comidas, Materiais | 14 (2 brinquedos + 5 comidas + 7 materiais) |
+
+Os Mundos 2, 3 e 4 seguem o mesmo formato, com 3 fases cada e suas próprias categorias e cotas de objetos (Mundo 2: Comidas, Animais e Brinquedos; Mundo 3: Bebidas, Comidas e Brinquedos; Mundo 4: Comidas e Mochila). O Mundo 5 tem uma única fase.
 
 ### Mecânica de organização
 
@@ -214,7 +216,9 @@ As três fases usam o mesmo motor de jogo (`game.js`), com configurações próp
 
 ### Desafio matemático
 
-- Baseado na soma real das quantidades organizadas pela criança (não em valores fixos).
+- Baseado nas quantidades reais organizadas pela criança (não em valores fixos), com a operação declarada por cada fase: soma no Mundo 1, subtração no Mundo 2, multiplicação no Mundo 3 e divisão no Mundo 4.
+
+- A fase do Mundo 5 declara, em vez disso, uma lista de cinco desafios de contas compostas (mais de um operador na mesma conta, com a precedência convencional) e um adversário: `math.js` mostra a área do adversário com um coração por conta a acertar.
 
 - Alternativas de resposta geradas dinamicamente (resposta correta + distratores).
 
@@ -226,7 +230,7 @@ As três fases usam o mesmo motor de jogo (`game.js`), com configurações próp
 
 - Progresso salvo em `localStorage` (fases concluídas, fase máxima liberada, mundos desbloqueados).
 
-- Conclusão de uma fase libera a próxima fase do Mundo 1; conclusão da Fase 3 libera o Mundo 2.
+- Conclusão de uma fase libera a próxima fase do mesmo mundo; concluir a última fase de um mundo libera o mundo seguinte.
 
 - Persistência limitada ao navegador local — ainda não há integração com backend externo.
 
@@ -236,9 +240,11 @@ As três fases usam o mesmo motor de jogo (`game.js`), com configurações próp
 
 ### Ainda não implementado
 
-- Música de fundo contínua entre menu e fases, com controle para ligar/desligar e volume moderado; demais configurações de acessibilidade ainda não foram implementadas.
+- Configurações de acessibilidade (contraste, tamanho de fonte, etc.). A trilha sonora contínua entre menu e fases, com botão de ligar/desligar, já está implementada (`js/audio.js`).
 
 - Seleção de avatar/apelido (interface exibe um avatar/nome fixo).
+
+- Card do Mundo 5 no carrossel do menu e arte definitiva dessa fase.
 
 - Pontuação ou sistema de conquistas.
 
@@ -272,7 +278,7 @@ Arruma-A-Bagunca/
 │   │                     todas as fases via startGame()
 │   ├── math.js         → motor do desafio matemático desacoplado; consome window.OPERACOES
 │   ├── operacoes.js    → catálogo e regras das operações matemáticas (Soma, Subtração,
-│   │                     Multiplicação e Divisão)
+│   │                     Multiplicação, Divisão e contas compostas)
 │   ├── progresso.js    → serviço de persistência de progresso (localStorage) multi-mundo e multi-fase;
 │   ├── audio.js        → trilha sonora contínua, mantida pela tela-base durante as transições de fases;
 │   ├── menu.js         → navegação do menu, carrossel de mundos e modais de fases e créditos
@@ -282,7 +288,8 @@ Arruma-A-Bagunca/
 │       ├── mundo1.js   → Mundo 1: A Casa (Soma)
 │       ├── mundo2.js   → Mundo 2: Parque (Subtração)
 │       ├── mundo3.js   → Mundo 3: Praia (Multiplicação)
-│       └── mundo4.js   → Mundo 4: Estrutura provisória (Divisão)
+│       ├── mundo4.js   → Mundo 4: Acampamento (Divisão)
+│       └── mundo5.js   → Mundo 5: Desafio Final (contas compostas, fase bônus)
 │
 └── assets/
     ├── audio/
@@ -293,6 +300,7 @@ Arruma-A-Bagunca/
         ├── mundo_1/            → botões de fase do modal de seleção
         ├── mundo_2/            → cenários, objetos e sprites_cestas_2 do Mundo 2
         ├── mundo_3/            → cenários, objetos e sprites_cestas_3 do Mundo 3
+        ├── mundo_4/            → cenários, objetos e sprites_cestas_4 do Mundo 4
         └── nova_tela_menu de_fases/ → menu de mundos (carrossel, progresso)
 ```
 
@@ -398,8 +406,10 @@ Pontos identificados atualmente que ainda merecem atenção:
 
 - ampliar testes de responsividade em dispositivos móveis reais;
 
-- implementar áudio, configurações de acessibilidade e seleção de avatar/apelido;
+- implementar configurações de acessibilidade e seleção de avatar/apelido;
 
-- definir tema e fases dos Mundos 2, 3 e 4, conforme o Plano de desenvolvimento evoluir.
+- definir a arte e o cenário definitivos do Mundo 5, hoje reaproveitados do Mundo 3;
+
+- dar acesso ao Mundo 5 pela UI (hoje não há card dele no carrossel do menu).
 
 As próximas prioridades serão definidas pela equipe considerando requisitos da faculdade, impacto no produto, UX/UI, acessibilidade, qualidade técnica e capacidade da equipe. Novas funcionalidades não devem ser implementadas apenas porque foram previstas para o futuro — cada incremento deve ser avaliado antes do desenvolvimento.
