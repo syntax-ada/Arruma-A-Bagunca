@@ -22,6 +22,12 @@ const btnSetaEsquerda = document.querySelector('.btn-seta[aria-label="Mundo ante
 const btnSetaDireita = document.querySelector('.btn-seta[aria-label="Próximo mundo"]');
 const conteudoFase = document.querySelector("#conteudo-fase");
 
+function tocarSomBotao() {
+  if (typeof window.tocarEfeito === "function") {
+    window.tocarEfeito("botao");
+  }
+}
+
 /**
  * Mantém o menu (e a trilha sonora) carregado enquanto a fase é trocada.
  * Assim, só o conteúdo da fase é recarregado e a música não sofre cortes.
@@ -47,6 +53,9 @@ function mostrarMenuMundos() {
   controlesIniciais?.classList.add("escondido");
   menuFases?.classList.remove("escondido");
   atualizarInterfaceProgresso();
+  if (typeof window.trocarTrilhaFundo === "function") {
+    window.trocarTrilhaFundo("menu");
+  }
 }
 
 /**
@@ -70,6 +79,7 @@ function obterLarguraPassoCarrossel() {
 
 if (btnSetaEsquerda && carrosselMundos) {
   btnSetaEsquerda.addEventListener("click", function () {
+    tocarSomBotao();
     const larguraDoCard = obterLarguraPassoCarrossel();
     carrosselMundos.scrollBy({ left: -larguraDoCard, behavior: "smooth" });
   });
@@ -77,6 +87,7 @@ if (btnSetaEsquerda && carrosselMundos) {
 
 if (btnSetaDireita && carrosselMundos) {
   btnSetaDireita.addEventListener("click", function () {
+    tocarSomBotao();
     const larguraDoCard = obterLarguraPassoCarrossel();
     carrosselMundos.scrollBy({ left: larguraDoCard, behavior: "smooth" });
   });
@@ -138,6 +149,7 @@ function atualizarBotoesModalFases(mundoId) {
       btnIniciarFase1.innerHTML = `<img src="assets/images/mundo_1/fase_1_botao.png" alt="Fase 1" />`;
       btnIniciarFase1.setAttribute("aria-label", `Jogar Fase 1 do Mundo ${mundoId}`);
       btnIniciarFase1.onclick = function () {
+        tocarSomBotao();
         const sufixoDev = devAtivo ? "&dev=true" : "";
         abrirFase(`fase1.html?mundo=${mundoId}&fase=1${sufixoDev}`);
       };
@@ -161,6 +173,7 @@ function atualizarBotoesModalFases(mundoId) {
       btnIniciarFase2.innerHTML = `<img src="assets/images/mundo_1/fase_2_botao.png" alt="Fase 2" />`;
       btnIniciarFase2.setAttribute("aria-label", `Jogar Fase 2 do Mundo ${mundoId}`);
       btnIniciarFase2.onclick = function () {
+        tocarSomBotao();
         const sufixoDev = devAtivo ? "&dev=true" : "";
         abrirFase(`fase1.html?mundo=${mundoId}&fase=2${sufixoDev}`);
       };
@@ -184,6 +197,7 @@ function atualizarBotoesModalFases(mundoId) {
       btnIniciarFase3.innerHTML = `<img src="assets/images/mundo_1/fase_3_botao.png" alt="Fase 3" />`;
       btnIniciarFase3.setAttribute("aria-label", `Jogar Fase 3 do Mundo ${mundoId}`);
       btnIniciarFase3.onclick = function () {
+        tocarSomBotao();
         const sufixoDev = devAtivo ? "&dev=true" : "";
         abrirFase(`fase1.html?mundo=${mundoId}&fase=3${sufixoDev}`);
       };
@@ -289,7 +303,7 @@ function atualizarInterfaceProgresso() {
 // Navegação básica da tela inicial e menus
 if (botaoJogar && telaInicial && menuFases && controlesIniciais) {
   botaoJogar.addEventListener("click", function () {
-
+    tocarSomBotao();
     localStorage.removeItem("arruma_bagunca_progresso");
 
     telaInicial.classList.add("escondido");
@@ -301,6 +315,10 @@ if (botaoJogar && telaInicial && menuFases && controlesIniciais) {
 
 if (botaoVoltar && telaInicial && menuFases && controlesIniciais) {
   botaoVoltar.addEventListener("click", function () {
+    tocarSomBotao();
+    if (typeof window.trocarTrilhaFundo === "function") {
+      window.trocarTrilhaFundo("menu");
+    }
     if (modalFases) {
       modalFases.classList.add("escondido");
     }
@@ -317,6 +335,7 @@ cardsCarrossel.forEach((card) => {
   card.addEventListener("click", function (event) {
     event.preventDefault();
     event.stopPropagation();
+    tocarSomBotao();
     const rawMundo = card.dataset.mundo;
     const mundoId = rawMundo ? parseInt(rawMundo, 10) : 1;
     abrirModalFases(mundoId);
@@ -325,6 +344,7 @@ cardsCarrossel.forEach((card) => {
 
 if (btnFecharModal && modalFases) {
   btnFecharModal.addEventListener("click", function () {
+    tocarSomBotao();
     modalFases.classList.add("escondido");
   });
 }
@@ -332,12 +352,14 @@ if (btnFecharModal && modalFases) {
 // Controle do Modal de Créditos
 if (botaoCreditos && modalCreditos) {
   botaoCreditos.addEventListener("click", function () {
+    tocarSomBotao();
     modalCreditos.classList.remove("escondido");
   });
 }
 
 if (btnFecharCreditos && modalCreditos) {
   btnFecharCreditos.addEventListener("click", function () {
+    tocarSomBotao();
     modalCreditos.classList.add("escondido");
   });
 }
@@ -397,8 +419,14 @@ function verificarParametroView() {
 document.addEventListener("DOMContentLoaded", function () {
   atualizarInterfaceProgresso();
   verificarParametroView();
+  if (typeof window.trocarTrilhaFundo === "function") {
+    window.trocarTrilhaFundo("menu");
+  }
 });
 
 // Executa imediatamente para garantir transição instantânea
 atualizarInterfaceProgresso();
 verificarParametroView();
+if (typeof window.trocarTrilhaFundo === "function") {
+  window.trocarTrilhaFundo("menu");
+}

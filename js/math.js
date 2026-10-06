@@ -439,6 +439,10 @@ function verificarRespostaMatematica(valorEscolhido, resultadoCorreto, botaoClic
     const botoes = document.querySelectorAll(".botao-opcao-matematica");
 
     if (valorEscolhido === resultadoCorreto) {
+        if (typeof window.tocarEfeito === "function") {
+            window.tocarEfeito("certo");
+        }
+
         botoes.forEach((b) => {
             b.disabled = true;
             if (Number(b.textContent) === resultadoCorreto) {
@@ -500,6 +504,9 @@ function verificarRespostaMatematica(valorEscolhido, resultadoCorreto, botaoClic
         mostrarFeedbackMatematica(operacao.mensagemSucesso(contaTexto), "success");
         exibirBotoesConclusao(faseAtual);
     } else {
+        if (typeof window.tocarEfeito === "function") {
+            window.tocarEfeito("errado");
+        }
         botaoClicado.classList.add("is-wrong");
         mostrarFeedbackMatematica("Quase lá! Vamos contar de novo? Tente outra resposta.", "error");
     }
@@ -566,6 +573,12 @@ function exibirBotoesConclusao(faseAtual, hospedeiro) {
         return;
     }
 
+    if (typeof window.tocarEfeito === "function") {
+        setTimeout(() => {
+            window.tocarEfeito("conclusao");
+        }, 350);
+    }
+
     let numeroFase = 1;
     if (typeof faseAtual === "number") {
         numeroFase = faseAtual;
@@ -584,6 +597,12 @@ function exibirBotoesConclusao(faseAtual, hospedeiro) {
     btnMenu.textContent = "Voltar para o Menu";
     btnMenu.setAttribute("aria-label", "Voltar para a seleção de mundos");
     btnMenu.addEventListener("click", () => {
+        if (typeof window.tocarEfeito === "function") {
+            window.tocarEfeito("botao");
+        }
+        if (typeof window.trocarTrilhaFundo === "function") {
+            window.trocarTrilhaFundo("menu");
+        }
         navegarEntreTelasDoJogo("menu", "index.html?view=mundos");
     });
     containerAcoes.appendChild(btnMenu);
@@ -608,6 +627,9 @@ function exibirBotoesConclusao(faseAtual, hospedeiro) {
         btnProxima.textContent = "Próxima Fase";
         btnProxima.setAttribute("aria-label", `Avançar para a Fase ${proximaFase}`);
         btnProxima.addEventListener("click", () => {
+            if (typeof window.tocarEfeito === "function") {
+                window.tocarEfeito("botao");
+            }
             navegarEntreTelasDoJogo("fase", `fase1.html?mundo=${mundoAtual}&fase=${proximaFase}`);
         });
         containerAcoes.appendChild(btnProxima);

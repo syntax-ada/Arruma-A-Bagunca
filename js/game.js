@@ -255,6 +255,10 @@ function finishDrag(event) {
     item.classList.add("is-correct");
     updateDropZoneCounter(targetDropZone);
 
+    if (typeof window.tocarEfeito === "function") {
+      window.tocarEfeito("certo");
+    }
+
     if (isOrganizationComplete()) {
       showFeedback("Parabéns! Você organizou todos os objetos!", "success");
 
@@ -274,6 +278,10 @@ function finishDrag(event) {
   } else {
     returnItemToStart(item);
     showFeedbackForIncorrectDrop(item);
+
+    if (typeof window.tocarEfeito === "function") {
+      window.tocarEfeito("errado");
+    }
   }
 
   activeDrag = null;
@@ -506,6 +514,10 @@ function handleDropZoneKeyboard(event) {
     currentAvailableItem.classList.add("is-correct");
     updateDropZoneCounter(event.currentTarget);
 
+    if (typeof window.tocarEfeito === "function") {
+      window.tocarEfeito("certo");
+    }
+
     if (isOrganizationComplete()) {
       showFeedback("Parabéns! Você organizou todos os objetos!", "success");
 
@@ -523,6 +535,9 @@ function handleDropZoneKeyboard(event) {
       showFeedback(`Muito bem! ${currentAvailableItem.dataset.itemName} está em ${getDropZoneName(event.currentTarget)}.`, "success");
     }
   } else {
+    if (typeof window.tocarEfeito === "function") {
+      window.tocarEfeito("errado");
+    }
     showFeedback("Quase! Esta não é a caixa certa.", "error");
   }
 }

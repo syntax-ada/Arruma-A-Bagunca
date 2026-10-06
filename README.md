@@ -85,7 +85,7 @@ O projeto completo prevê:
 | Mundo 1 | A Casa | Soma (`+`) | Fase 1, Fase 2, Fase 3 | Implementado |
 | Mundo 2 | Parque | Subtração (`−`) | Fase 1, Fase 2, Fase 3 | Implementado |
 | Mundo 3 | Praia | Multiplicação (`×`) | Fase 1, Fase 2, Fase 3 | Implementado |
-| Mundo 4 | Estrutura provisória | Divisão (`÷`) | Fase 1, Fase 2, Fase 3 | Implementado |
+| Mundo 4 | Acampamento | Divisão (`÷`) | Fase 1, Fase 2, Fase 3 | Implementado |
 | Mundo bônus | Ainda não definido | Revisão geral | Todas as contas/conteúdos matemáticos trabalhados no jogo | Planejado |
 
 O carrossel do menu de mundos tem cards para os Mundos 1 a 4, já com os temas definidos acima. O Mundo 5 ainda não tem card no carrossel: ele é carregado e registrado em `window.MUNDOS[5]`, e hoje só é alcançado por URL direta (`fase1.html?mundo=5&fase=1`) ou pelo painel dev. A arte do Mundo 5 é provisória — reaproveita o cenário do Mundo 3 (Praia) e um asset dele como adversário, conforme marcado em `js/mundos/mundo5.js`.

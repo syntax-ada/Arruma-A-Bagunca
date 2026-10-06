@@ -90,9 +90,20 @@
     return mundo.totalFases;
   };
 
+  // Atualiza a trilha sonora para o áudio correspondente do mundo ativo
+  if (typeof window.trocarTrilhaFundo === "function") {
+    window.trocarTrilhaFundo(mundo.id);
+  }
+
   const btnVoltarFase = document.querySelector("#btn-voltar-fase");
   if (btnVoltarFase) {
     btnVoltarFase.addEventListener("click", function () {
+      if (typeof window.tocarEfeito === "function") {
+        window.tocarEfeito("botao");
+      }
+      if (typeof window.trocarTrilhaFundo === "function") {
+        window.trocarTrilhaFundo("menu");
+      }
       if (typeof navegarEntreTelasDoJogo === "function" && window.parent !== window) {
         navegarEntreTelasDoJogo("menu", "index.html");
       } else {
