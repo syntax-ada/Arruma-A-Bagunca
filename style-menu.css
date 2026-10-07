@@ -69,9 +69,40 @@ img {
   display: block;
 }
 
-#tela-inicial > img {
+#tela-inicial > img:not(.logo-universidade) {
   max-width: 85%;
   height: auto;
+}
+
+.logo-universidade {
+  position: absolute;
+  top: clamp(24px, 3.5vw, 40px);
+  left: clamp(30px, 4.5vw, 65px);
+  width: clamp(130px, 14vw, 185px);
+  max-width: 185px;
+  height: auto;
+  object-fit: contain;
+  pointer-events: none;
+  z-index: 10;
+  user-select: none;
+}
+
+@media (max-width: 768px) {
+  .logo-universidade {
+    top: 24px;
+    left: 32px;
+    width: clamp(100px, 20vw, 130px);
+    max-width: 130px;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo-universidade {
+    top: 20px;
+    left: 24px;
+    width: 105px;
+    max-width: 105px;
+  }
 }
 
 button {
@@ -638,5 +669,183 @@ button {
     font-size: 16px;
     padding: 8px 24px;
     max-width: 180px;
+  }
+}
+
+/* ==========================================================
+   SIDEBAR DO BOSS (MUNDO 5) & ÍCONE FLUTUANTE
+   ========================================================== */
+.sidebar-boss {
+  position: fixed;
+  right: clamp(16px, 3vw, 36px);
+  top: 50%;
+  transform: translateY(-50%);
+  width: clamp(230px, 20vw, 280px);
+  background: linear-gradient(180deg, #1d63d6 0%, #0d388e 100%);
+  border: 4px solid #ffffff;
+  border-radius: 28px;
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.45), inset 0 2px 6px rgba(255, 255, 255, 0.3);
+  z-index: 70;
+  overflow: visible;
+  animation: surgimentoSidebar 0.35s ease-out;
+}
+
+@keyframes surgimentoSidebar {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) translateX(40px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0) scale(1);
+  }
+}
+
+.conteudo-sidebar-boss {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  padding: 24px 18px 20px;
+}
+
+.btn-fechar-sidebar-boss {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  width: 42px;
+  height: 42px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: 75;
+  transition: transform 0.2s ease;
+}
+
+.btn-fechar-sidebar-boss:hover {
+  transform: scale(1.15);
+}
+
+.btn-fechar-sidebar-boss img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.img-boss-sidebar {
+  width: 100%;
+  max-height: 160px;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.35));
+  transition: transform 0.3s ease;
+}
+
+.img-boss-sidebar:hover {
+  transform: scale(1.05);
+}
+
+.texto-boss-sidebar {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #ffffff;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  line-height: 1.3;
+}
+
+.btn-jogar-boss {
+  background: linear-gradient(180deg, #2ecc71 0%, #27ae60 100%);
+  color: #ffffff;
+  border: 3px solid #ffffff;
+  border-radius: 999px;
+  padding: 10px 36px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1.35rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease, filter 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-jogar-boss:hover {
+  transform: scale(1.08);
+  filter: brightness(1.1);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+.btn-jogar-boss:active {
+  transform: scale(0.96);
+}
+
+/* ÍCONE FLUTUANTE DO MONSTRO */
+.btn-icone-boss {
+  position: fixed;
+  right: clamp(16px, 3vw, 32px);
+  bottom: clamp(24px, 4vw, 40px);
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1d63d6 0%, #0d388e 100%);
+  border: 3px solid #ffd13b;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  z-index: 75;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  animation: pulsoMonstro 2.5s infinite ease-in-out;
+  transition: transform 0.2s ease;
+}
+
+.btn-icone-boss img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.3));
+}
+
+.btn-icone-boss:hover {
+  animation: none;
+  transform: scale(1.15);
+}
+
+@keyframes pulsoMonstro {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+    box-shadow: 0 10px 28px rgba(29, 99, 214, 0.6), 0 0 12px rgba(255, 209, 59, 0.8);
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar-boss {
+    right: 50%;
+    top: 50%;
+    transform: translate(50%, -50%);
+    width: min(290px, 88vw);
+  }
+
+  @keyframes surgimentoSidebar {
+    from {
+      opacity: 0;
+      transform: translate(50%, -50%) scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: translate(50%, -50%) scale(1);
+    }
+  }
+
+  .btn-icone-boss {
+    width: 60px;
+    height: 60px;
+    right: 16px;
+    bottom: 20px;
   }
 }

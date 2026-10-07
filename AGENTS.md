@@ -121,18 +121,11 @@ Não altere responsabilidades arquiteturais importantes sem sinalizar o impacto 
 | 2 | Parque | Subtração (`−`) | 3 fases (Comidas, Animais, Brinquedos) | Sim (desbloqueado após concluir Mundo 1) |
 | 3 | Praia | Multiplicação (`×`) | 3 fases (Bebidas, Comidas, Brinquedos) | Sim (desbloqueado após concluir Mundo 2) |
 | 4 | Acampamento | Divisão (`÷`) | 3 fases (Comida, Mochila) | Sim (desbloqueado após concluir Mundo 3) |
+| 5 | Desafio Final (Boss) | Expressões Compostas | 1 fase (Batalha contra o Boss + Organização Noturna) | Sim (Sidebar lateral do Boss desbloqueada após Mundo 4 / Dev Mode) |
 
 As Fases 1, 2 e 3 do Mundo 1 estão totalmente acessíveis pela UI (a Fase 1 liberada por padrão e as Fases 2 e 3 desbloqueadas progressivamente). Os Mundos 2, 3 e 4 estão implementados no engine com suas respectivas operações matemáticas e mecânicas completas, e são desbloqueados em sequência pelo carrossel.
 
-O Mundo 5 (`mundo5.js`) é a fase bônus / desafio final: está carregado em
-`index.html` e `fase1.html` e registrado em `window.MUNDOS[5]`, com uma única
-fase (`totalFases: 1`) que reúne cinco desafios de contas compostas e declara um
-adversário (campo `boss`), exibido por `math.js` com um coração por conta a
-acertar. O cenário e os objetos dessa fase são provisórios — reaproveitam a arte
-do Mundo 3 (Praia), conforme marcado no próprio arquivo. `progresso.js`
-desbloqueia o Mundo 5 ao concluir a Fase 3 do Mundo 4, mas o carrossel de
-`index.html` só tem cards dos Mundos 1 a 4, então o mundo ainda não é alcançável
-pela UI.
+O Mundo 5 (`mundo5.js`) é o desafio final contra o Monstro da Bagunça: reúne cinco desafios de expressões compostas com precedência de operadores e uma etapa final de organização na sala à noite (`sala_noite.jpeg`). É acessível na tela de seleção de mundos por meio de uma sidebar vertical azul dedicada à direita, que é liberada após a conclusão do Mundo 4 (ou com `?dev=true`) e conta com botão de fechar e ícone flutuante minimizado para reabertura. Na batalha, o monstro fica centralizado com balão de risada, acompanhado de 5 corações dinâmicos de vida no HUD, balões de instrução personalizados (`hud_branco.png` e `hud_branco2.png`) e transição suave para a organização dos itens após derrotar o adversário.
 
 Esta tabela reflete o estado no momento da última revisão deste documento —
 se o código mudar, atualize-a como parte da tarefa que a alterou.

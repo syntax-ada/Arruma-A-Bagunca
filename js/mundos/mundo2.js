@@ -150,46 +150,12 @@
   }
 
   // ==========================================================
-  // SPRITES DAS CESTAS DO MUNDO 2
+  // CESTAS UNIFICADAS DO MUNDO 2 (PARQUE)
+  // Imagens unificadas contendo cesto/caixa, etiqueta e bolinha de contagem
   // ==========================================================
-  const SPRITES_CESTA_ANIMAIS_MUNDO2 = [
-    "assets/images/mundo_2/sprites_cestas_2/caixa_pet_piquenique.png",
-    "assets/images/mundo_2/sprites_cestas_2/caixa_pet_piquenique-1.png",
-    "assets/images/mundo_2/sprites_cestas_2/caixa_pet_piquenique-2.png",
-    "assets/images/mundo_2/sprites_cestas_2/caixa_pet_piquenique-3.png",
-    "assets/images/mundo_2/sprites_cestas_2/caixa_pet_piquenique-4.png",
-    "assets/images/mundo_2/sprites_cestas_2/caixa_pet_piquenique-5.png",
-    "assets/images/mundo_2/sprites_cestas_2/caixa_pet_piquenique-6.png",
-    "assets/images/mundo_2/sprites_cestas_2/caixa_pet_piquenique-7.png",
-    "assets/images/mundo_2/sprites_cestas_2/caixa_pet_piquenique-8.png",
-    "assets/images/mundo_2/sprites_cestas_2/caixa_pet_piquenique-9.png",
-  ];
-
-  const SPRITES_CESTA_BRINQUEDOS_MUNDO2 = [
-    "assets/images/mundo_2/sprites_cestas_2/cesta_brinquedos_piquenique.png",
-    "assets/images/mundo_2/sprites_cestas_2/cesta_brinquedos_piquenique-1.png",
-    "assets/images/mundo_2/sprites_cestas_2/cesta_brinquedos_piquenique-2.png",
-    "assets/images/mundo_2/sprites_cestas_2/cesta_brinquedos_piquenique-3.png",
-    "assets/images/mundo_2/sprites_cestas_2/cesta_brinquedos_piquenique-4.png",
-    "assets/images/mundo_2/sprites_cestas_2/cesta_brinquedos_piquenique-5.png",
-    "assets/images/mundo_2/sprites_cestas_2/cesta_brinquedos_piquenique-6.png",
-    "assets/images/mundo_2/sprites_cestas_2/cesta_brinquedos_piquenique-7.png",
-    "assets/images/mundo_2/sprites_cestas_2/cesta_brinquedos_piquenique-8.png",
-    "assets/images/mundo_2/sprites_cestas_2/cesta_brinquedos_piquenique-9.png",
-  ];
-
-  const SPRITES_CESTA_COMIDAS_MUNDO2 = [
-    "assets/images/mundo_2/sprites_cestas_2/cesta_comidas_piquenique.png",
-    "assets/images/mundo_2/sprites_cestas_2/cesta_comidas_piquenique-1.png",
-    "assets/images/mundo_2/sprites_cestas_2/cesta_comidas_piquenique-2.png",
-    "assets/images/mundo_2/sprites_cestas_2/cesta_comidas_piquenique-3.png",
-    "assets/images/mundo_2/sprites_cestas_2/cesta_comidas_piquenique-4.png",
-    "assets/images/mundo_2/sprites_cestas_2/cesta_comidas_piquenique-5.png",
-    "assets/images/mundo_2/sprites_cestas_2/cesta_comidas_piquenique-6.png",
-    "assets/images/mundo_2/sprites_cestas_2/cesta_comidas_piquenique-7.png",
-    "assets/images/mundo_2/sprites_cestas_2/cesta_comidas_piquenique-8.png",
-    "assets/images/mundo_2/sprites_cestas_2/cesta_comidas_piquenique-9.png",
-  ];
+  const SPRITES_CESTA_ANIMAIS_MUNDO2 = "assets/images/mundo_2/cesta_animais.png";
+  const SPRITES_CESTA_BRINQUEDOS_MUNDO2 = "assets/images/mundo_2/cesta_brinquedos.png";
+  const SPRITES_CESTA_COMIDAS_MUNDO2 = "assets/images/mundo_2/cesta_comidas.png";
 
   // ==========================================================
   // CONFIGURAÇÃO DA FASE 1 (Mundo 2 — Parque)
@@ -213,8 +179,6 @@
         ariaLabel: "Caixa de animais de estimação",
         icone: "🐶",
         posicao: "esq-centro",
-        etiquetaImgSrc: "assets/images/mundo_2/botton_animais.png",
-        etiquetaImgAlt: "Categoria Animais",
         sprites: SPRITES_CESTA_ANIMAIS_MUNDO2,
       },
       {
@@ -224,8 +188,6 @@
         ariaLabel: "Cesta de brinquedos",
         icone: "🧸",
         posicao: "dir-centro",
-        etiquetaImgSrc: "assets/images/mundo_2/botton_brinquedos.png",
-        etiquetaImgAlt: "Categoria Brinquedos",
         sprites: SPRITES_CESTA_BRINQUEDOS_MUNDO2,
       },
     ],
@@ -253,8 +215,6 @@
         ariaLabel: "Cesta de comidas do piquenique",
         icone: "🍎",
         posicao: "esq-centro",
-        etiquetaImgSrc: "assets/images/mundo_2/botton_comida.png",
-        etiquetaImgAlt: "Categoria Comidas",
         sprites: SPRITES_CESTA_COMIDAS_MUNDO2,
       },
       {
@@ -264,8 +224,6 @@
         ariaLabel: "Caixa de animais de estimação",
         icone: "🐶",
         posicao: "dir-centro",
-        etiquetaImgSrc: "assets/images/mundo_2/botton_animais.png",
-        etiquetaImgAlt: "Categoria Animais",
         sprites: SPRITES_CESTA_ANIMAIS_MUNDO2,
       },
     ],
@@ -293,8 +251,6 @@
         ariaLabel: "Cesta de brinquedos",
         icone: "🧸",
         posicao: "esq-topo",
-        etiquetaImgSrc: "assets/images/mundo_2/botton_brinquedos.png",
-        etiquetaImgAlt: "Categoria Brinquedos",
         sprites: SPRITES_CESTA_BRINQUEDOS_MUNDO2,
       },
       {
@@ -304,8 +260,6 @@
         ariaLabel: "Caixa de animais de estimação",
         icone: "🐶",
         posicao: "esq-base",
-        etiquetaImgSrc: "assets/images/mundo_2/botton_animais.png",
-        etiquetaImgAlt: "Categoria Animais",
         sprites: SPRITES_CESTA_ANIMAIS_MUNDO2,
       },
       {
@@ -315,8 +269,6 @@
         ariaLabel: "Cesta de comidas do piquenique",
         icone: "🍎",
         posicao: "dir-centro",
-        etiquetaImgSrc: "assets/images/mundo_2/botton_comida.png",
-        etiquetaImgAlt: "Categoria Comidas",
         sprites: SPRITES_CESTA_COMIDAS_MUNDO2,
       },
     ],

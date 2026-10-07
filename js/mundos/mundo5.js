@@ -47,10 +47,9 @@
 
 (function () {
   // ==========================================================
-  // FUNDOS DE TELA (provisórios — reaproveitados do Mundo 3)
+  // FUNDOS DE TELA (Sala à noite)
   // ==========================================================
-  const FUNDO_MUNDO_5_BAGUNCADO = "assets/images/mundo_3/praia_bagunçado.png";
-  const FUNDO_MUNDO_5_ARRUMADO = "assets/images/mundo_3/praia.png";
+  const FUNDO_MUNDO_5 = "assets/images/mundo_5/sala_noite.jpeg";
 
   // ==========================================================
   // OS CINCO DESAFIOS DO DESAFIO FINAL
@@ -85,8 +84,7 @@
   ];
 
   // ==========================================================
-  // CATÁLOGO DE MODELOS DISPONÍVEIS POR CATEGORIA
-  // (provisórios — reaproveitados do Mundo 3)
+  // CATÁLOGO DE MODELOS DISPONÍVEIS POR CATEGORIA (MUNDO 5)
   // ==========================================================
   const MODELOS_BEBIDAS = [
     {
@@ -94,7 +92,7 @@
       category: "bebidas",
       itemName: "a água",
       ariaLabel: "Garrafa de água mineral. Arraste para a cesta de bebidas.",
-      imgSrc: "assets/images/mundo_3/agua.png",
+      imgSrc: "assets/images/mundo_5/sprites_mundo5/agua.png",
       imgAlt: "Garrafa de água",
     },
     {
@@ -102,8 +100,16 @@
       category: "bebidas",
       itemName: "o refrigerante",
       ariaLabel: "Lata de refrigerante. Arraste para a cesta de bebidas.",
-      imgSrc: "assets/images/mundo_3/coca.png",
+      imgSrc: "assets/images/mundo_5/sprites_mundo5/coca.png",
       imgAlt: "Lata de refrigerante",
+    },
+    {
+      baseId: "refri-laranja",
+      category: "bebidas",
+      itemName: "o refrigerante de laranja",
+      ariaLabel: "Garrafa de suco de laranja. Arraste para a cesta de bebidas.",
+      imgSrc: "assets/images/mundo_5/sprites_mundo5/refri_laranja.png",
+      imgAlt: "Refrigerante de laranja",
     },
   ];
 
@@ -113,7 +119,7 @@
       category: "brinquedos",
       itemName: "a bola de vôlei",
       ariaLabel: "Bola de vôlei. Arraste para a cesta de brinquedos.",
-      imgSrc: "assets/images/mundo_3/bola de volei.png",
+      imgSrc: "assets/images/mundo_5/sprites_mundo5/bola de volei.png",
       imgAlt: "Bola de vôlei",
     },
     {
@@ -121,8 +127,24 @@
       category: "brinquedos",
       itemName: "o robô",
       ariaLabel: "Robô de brinquedo. Arraste para a cesta de brinquedos.",
-      imgSrc: "assets/images/mundo_3/robo.png",
+      imgSrc: "assets/images/mundo_5/sprites_mundo5/robo.png",
       imgAlt: "Robô de brinquedo",
+    },
+    {
+      baseId: "urso",
+      category: "brinquedos",
+      itemName: "o ursinho de pelúcia",
+      ariaLabel: "Ursinho de pelúcia. Arraste para a cesta de brinquedos.",
+      imgSrc: "assets/images/mundo_5/sprites_mundo5/urso.png",
+      imgAlt: "Ursinho de pelúcia",
+    },
+    {
+      baseId: "tremzinho",
+      category: "brinquedos",
+      itemName: "o trenzinho",
+      ariaLabel: "Trenzinho de brinquedo. Arraste para a cesta de brinquedos.",
+      imgSrc: "assets/images/mundo_5/sprites_mundo5/tremzinho.png",
+      imgAlt: "Trenzinho de brinquedo",
     },
   ];
 
@@ -139,69 +161,40 @@
 
   function gerarItensMundo5Fase1() {
     const fn = getGerarItensFaseFn();
-    // Provisório: mesmas cotas da Fase 1 do Mundo 3 — 2 categorias, 6 itens.
     return fn ? fn([
-      { categoria: "brinquedos", quantidade: 2, modelos: MODELOS_BRINQUEDOS },
-      { categoria: "bebidas", quantidade: 4, modelos: MODELOS_BEBIDAS },
+      { categoria: "brinquedos", quantidade: 3, modelos: MODELOS_BRINQUEDOS },
+      { categoria: "bebidas", quantidade: 3, modelos: MODELOS_BEBIDAS },
     ]) : [];
   }
 
   // ==========================================================
-  // SPRITES DAS CESTAS (provisórios — reaproveitados do Mundo 3)
+  // CESTAS UNIFICADAS DO MUNDO 5 (DESAFIO FINAL)
+  // Imagens unificadas contendo cesto, etiqueta e bolinha de contagem
   // ==========================================================
-  const SPRITES_CESTA_BEBIDAS_MUNDO5 = [
-    "assets/images/mundo_3/sprites_cestas_3/cesta_bebida_praia-0.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_bebida_praia-1.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_bebida_praia-2.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_bebida_praia-3.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_bebida_praia-4.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_bebida_praia-5.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_bebida_praia-6.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_bebida_praia-7.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_bebida_praia-8.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_bebida_praia-9.png",
-  ];
-
-  const SPRITES_CESTA_BRINQUEDOS_MUNDO5 = [
-    "assets/images/mundo_3/sprites_cestas_3/cesta_brinquedo_praia-0.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_brinquedo_praia-1.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_brinquedo_praia-2.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_brinquedo_praia-3.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_brinquedo_praia-4.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_brinquedo_praia-5.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_brinquedo_praia-6.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_brinquedo_praia-7.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_brinquedo_praia-8.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_brinquedo_praia-9.png",
-  ];
+  const SPRITES_CESTA_BEBIDAS_MUNDO5 = "assets/images/mundo_5/sprites_mundo5/cesta_bebidas.png";
+  const SPRITES_CESTA_BRINQUEDOS_MUNDO5 = "assets/images/mundo_5/sprites_mundo5/cesta_brinquedos.png";
 
   // ==========================================================
   // CONFIGURAÇÃO DA FASE ÚNICA (Mundo 5 — Desafio Final)
-  // Cenário provisório do Mundo 3 | 2 Categorias | 6 Objetos no total
+  // Cenário Noturno | 2 Categorias | 6 Objetos no total
   // ==========================================================
   const CONFIG_FASE_1_MUNDO_5 = {
-    // ⚠️ Provisório — ver o cabeçalho do arquivo. Vale enquanto o motor ainda
-    // monta uma conta simples a partir das quantidades organizadas.
-    operacao: "multiplicacao",
+    operacao: "composta",
 
     // Os cinco desafios do desafio final, declarados aqui, na fase que os usa.
     desafios: DESAFIOS_MUNDO_5,
 
     // Adversário da fase. Declarar este campo é o que faz a área do Boss e os
-    // corações aparecerem — a quantidade de corações NÃO vem daqui, ela é o
-    // tamanho da lista "desafios" acima (um coração por conta a acertar).
-    //
-    // ⚠️ ARTE PROVISÓRIA. Reaproveita um asset do Mundo 3 só para a mecânica
-    // poder ser exercitada; não é o monstro definitivo.
+    // corações aparecerem.
     boss: {
       nome: "Monstro da Bagunça",
-      imgSrc: "assets/images/mundo_3/robo.png",
+      imgSrc: "assets/images/mundo_5/sprites_mundo5/monstro.png",
       imgAlt: "Monstro da Bagunça",
     },
 
-    fundo: FUNDO_MUNDO_5_BAGUNCADO,
-    fundoBaguncado: FUNDO_MUNDO_5_BAGUNCADO,
-    fundoArrumado: FUNDO_MUNDO_5_ARRUMADO,
+    fundo: FUNDO_MUNDO_5,
+    fundoBaguncado: FUNDO_MUNDO_5,
+    fundoArrumado: FUNDO_MUNDO_5,
     gerarObjetos: gerarItensMundo5Fase1,
     get objetos() {
       return gerarItensMundo5Fase1();
@@ -214,8 +207,6 @@
         ariaLabel: "Cesta de brinquedos",
         icone: "🏐",
         posicao: "esq-centro",
-        etiquetaImgSrc: "assets/images/mundo_3/botton_brinquedos.png",
-        etiquetaImgAlt: "Categoria Brinquedos",
         sprites: SPRITES_CESTA_BRINQUEDOS_MUNDO5,
       },
       {
@@ -225,8 +216,6 @@
         ariaLabel: "Cesta de bebidas",
         icone: "🥤",
         posicao: "dir-centro",
-        etiquetaImgSrc: "assets/images/mundo_3/botton_bebidas.png",
-        etiquetaImgAlt: "Categoria Bebidas",
         sprites: SPRITES_CESTA_BEBIDAS_MUNDO5,
       },
     ],

@@ -142,6 +142,8 @@ function iniciarEtapaMatematica(dadosQuantidades, configDaFase) {
 // precisar distinguir a cor dos emojis para saber quantos sobraram.
 function renderizarBoss() {
     const area = document.querySelector("#area-boss");
+    const hudVidas = document.querySelector("#boss-hud-vidas");
+
     if (!area) {
         return;
     }
@@ -149,6 +151,9 @@ function renderizarBoss() {
     if (!bossDaFase || !sequenciaDeDesafios) {
         area.classList.add("escondido");
         area.classList.remove("is-derrotado");
+        if (hudVidas) {
+            hudVidas.classList.add("escondido");
+        }
         return;
     }
 
@@ -166,6 +171,20 @@ function renderizarBoss() {
     const nome = document.querySelector("#boss-nome");
     if (nome) {
         nome.textContent = bossDaFase.nome || "";
+    }
+
+    // Renderização dos corações de vida dinâmicos no HUD superior esquerdo
+    if (hudVidas) {
+        hudVidas.classList.remove("escondido");
+        hudVidas.innerHTML = "";
+        for (let i = 0; i < total; i++) {
+            const coracao = document.createElement("span");
+            coracao.className = `coracao-vida ${i < restantes ? "ativo" : "perdido"}`;
+            coracao.setAttribute("aria-hidden", "true");
+            coracao.textContent = "❤️";
+            hudVidas.appendChild(coracao);
+        }
+        hudVidas.setAttribute("aria-label", `${restantes} de ${total} corações de vida do monstro`);
     }
 
     // Um símbolo por conta: cheio para o que falta, vazio para o que já caiu.
@@ -206,9 +225,42 @@ function abrirEtapaDeOrganizacao() {
         telaMatematica.classList.add("escondido");
     }
 
+    const hudVidas = document.querySelector("#boss-hud-vidas");
+    if (hudVidas) {
+        hudVidas.classList.add("escondido");
+    }
+
+    const areaBoss = document.querySelector("#area-boss");
+    if (areaBoss) {
+        areaBoss.classList.add("escondido");
+        areaBoss.classList.remove("boss-derrotado-animando");
+    }
+
+    const painelMat = document.querySelector(".painel-matematica");
+    if (painelMat) {
+        painelMat.classList.remove("painel-matematica-sumindo");
+    }
+
     const telaOrganizacao = document.querySelector("#tela-organizacao");
     if (telaOrganizacao) {
         telaOrganizacao.classList.remove("escondido");
+        telaOrganizacao.classList.add("fade-in-organizacao");
+    }
+
+    // No Mundo 5: atualiza o balão de instruções para hud_branco2.png ("Coloque cada item em sua respectiva cesta.")
+    if (bossDaFase) {
+        const hudOrgImg = document.querySelector("#tela-organizacao .caixa-instrucoes");
+        if (hudOrgImg) {
+            hudOrgImg.src = "assets/images/mundo_5/hud_branco2.png";
+            hudOrgImg.alt = "Coloque cada item em sua respectiva cesta.";
+        }
+        const feedbackMsg = document.querySelector("#feedback-message");
+        if (feedbackMsg) {
+            feedbackMsg.classList.add("hud-texto-oculto-boss");
+        }
+        if (faseEmAndamento?.fundoBaguncado || faseEmAndamento?.fundo) {
+            document.body.style.backgroundImage = `url("${faseEmAndamento.fundoBaguncado || faseEmAndamento.fundo}")`;
+        }
     }
 
     const aviso = document.querySelector("#aviso-organizacao");
@@ -239,6 +291,20 @@ function iniciarDesafioMatematico(dadosQuantidades, operacaoId) {
 
     if (telaMatematica) {
         telaMatematica.classList.remove("escondido");
+    }
+
+    // No Mundo 5 com Boss: configura o balão de instruções da matemática para hud_branco.png
+    if (bossDaFase) {
+        document.body.classList.add("fase-com-boss");
+        const hudMatematicaImg = document.querySelector("#tela-matematica .caixa-instrucoes");
+        if (hudMatematicaImg) {
+            hudMatematicaImg.src = "assets/images/mundo_5/hud_branco.png";
+            hudMatematicaImg.alt = "Arrume a Bagunça! Derrote o boss da bagunça para ganhar!";
+        }
+        const tituloMatematica = document.querySelector("#titulo-matematica");
+        if (tituloMatematica) {
+            tituloMatematica.classList.add("hud-texto-oculto-boss");
+        }
     }
 
     // Três formatos são aceitos aqui:
@@ -475,6 +541,12 @@ function verificarRespostaMatematica(valorEscolhido, resultadoCorreto, botaoClic
         if (sequenciaDeDesafios) {
             acertosNaSequencia++;
             renderizarBoss();
+            const bossImg = document.querySelector("#boss-imagem");
+            if (bossImg) {
+                bossImg.classList.remove("boss-levou-dano");
+                void bossImg.offsetWidth;
+                bossImg.classList.add("boss-levou-dano");
+            }
         }
 
         // Fase com sequência: este acerto NÃO conclui a fase enquanto houver
@@ -496,6 +568,14 @@ function verificarRespostaMatematica(valorEscolhido, resultadoCorreto, botaoClic
         // passam a pertencer ao fim da organização.
         if (bossFoiVencido()) {
             mostrarFeedbackMatematica(operacao.mensagemSucesso(contaTexto), "success");
+            const areaBoss = document.querySelector("#area-boss");
+            if (areaBoss) {
+                areaBoss.classList.add("boss-derrotado-animando");
+            }
+            const painelMat = document.querySelector(".painel-matematica");
+            if (painelMat) {
+                painelMat.classList.add("painel-matematica-sumindo");
+            }
             setTimeout(abrirEtapaDeOrganizacao, PAUSA_ANTES_DA_ORGANIZACAO_MS);
             return;
         }
@@ -537,10 +617,6 @@ function registrarConclusaoDaFase() {
 
 // Revela o encerramento da etapa final e devolve o elemento, para os botões de
 // conclusão serem anexados dentro dele.
-//
-// Toda a apresentação (texto, emojis, layout) está no fase1.html e no CSS: aqui
-// só se liga e desliga a visibilidade. Trocar a mensagem, a ilustração ou o
-// estilo não exige mexer na lógica de conclusão.
 function exibirMensagemDeVitoria() {
     // O aviso da etapa de arrumação já cumpriu o seu papel.
     const aviso = document.querySelector("#aviso-organizacao");
@@ -550,6 +626,16 @@ function exibirMensagemDeVitoria() {
 
     const painelVitoria = document.querySelector("#painel-vitoria");
     if (painelVitoria) {
+        if (bossDaFase) {
+            const tituloVitoria = painelVitoria.querySelector(".titulo-vitoria");
+            if (tituloVitoria) {
+                tituloVitoria.innerHTML = `<span aria-hidden="true">🎉</span> MONSTRO DERROTADO!`;
+            }
+            const subtituloVitoria = painelVitoria.querySelector(".subtitulo-vitoria");
+            if (subtituloVitoria) {
+                subtituloVitoria.innerHTML = `<span aria-hidden="true">⭐</span> VOCÊ ARRUMOU A BAGUNÇA!`;
+            }
+        }
         painelVitoria.classList.remove("escondido");
     }
 

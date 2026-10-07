@@ -22,6 +22,11 @@
 
       <section id="tela-inicial">
         <img
+          class="logo-universidade"
+          src="assets/images/logo-cruzeiro-do-sul.png"
+          alt="Logotipo da Universidade Cruzeiro do Sul"
+        />
+        <img
           src="assets/images/tela_inicial/logotipo_arruma _a_bagunça.png"
           alt="Logotipo do jogo Arruma a Bagunça"
         />
@@ -102,6 +107,23 @@
             </button>
           </div>
         </div>
+
+        <!-- Painel lateral (Sidebar) do Desafio do Boss - Mundo 5 -->
+        <aside id="sidebar-boss" class="sidebar-boss escondido" aria-label="Desafio do Monstro da Bagunça">
+          <button class="btn-fechar-sidebar-boss" id="btn-fechar-sidebar-boss" type="button" aria-label="Fechar desafio do Monstro">
+            <img src="assets/images/mundo_1/botão_fechar.png" alt="Fechar" />
+          </button>
+          <div class="conteudo-sidebar-boss">
+            <img class="img-boss-sidebar" src="assets/images/nova_tela_menu de_fases/Mundo_monstro.png" alt="Monstro da Bagunça" />
+            <p class="texto-boss-sidebar">O Monstro da Bagunça apareceu!</p>
+            <button class="btn-jogar-boss" id="btn-jogar-boss" type="button">JOGAR</button>
+          </div>
+        </aside>
+
+        <!-- Ícone flutuante do Monstro para reabrir a sidebar quando fechada -->
+        <button id="btn-icone-boss" class="btn-icone-boss escondido" type="button" aria-label="Abrir desafio do Monstro da Bagunça">
+          <img src="assets/images/mundo_5/sprites_mundo5/monstro.png" alt="" />
+        </button>
 
         <footer class="progresso-mundos">
           <div class="trilho-progresso" role="progressbar" aria-label="Progresso do jogo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="10">

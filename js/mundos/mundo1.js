@@ -32,7 +32,7 @@
       category: "brinquedos",
       itemName: "o ursinho",
       ariaLabel: "Ursinho de brinquedo. Arraste para a cesta de brinquedos.",
-      imgSrc: "assets/images/tela_fase1/uso 3.png",
+      imgSrc: "assets/images/tela_fase1/urso.png",
       imgAlt: "Ursinho de brinquedo",
     },
     {
@@ -138,7 +138,7 @@
       category: "brinquedos",
       itemName: "o ursinho",
       ariaLabel: "Ursinho de brinquedo. Arraste para a cesta de brinquedos.",
-      imgSrc: "assets/images/tela_fase1/uso 3.png",
+      imgSrc: "assets/images/tela_fase1/urso.png",
       imgAlt: "Ursinho de brinquedo",
     },
     {
@@ -154,7 +154,7 @@
       category: "brinquedos",
       itemName: "o ursinho",
       ariaLabel: "Ursinho de brinquedo. Arraste para a cesta de brinquedos.",
-      imgSrc: "assets/images/tela_fase1/uso 3.png",
+      imgSrc: "assets/images/tela_fase1/urso.png",
       imgAlt: "Ursinho de brinquedo",
     },
     {
@@ -176,6 +176,14 @@
   ];
 
   // ==========================================================
+  // CESTAS UNIFICADAS DO MUNDO 1 (A CASA)
+  // Imagens unificadas contendo cesto, etiqueta e bolinha de contagem
+  // ==========================================================
+  const SPRITES_CESTA_BRINQUEDOS = "assets/images/mundo_1/cesta_brinquedos.png";
+  const SPRITES_CESTA_COMIDAS = "assets/images/mundo_1/cesta_comidas.png";
+  const SPRITES_CESTA_MATERIAIS = "assets/images/mundo_1/cesta_materiais.png";
+
+  // ==========================================================
   // CONFIGURAÇÃO DA FASE 1 (Mundo 1 — Adição)
   // 2 Categorias (Brinquedos e Comidas) | 5 Objetos no total
   // ==========================================================
@@ -193,14 +201,7 @@
         ariaLabel: "Cesta de brinquedos",
         icone: "🧸",
         posicao: "esq-centro",
-        etiquetaImgSrc: "assets/images/tela_fase1/botton_brinquedos.png",
-        etiquetaImgAlt: "Categoria Brinquedos",
-        sprites: [
-          "assets/images/tela_fase1/sprites_cestas/brinquedos/1_cesta_brinquedo-1.png",
-          "assets/images/tela_fase1/sprites_cestas/brinquedos/1_cesta_brinquedo.png",
-          "assets/images/tela_fase1/sprites_cestas/brinquedos/2_cesta_brinquedo.png",
-          "assets/images/tela_fase1/sprites_cestas/brinquedos/3_cesta_brinquedo.png",
-        ],
+        sprites: SPRITES_CESTA_BRINQUEDOS,
       },
       {
         id: "cesta-comidas",
@@ -209,14 +210,7 @@
         ariaLabel: "Cesta de comidas",
         icone: "🍎",
         posicao: "dir-centro",
-        etiquetaImgSrc: "assets/images/tela_fase1/botton_comida.png",
-        etiquetaImgAlt: "Categoria Comida",
-        sprites: [
-          "assets/images/tela_fase1/sprites_cestas/comidas/1_cesta_comida-1.png",
-          "assets/images/tela_fase1/sprites_cestas/comidas/1_cesta_comida.png",
-          "assets/images/tela_fase1/sprites_cestas/comidas/2_cesta_comida.png",
-          "assets/images/tela_fase1/sprites_cestas/comidas/3_cesta_comida.png",
-        ],
+        sprites: SPRITES_CESTA_COMIDAS,
       },
     ],
   };
@@ -239,14 +233,7 @@
         ariaLabel: "Cesta de brinquedos",
         icone: "🧸",
         posicao: "esq-topo",
-        etiquetaImgSrc: "assets/images/tela_fase1/botton_brinquedos.png",
-        etiquetaImgAlt: "Categoria Brinquedos",
-        sprites: [
-          "assets/images/tela_fase1/sprites_cestas/brinquedos/1_cesta_brinquedo-1.png",
-          "assets/images/tela_fase1/sprites_cestas/brinquedos/1_cesta_brinquedo.png",
-          "assets/images/tela_fase1/sprites_cestas/brinquedos/2_cesta_brinquedo.png",
-          "assets/images/tela_fase1/sprites_cestas/brinquedos/3_cesta_brinquedo.png",
-        ],
+        sprites: SPRITES_CESTA_BRINQUEDOS,
       },
       {
         id: "cesta-comidas",
@@ -255,14 +242,7 @@
         ariaLabel: "Cesta de comidas",
         icone: "🍎",
         posicao: "esq-base",
-        etiquetaImgSrc: "assets/images/tela_fase1/botton_comida.png",
-        etiquetaImgAlt: "Categoria Comida",
-        sprites: [
-          "assets/images/tela_fase1/sprites_cestas/comidas/1_cesta_comida-1.png",
-          "assets/images/tela_fase1/sprites_cestas/comidas/1_cesta_comida.png",
-          "assets/images/tela_fase1/sprites_cestas/comidas/2_cesta_comida.png",
-          "assets/images/tela_fase1/sprites_cestas/comidas/3_cesta_comida.png",
-        ],
+        sprites: SPRITES_CESTA_COMIDAS,
       },
       {
         id: "cesta-materiais",
@@ -271,14 +251,7 @@
         ariaLabel: "Cesta de materiais escolares",
         icone: "✏️",
         posicao: "dir-centro",
-        etiquetaImgSrc: "assets/images/tela_fase1/botton_material.png",
-        etiquetaImgAlt: "Categoria Material escolar",
-        sprites: [
-          "assets/images/tela_fase1/sprites_cestas/materiais/1_cesta_material-1.png",
-          "assets/images/tela_fase1/sprites_cestas/materiais/1_cesta_material.png",
-          "assets/images/tela_fase1/sprites_cestas/materiais/2_cesta_material.png",
-          "assets/images/tela_fase1/sprites_cestas/materiais/3_cesta_material.png",
-        ],
+        sprites: SPRITES_CESTA_MATERIAIS,
       },
     ],
   };
@@ -301,14 +274,7 @@
         ariaLabel: "Cesta de brinquedos",
         icone: "🧸",
         posicao: "esq-topo",
-        etiquetaImgSrc: "assets/images/tela_fase1/botton_brinquedos.png",
-        etiquetaImgAlt: "Categoria Brinquedos",
-        sprites: [
-          "assets/images/tela_fase1/sprites_cestas/brinquedos/1_cesta_brinquedo-1.png",
-          "assets/images/tela_fase1/sprites_cestas/brinquedos/1_cesta_brinquedo.png",
-          "assets/images/tela_fase1/sprites_cestas/brinquedos/2_cesta_brinquedo.png",
-          "assets/images/tela_fase1/sprites_cestas/brinquedos/3_cesta_brinquedo.png",
-        ],
+        sprites: SPRITES_CESTA_BRINQUEDOS,
       },
       {
         id: "cesta-comidas",
@@ -317,14 +283,7 @@
         ariaLabel: "Cesta de comidas",
         icone: "🍎",
         posicao: "esq-base",
-        etiquetaImgSrc: "assets/images/tela_fase1/botton_comida.png",
-        etiquetaImgAlt: "Categoria Comida",
-        sprites: [
-          "assets/images/tela_fase1/sprites_cestas/comidas/1_cesta_comida-1.png",
-          "assets/images/tela_fase1/sprites_cestas/comidas/1_cesta_comida.png",
-          "assets/images/tela_fase1/sprites_cestas/comidas/2_cesta_comida.png",
-          "assets/images/tela_fase1/sprites_cestas/comidas/3_cesta_comida.png",
-        ],
+        sprites: SPRITES_CESTA_COMIDAS,
       },
       {
         id: "cesta-materiais",
@@ -333,14 +292,7 @@
         ariaLabel: "Cesta de materiais escolares",
         icone: "✏️",
         posicao: "dir-centro",
-        etiquetaImgSrc: "assets/images/tela_fase1/botton_material.png",
-        etiquetaImgAlt: "Categoria Material escolar",
-        sprites: [
-          "assets/images/tela_fase1/sprites_cestas/materiais/1_cesta_material-1.png",
-          "assets/images/tela_fase1/sprites_cestas/materiais/1_cesta_material.png",
-          "assets/images/tela_fase1/sprites_cestas/materiais/2_cesta_material.png",
-          "assets/images/tela_fase1/sprites_cestas/materiais/3_cesta_material.png",
-        ],
+        sprites: SPRITES_CESTA_MATERIAIS,
       },
     ],
   };

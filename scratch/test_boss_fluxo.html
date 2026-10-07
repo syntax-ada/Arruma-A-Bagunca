@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Teste Automatizado do Boss e Transição</title>
+</head>
+<body style="margin: 0; background: #000;">
+  <iframe id="jogo" src="../fase1.html?mundo=5&fase=1&dev=true" style="width: 1280px; height: 720px; border: none;"></iframe>
+  <div id="status" style="position: fixed; bottom: 10px; left: 10px; color: #00ff00; font-family: monospace; font-size: 16px; background: rgba(0,0,0,0.85); padding: 12px; z-index: 9999;"></div>
+  <script>
+    const iframe = document.querySelector("#jogo");
+    const status = document.querySelector("#status");
+
+    function log(msg) {
+      console.log(msg);
+      status.innerHTML += msg + "<br>";
+    }
+
+    iframe.onload = () => {
+      log("Iniciando batalha...");
+      const doc = iframe.contentDocument;
+      const win = iframe.contentWindow;
+
+      let contasRespondidas = 0;
+
+      function responderProxima() {
+        const desafio = win.obterDesafioMatematicoAtivo ? win.obterDesafioMatematicoAtivo() : null;
+        if (!desafio) {
+          log("Boss derrotado! Aguardando transição para organização...");
+          setTimeout(verificarOrganizacao, 2500);
+          return;
+        }
+
+        const botoes = doc.querySelectorAll(".botao-opcao-matematica");
+        let achou = false;
+        botoes.forEach(b => {
+          if (Number(b.textContent) === desafio.resultadoCorreto) {
+            contasRespondidas++;
+            log(`Conta ${contasRespondidas}/5 acertada (${desafio.resultadoCorreto}).`);
+            b.click();
+            achou = true;
+          }
+        });
+
+        if (achou) {
+          setTimeout(responderProxima, 1200);
+        } else {
+          log("Erro: botão não encontrado.");
+        }
+      }
+
+      function verificarOrganizacao() {
+        const telaOrg = doc.querySelector("#tela-organizacao");
+        const telaMat = doc.querySelector("#tela-matematica");
+        const areaBoss = doc.querySelector("#area-boss");
+        const hudImg = doc.querySelector("#tela-organizacao .caixa-instrucoes");
+
+        const orgVisivel = !telaOrg.classList.contains("escondido");
+        const matOculta = telaMat.classList.contains("escondido");
+        const bossOculto = areaBoss.classList.contains("escondido");
+        const hudCorreto = hudImg && hudImg.src.includes("hud_branco2.png");
+
+        log(`Organização visível: ${orgVisivel ? "SIM" : "NÃO"}`);
+        log(`Matemática oculta: ${matOculta ? "SIM" : "NÃO"}`);
+        log(`Boss oculto: ${bossOculto ? "SIM" : "NÃO"}`);
+        log(`HUD Branco 2: ${hudCorreto ? "SIM" : "NÃO"}`);
+
+        if (orgVisivel && matOculta && bossOculto && hudCorreto) {
+          log("<b style='color:#33ff33;'>TRANSIÇÃO PARA ORGANIZAÇÃO CONCLUÍDA COM SUCESSO!</b>");
+        }
+      }
+
+      setTimeout(responderProxima, 800);
+    };
+  </script>
+</body>
+</html>
+

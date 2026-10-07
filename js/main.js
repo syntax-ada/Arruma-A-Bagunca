@@ -78,6 +78,9 @@
   }
 
   // Identidade do mundo ativo e da fase ativa
+  document.body.classList.remove("mundo-1", "mundo-2", "mundo-3", "mundo-4", "mundo-5");
+  document.body.classList.add(`mundo-${mundo.id}`);
+
   window.obterMundoAtivo = function () {
     return mundo.id;
   };

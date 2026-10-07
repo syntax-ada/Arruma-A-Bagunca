@@ -21,6 +21,11 @@ const carrosselMundos = document.querySelector(".carrossel-mundos");
 const btnSetaEsquerda = document.querySelector('.btn-seta[aria-label="Mundo anterior"]');
 const btnSetaDireita = document.querySelector('.btn-seta[aria-label="Próximo mundo"]');
 const conteudoFase = document.querySelector("#conteudo-fase");
+const sidebarBoss = document.querySelector("#sidebar-boss");
+const btnFecharSidebarBoss = document.querySelector("#btn-fechar-sidebar-boss");
+const btnJogarBoss = document.querySelector("#btn-jogar-boss");
+const btnIconeBoss = document.querySelector("#btn-icone-boss");
+let sidebarBossFechadaManualmente = false;
 
 function tocarSomBotao() {
   if (typeof window.tocarEfeito === "function") {
@@ -298,6 +303,21 @@ function atualizarInterfaceProgresso() {
   if (textoProgresso) {
     textoProgresso.textContent = `${porcentagem}%`;
   }
+
+  // 4. Controle de exibição da Sidebar do Boss (Mundo 5) e Ícone Flutuante
+  const bossDesbloqueado = devAtivo || mundosLiberados.includes(5);
+  if (bossDesbloqueado) {
+    if (!sidebarBossFechadaManualmente) {
+      sidebarBoss?.classList.remove("escondido");
+      btnIconeBoss?.classList.add("escondido");
+    } else {
+      sidebarBoss?.classList.add("escondido");
+      btnIconeBoss?.classList.remove("escondido");
+    }
+  } else {
+    sidebarBoss?.classList.add("escondido");
+    btnIconeBoss?.classList.add("escondido");
+  }
 }
 
 // Navegação básica da tela inicial e menus
@@ -325,6 +345,34 @@ if (botaoVoltar && telaInicial && menuFases && controlesIniciais) {
     menuFases.classList.add("escondido");
     telaInicial.classList.remove("escondido");
     controlesIniciais.classList.remove("escondido");
+  });
+}
+
+// Controle da Sidebar do Boss (Mundo 5)
+if (btnFecharSidebarBoss) {
+  btnFecharSidebarBoss.addEventListener("click", function () {
+    tocarSomBotao();
+    sidebarBossFechadaManualmente = true;
+    sidebarBoss?.classList.add("escondido");
+    btnIconeBoss?.classList.remove("escondido");
+  });
+}
+
+if (btnIconeBoss) {
+  btnIconeBoss.addEventListener("click", function () {
+    tocarSomBotao();
+    sidebarBossFechadaManualmente = false;
+    btnIconeBoss?.classList.add("escondido");
+    sidebarBoss?.classList.remove("escondido");
+  });
+}
+
+if (btnJogarBoss) {
+  btnJogarBoss.addEventListener("click", function () {
+    tocarSomBotao();
+    const devAtivo = isModoDevAtivo();
+    const sufixoDev = devAtivo ? "&dev=true" : "";
+    abrirFase(`fase1.html?mundo=5&fase=1${sufixoDev}`);
   });
 }
 

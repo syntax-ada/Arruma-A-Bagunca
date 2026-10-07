@@ -69,7 +69,8 @@ function renderizarCestas(listaCategorias = []) {
     basketSprites[cat.accepts] = cat.sprites || [];
 
     const dropZone = document.createElement("div");
-    dropZone.className = `categoria cesta-container drop-zone${cat.posicao ? ` posicao-${cat.posicao}` : ""}`;
+    const classesCesta = Array.from(new Set(["categoria", "cesta-container", "drop-zone", cat.id, `cesta-${cat.accepts}`].filter(Boolean))).join(" ");
+    dropZone.className = `${classesCesta}${cat.posicao ? ` posicao-${cat.posicao}` : ""}${cat.classeCesta ? ` ${cat.classeCesta}` : ""}`;
     dropZone.id = cat.id;
     dropZone.dataset.accepts = cat.accepts;
     dropZone.tabIndex = 0;
@@ -88,15 +89,30 @@ function renderizarCestas(listaCategorias = []) {
     dropZone.appendChild(contador);
 
     const imgCesta = document.createElement("img");
-    imgCesta.className = "cesta cesta-img";
-    imgCesta.src = cat.sprites && cat.sprites.length > 0 ? cat.sprites[0] : "";
+    imgCesta.className = `cesta cesta-img${cat.classeCesta ? ` ${cat.classeCesta}` : ""}`;
+    const cestaSrc = typeof cat.sprites === "string"
+      ? cat.sprites
+      : (Array.isArray(cat.sprites) && cat.sprites.length > 0 ? cat.sprites[0] : (cat.imgSrc || ""));
+    imgCesta.src = cestaSrc;
     imgCesta.alt = `${cat.ariaLabel} com zero itens`;
     dropZone.appendChild(imgCesta);
 
-    if (cat.etiquetaImgSrc) {
+    // Contador numérico dinâmico sobre a cesta (inicializado em 0)
+    const contadorItens = document.createElement("span");
+    contadorItens.className = "contador-itens";
+    contadorItens.textContent = "0";
+    dropZone.appendChild(contadorItens);
+
+    // Container para sobreposição dinâmica de itens dentro da cesta (inicia vazio)
+    const itensSobrepostos = document.createElement("div");
+    itensSobrepostos.className = "itens-sobrepostos";
+    dropZone.appendChild(itensSobrepostos);
+
+    const etiquetaSrc = cat.etiquetaImgSrc || cat.etiqueta;
+    if (typeof etiquetaSrc === "string" && etiquetaSrc.trim() !== "") {
       const imgEtiqueta = document.createElement("img");
       imgEtiqueta.className = "etiqueta-categoria categoria-img";
-      imgEtiqueta.src = cat.etiquetaImgSrc;
+      imgEtiqueta.src = etiquetaSrc.trim();
       imgEtiqueta.alt = cat.etiquetaImgAlt || `Categoria ${cat.nome}`;
       dropZone.appendChild(imgEtiqueta);
     }
@@ -237,6 +253,29 @@ function moveDrag(event) {
   updateDropZoneHighlight(event.clientX, event.clientY);
 }
 
+function adicionarItemSobreposto(dropZone, item) {
+  if (!dropZone || !item) {
+    return;
+  }
+
+  const containerSobrepostos = dropZone.querySelector(".itens-sobrepostos");
+  if (!containerSobrepostos) {
+    return;
+  }
+
+  if (containerSobrepostos.children.length < 3) {
+    const imgOriginal = item.querySelector("img");
+    const src = imgOriginal ? imgOriginal.getAttribute("src") || imgOriginal.src : "";
+    if (src) {
+      const imgSobreposta = document.createElement("img");
+      imgSobreposta.src = src;
+      imgSobreposta.alt = imgOriginal.alt || "";
+      imgSobreposta.className = "item-sobreposto";
+      containerSobrepostos.appendChild(imgSobreposta);
+    }
+  }
+}
+
 function finishDrag(event) {
   if (!isCurrentPointer(event)) {
     return;
@@ -253,6 +292,15 @@ function finishDrag(event) {
   if (isCorrectDropZone(item, targetDropZone)) {
     placeItemInsideDropZone(item, targetDropZone);
     item.classList.add("is-correct");
+
+    const contadorItens = targetDropZone.querySelector(".contador-itens");
+    if (contadorItens) {
+      const valorAtual = parseInt(contadorItens.textContent, 10) || 0;
+      contadorItens.textContent = String(valorAtual + 1);
+    }
+
+    adicionarItemSobreposto(targetDropZone, item);
+
     updateDropZoneCounter(targetDropZone);
 
     if (typeof window.tocarEfeito === "function") {
@@ -433,15 +481,9 @@ function updateDropZoneCounter(dropZone) {
     counter.setAttribute("aria-label", `${placedCount} itens organizados`);
   }
 
-  const category = dropZone.dataset.accepts;
-  const cestaImg = dropZone.querySelector(".cesta");
-  const catConfig = activeConfig?.categorias?.find((c) => c.accepts === category);
-  const sprites = catConfig?.sprites || basketSprites[category];
-
-  if (cestaImg && sprites && sprites.length > 0) {
-    const maxSpriteIndex = sprites.length - 1;
-    const spriteIndex = Math.min(placedCount, maxSpriteIndex);
-    cestaImg.src = sprites[spriteIndex];
+  const contadorItens = dropZone.querySelector(".contador-itens");
+  if (contadorItens) {
+    contadorItens.textContent = String(placedCount);
   }
 }
 
@@ -512,6 +554,15 @@ function handleDropZoneKeyboard(event) {
   if (isCorrectDropZone(currentAvailableItem, event.currentTarget)) {
     placeItemInsideDropZone(currentAvailableItem, event.currentTarget);
     currentAvailableItem.classList.add("is-correct");
+
+    const contadorItens = event.currentTarget.querySelector(".contador-itens");
+    if (contadorItens) {
+      const valorAtual = parseInt(contadorItens.textContent, 10) || 0;
+      contadorItens.textContent = String(valorAtual + 1);
+    }
+
+    adicionarItemSobreposto(event.currentTarget, currentAvailableItem);
+
     updateDropZoneCounter(event.currentTarget);
 
     if (typeof window.tocarEfeito === "function") {

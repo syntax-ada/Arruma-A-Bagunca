@@ -141,46 +141,12 @@
   }
 
   // ==========================================================
-  // SPRITES DAS CESTAS DO MUNDO 3
+  // CESTAS UNIFICADAS DO MUNDO 3 (PRAIA)
+  // Imagens unificadas contendo cesto, etiqueta e bolinha de contagem
   // ==========================================================
-  const SPRITES_CESTA_BEBIDAS_MUNDO3 = [
-    "assets/images/mundo_3/sprites_cestas_3/cesta_bebida_praia-0.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_bebida_praia-1.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_bebida_praia-2.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_bebida_praia-3.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_bebida_praia-4.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_bebida_praia-5.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_bebida_praia-6.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_bebida_praia-7.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_bebida_praia-8.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_bebida_praia-9.png",
-  ];
-
-  const SPRITES_CESTA_COMIDAS_MUNDO3 = [
-    "assets/images/mundo_3/sprites_cestas_3/cesta_comida_praia-0.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_comida_praia-1.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_comida_praia-2.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_comida_praia-3.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_comida_praia-4.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_comida_praia-5.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_comida_praia-6.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_comida_praia-7.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_comida_praia-8.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_comida_praia-9.png",
-  ];
-
-  const SPRITES_CESTA_BRINQUEDOS_MUNDO3 = [
-    "assets/images/mundo_3/sprites_cestas_3/cesta_brinquedo_praia-0.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_brinquedo_praia-1.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_brinquedo_praia-2.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_brinquedo_praia-3.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_brinquedo_praia-4.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_brinquedo_praia-5.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_brinquedo_praia-6.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_brinquedo_praia-7.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_brinquedo_praia-8.png",
-    "assets/images/mundo_3/sprites_cestas_3/cesta_brinquedo_praia-9.png",
-  ];
+  const SPRITES_CESTA_BEBIDAS_MUNDO3 = "assets/images/mundo_3/cesta_bebidas.png";
+  const SPRITES_CESTA_COMIDAS_MUNDO3 = "assets/images/mundo_3/cesta_comidas.png";
+  const SPRITES_CESTA_BRINQUEDOS_MUNDO3 = "assets/images/mundo_3/cesta_brinquedos.png";
 
   // ==========================================================
   // CONFIGURAÇÃO DA FASE 1 (Mundo 3 — Praia)
@@ -204,8 +170,6 @@
         ariaLabel: "Cesta de brinquedos da praia",
         icone: "🏐",
         posicao: "esq-centro",
-        etiquetaImgSrc: "assets/images/mundo_3/botton_brinquedos.png",
-        etiquetaImgAlt: "Categoria Brinquedos",
         sprites: SPRITES_CESTA_BRINQUEDOS_MUNDO3,
       },
       {
@@ -215,8 +179,6 @@
         ariaLabel: "Cesta de bebidas da praia",
         icone: "🥤",
         posicao: "dir-centro",
-        etiquetaImgSrc: "assets/images/mundo_3/botton_bebidas.png",
-        etiquetaImgAlt: "Categoria Bebidas",
         sprites: SPRITES_CESTA_BEBIDAS_MUNDO3,
       },
     ],
@@ -244,8 +206,6 @@
         ariaLabel: "Cesta de bebidas da praia",
         icone: "🥤",
         posicao: "esq-centro",
-        etiquetaImgSrc: "assets/images/mundo_3/botton_bebidas.png",
-        etiquetaImgAlt: "Categoria Bebidas",
         sprites: SPRITES_CESTA_BEBIDAS_MUNDO3,
       },
       {
@@ -255,8 +215,6 @@
         ariaLabel: "Cesta de comidas da praia",
         icone: "🍦",
         posicao: "dir-centro",
-        etiquetaImgSrc: "assets/images/mundo_3/botton_comida.png",
-        etiquetaImgAlt: "Categoria Comidas",
         sprites: SPRITES_CESTA_COMIDAS_MUNDO3,
       },
     ],
@@ -284,8 +242,6 @@
         ariaLabel: "Cesta de brinquedos da praia",
         icone: "🏐",
         posicao: "esq-topo",
-        etiquetaImgSrc: "assets/images/mundo_3/botton_brinquedos.png",
-        etiquetaImgAlt: "Categoria Brinquedos",
         sprites: SPRITES_CESTA_BRINQUEDOS_MUNDO3,
       },
       {
@@ -295,8 +251,6 @@
         ariaLabel: "Cesta de comidas da praia",
         icone: "🍦",
         posicao: "esq-base",
-        etiquetaImgSrc: "assets/images/mundo_3/botton_comida.png",
-        etiquetaImgAlt: "Categoria Comidas",
         sprites: SPRITES_CESTA_COMIDAS_MUNDO3,
       },
       {
@@ -306,8 +260,6 @@
         ariaLabel: "Cesta de bebidas da praia",
         icone: "🥤",
         posicao: "dir-centro",
-        etiquetaImgSrc: "assets/images/mundo_3/botton_bebidas.png",
-        etiquetaImgAlt: "Categoria Bebidas",
         sprites: SPRITES_CESTA_BEBIDAS_MUNDO3,
       },
     ],

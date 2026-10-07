@@ -118,33 +118,11 @@
   }
 
   // ==========================================================
-  // SPRITES DAS CESTAS DO MUNDO 4
+  // CESTAS UNIFICADAS DO MUNDO 4 (ACAMPAMENTO)
+  // Imagens unificadas contendo cesto/mochila, etiqueta e bolinha de contagem
   // ==========================================================
-  const SPRITES_CESTA_COMIDAS_MUNDO4 = [
-    "assets/images/mundo_4/sprites_cestas_4/cesta_comida_praia-0.png",
-    "assets/images/mundo_4/sprites_cestas_4/cesta_comida_praia-1.png",
-    "assets/images/mundo_4/sprites_cestas_4/cesta_comida_praia-2.png",
-    "assets/images/mundo_4/sprites_cestas_4/cesta_comida_praia-3.png",
-    "assets/images/mundo_4/sprites_cestas_4/cesta_comida_praia-4.png",
-    "assets/images/mundo_4/sprites_cestas_4/cesta_comida_praia-5.png",
-    "assets/images/mundo_4/sprites_cestas_4/cesta_comida_praia-6.png",
-    "assets/images/mundo_4/sprites_cestas_4/cesta_comida_praia-7.png",
-    "assets/images/mundo_4/sprites_cestas_4/cesta_comida_praia-8.png",
-    "assets/images/mundo_4/sprites_cestas_4/cesta_comida_praia-9.png",
-  ];
-
-  const SPRITES_CESTA_MOCHILA_MUNDO4 = [
-    "assets/images/mundo_4/sprites_cestas_4/mochila-0.png",
-    "assets/images/mundo_4/sprites_cestas_4/mochila-1.png",
-    "assets/images/mundo_4/sprites_cestas_4/mochila-2.png",
-    "assets/images/mundo_4/sprites_cestas_4/mochila-3.png",
-    "assets/images/mundo_4/sprites_cestas_4/mochila-4.png",
-    "assets/images/mundo_4/sprites_cestas_4/mochila-5.png",
-    "assets/images/mundo_4/sprites_cestas_4/mochila-6.png",
-    "assets/images/mundo_4/sprites_cestas_4/mochila-7.png",
-    "assets/images/mundo_4/sprites_cestas_4/mochila-8.png",
-    "assets/images/mundo_4/sprites_cestas_4/mochila-9.png",
-  ];
+  const SPRITES_CESTA_COMIDAS_MUNDO4 = "assets/images/mundo_4/cesta_comidas.png";
+  const SPRITES_CESTA_MOCHILA_MUNDO4 = "assets/images/mundo_4/cesta_mochila.png";
 
   // ==========================================================
   // CONFIGURAÇÃO DA FASE 1 (Mundo 4 — Acampamento)
@@ -168,8 +146,6 @@
         ariaLabel: "Cesta de comida do acampamento",
         icone: "🍎",
         posicao: "esq-centro",
-        etiquetaImgSrc: "assets/images/mundo_4/botton_comida.png",
-        etiquetaImgAlt: "Categoria Comida",
         sprites: SPRITES_CESTA_COMIDAS_MUNDO4,
       },
       {
@@ -179,8 +155,6 @@
         ariaLabel: "Mochila do acampamento",
         icone: "🎒",
         posicao: "dir-centro",
-        etiquetaImgSrc: "assets/images/mundo_4/botton_mochila.png",
-        etiquetaImgAlt: "Categoria Mochila",
         sprites: SPRITES_CESTA_MOCHILA_MUNDO4,
       },
     ],
@@ -208,8 +182,6 @@
         ariaLabel: "Cesta de comida do acampamento",
         icone: "🍎",
         posicao: "esq-centro",
-        etiquetaImgSrc: "assets/images/mundo_4/botton_comida.png",
-        etiquetaImgAlt: "Categoria Comida",
         sprites: SPRITES_CESTA_COMIDAS_MUNDO4,
       },
       {
@@ -219,8 +191,6 @@
         ariaLabel: "Mochila do acampamento",
         icone: "🎒",
         posicao: "dir-centro",
-        etiquetaImgSrc: "assets/images/mundo_4/botton_mochila.png",
-        etiquetaImgAlt: "Categoria Mochila",
         sprites: SPRITES_CESTA_MOCHILA_MUNDO4,
       },
     ],
@@ -248,8 +218,6 @@
         ariaLabel: "Cesta de comida do acampamento",
         icone: "🍎",
         posicao: "esq-centro",
-        etiquetaImgSrc: "assets/images/mundo_4/botton_comida.png",
-        etiquetaImgAlt: "Categoria Comida",
         sprites: SPRITES_CESTA_COMIDAS_MUNDO4,
       },
       {
@@ -259,8 +227,6 @@
         ariaLabel: "Mochila do acampamento",
         icone: "🎒",
         posicao: "dir-centro",
-        etiquetaImgSrc: "assets/images/mundo_4/botton_mochila.png",
-        etiquetaImgAlt: "Categoria Mochila",
         sprites: SPRITES_CESTA_MOCHILA_MUNDO4,
       },
     ],

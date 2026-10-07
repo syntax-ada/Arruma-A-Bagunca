@@ -263,6 +263,187 @@
     transition: transform 0.15s ease;
 }
 
+/* ==========================================================
+   CONTADOR DINÂMICO DE ITENS NA CESTA
+   Estrutura base compartilhada com centralização flexbox.
+   Coordenadas calibradas individualmente por categoria abaixo.
+   ========================================================== */
+.contador-itens {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #ffffff;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: clamp(1.15rem, 2vw, 1.6rem);
+    font-weight: bold;
+    line-height: 1;
+    text-align: center;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    pointer-events: none;
+    user-select: none;
+    z-index: 5;
+}
+
+/* ==========================================================
+   ALINHAMENTO INDIVIDUAL DOS CONTADORES POR CATEGORIA/CESTA
+   Centraliza o número perfeitamente na bolinha de cada imagem unificada.
+   ========================================================== */
+
+/* Cesta Mochila (Mundo 4) */
+.cesta-mochila .contador-itens,
+#cesta-mochila .contador-itens,
+[data-accepts="mochila"] .contador-itens {
+    top: 10%;
+    right: 0.5%;
+    width: 26.7%;
+    height: 23.6%;
+}
+
+/* Cesta Bebidas (Mundos 3 e 5) */
+.cesta-bebidas .contador-itens,
+#cesta-bebidas .contador-itens,
+[data-accepts="bebidas"] .contador-itens {
+    top: 9.5%;
+    right: 0.5%;
+    width: 23.5%;
+    height: 20.8%;
+}
+
+/* Cesta Animais (Mundo 2) */
+.cesta-animais .contador-itens,
+#cesta-animais .contador-itens,
+[data-accepts="animais"] .contador-itens {
+    top: 1%;
+    right: 0.6%;
+    width: 23.1%;
+    height: 23.9%;
+}
+
+/* Cesta Material Escolar (Mundo 1) */
+.cesta-materiais .contador-itens,
+#cesta-materiais .contador-itens,
+[data-accepts="materiais"] .contador-itens {
+    top: 0%;
+    right: 13.7%;
+    width: 14.9%;
+    height: 25.7%;
+}
+
+/* Cesta Comidas / Comida (Mundos 2, 3 e 4) */
+.cesta-comidas .contador-itens,
+.cesta-comida .contador-itens,
+#cesta-comidas .contador-itens,
+#cesta-comida .contador-itens,
+[data-accepts="comidas"] .contador-itens,
+[data-accepts="comida"] .contador-itens {
+    top: 22.3%;
+    right: 0.5%;
+    width: 23.6%;
+    height: 20.2%;
+}
+
+/* Cesta Comidas específica do Mundo 1 */
+.mundo-1 .cesta-comidas .contador-itens,
+.mundo-1 #cesta-comidas .contador-itens,
+.mundo-1 [data-accepts="comidas"] .contador-itens {
+    top: 0%;
+    right: 0%;
+    width: 22%;
+    height: 26.2%;
+}
+
+/* Cesta Brinquedos Padrão (Mundo 1) */
+.cesta-brinquedos .contador-itens,
+#cesta-brinquedos .contador-itens,
+[data-accepts="brinquedos"] .contador-itens {
+    top: 0%;
+    right: 1%;
+    width: 19.3%;
+    height: 25.8%;
+}
+
+/* Cesta Brinquedos (Mundo 2 - Parque) */
+.mundo-2 .cesta-brinquedos .contador-itens,
+.mundo-2 #cesta-brinquedos .contador-itens,
+.mundo-2 [data-accepts="brinquedos"] .contador-itens {
+    top: 20.9%;
+    right: 1.1%;
+    width: 21.6%;
+    height: 19.5%;
+}
+
+/* Cesta Brinquedos (Mundos 3 e 5 - Praia/Desafio Final) */
+.mundo-3 .cesta-brinquedos .contador-itens,
+.mundo-3 #cesta-brinquedos .contador-itens,
+.mundo-3 [data-accepts="brinquedos"] .contador-itens,
+.mundo-5 .cesta-brinquedos .contador-itens,
+.mundo-5 #cesta-brinquedos .contador-itens,
+.mundo-5 [data-accepts="brinquedos"] .contador-itens {
+    top: 2.8%;
+    right: 3.7%;
+    width: 21.6%;
+    height: 23.4%;
+}
+
+/* ==========================================================
+   CORREÇÃO DE TAMANHO DA CESTA DE MATERIAL ESCOLAR (MUNDO 1)
+   Equaliza visualmente o tamanho da cesta com as demais
+   ========================================================== */
+.cesta-materiais,
+#cesta-materiais,
+[data-accepts="materiais"] {
+    transform-origin: center bottom;
+}
+
+@media (min-width: 769px) {
+    .cesta-materiais,
+    #cesta-materiais,
+    [data-accepts="materiais"] {
+        transform: scale(1.45);
+        transform-origin: right center;
+    }
+
+    .cesta-materiais.drop-zone.is-over,
+    #cesta-materiais.drop-zone.is-over,
+    [data-accepts="materiais"].drop-zone.is-over {
+        transform: scale(1.50);
+    }
+}
+
+/* ==========================================================
+   SOBREPOSIÇÃO DINÂMICA DE ITENS NA CESTA
+   Exibe os objetos reais organizados dentro da abertura da cesta unificada.
+   ========================================================== */
+.itens-sobrepostos {
+    position: absolute;
+    top: 19.5%;
+    left: 12%;
+    width: 60%;
+    height: 24%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.itens-sobrepostos img {
+    width: 40px;
+    max-width: 38%;
+    height: auto;
+    max-height: 100%;
+    object-fit: contain;
+    z-index: 1;
+    pointer-events: none;
+    user-select: none;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+}
+
+.itens-sobrepostos img + img {
+    margin-left: -8px;
+}
+
 .drop-zone.is-over {
     transform: scale(1.04);
 }
@@ -326,8 +507,12 @@
 
 @media (min-width: 769px) {
     .area-objetos {
-        /* Reserva espaço lateral amplo para manter a grid centralizada */
-        padding: 10px clamp(170px, 21vw, 250px);
+        /* Reserva espaço lateral para manter a grid centralizada e livre das cestas */
+        padding: 10px clamp(220px, 24vw, 320px) 10px clamp(170px, 20vw, 250px);
+    }
+
+    .grid-objetos {
+        max-width: min(88vw, 670px);
     }
 
     .categorias {
@@ -371,7 +556,7 @@
     }
 
     .categoria.posicao-dir-centro {
-        right: clamp(14px, 2.5vw, 40px);
+        right: clamp(10px, 1.8vw, 25px);
         top: 36%;
         bottom: auto;
         left: auto;
@@ -442,7 +627,7 @@
 
     .categoria,
     .cesta-container {
-        position: static;
+        position: relative;
         width: min(29vw, 120px);
         max-width: min(29vw, 120px);
     }
@@ -461,6 +646,14 @@
         max-width: min(29vw, 120px);
         margin: 0 auto !important;
         padding: 0 !important;
+    }
+
+    .itens-sobrepostos img {
+        width: 26px;
+    }
+
+    .itens-sobrepostos img + img {
+        margin-left: -6px;
     }
 }
 
@@ -701,87 +894,252 @@
 }
 
 /* ==========================================================
-   ADVERSÁRIO DA FASE (BOSS) E SEUS CORAÇÕES
-   Área exibida somente quando a fase declara um "boss" — a decisão é do dado
-   da fase, não do número do mundo (ver iniciarEtapaMatematica em js/math.js).
+   ADVERSÁRIO DA FASE (BOSS DO MUNDO 5) & BATALHA
    ========================================================== */
+
+/* HUD SUPERIOR: 5 CORAÇÕES DINÂMICOS */
+.boss-hud-vidas {
+    position: fixed;
+    top: 14px;
+    left: clamp(84px, 8.5vw, 98px);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(15, 23, 42, 0.65);
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    border-radius: 999px;
+    padding: 6px 14px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+    z-index: 60;
+}
+
+.boss-hud-vidas .coracao-vida {
+    font-size: clamp(1.4rem, 2.2vw, 1.85rem);
+    line-height: 1;
+    display: inline-block;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.3s ease, opacity 0.3s ease;
+    user-select: none;
+}
+
+.boss-hud-vidas .coracao-vida.ativo {
+    filter: drop-shadow(0 0 6px rgba(255, 45, 45, 0.85));
+    transform: scale(1);
+}
+
+.boss-hud-vidas .coracao-vida.perdido {
+    filter: grayscale(100%) opacity(0.35);
+    transform: scale(0.8);
+}
+
+/* OCULTAÇÃO DE TEXTO DO HUD NO MUNDO 5 (POIS JÁ ESTÁ NA IMAGEM PNG) */
+.hud-texto-oculto-boss {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+.fase-com-boss .hud-container {
+    width: min(68vw, 530px);
+}
+
+/* ÁREA CENTRAL DO BOSS NA SALA */
 .area-boss {
+    position: absolute;
+    top: 42%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
-    margin-top: 8px;
-    padding: 12px 28px;
-    background: rgba(255, 255, 255, 0.95);
-    border: 4px solid #24577a;
-    border-radius: 24px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+    justify-content: center;
+    z-index: 10;
+    pointer-events: none;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    margin: 0;
+    padding: 0;
+}
+
+.boss-figura-container {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .boss-imagem {
-    width: 110px;
+    width: clamp(210px, 25vw, 340px);
     height: auto;
+    max-height: 44vh;
+    object-fit: contain;
+    filter: drop-shadow(0 12px 28px rgba(0, 0, 0, 0.5));
+    transition: transform 0.25s ease, filter 0.25s ease;
+    user-select: none;
 }
 
-.boss-nome {
+/* BALÃO DE RISADA ("HAHAHAHA!") */
+.boss-risada {
+    position: absolute;
+    top: -15%;
+    right: -32%;
+    width: clamp(130px, 16vw, 210px);
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.4));
+    animation: flutuarRisada 2.5s infinite ease-in-out;
+    pointer-events: none;
+    user-select: none;
+}
+
+@keyframes flutuarRisada {
+    0%, 100% {
+        transform: translateY(0) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-8px) rotate(2deg);
+    }
+}
+
+/* ANIMAÇÃO DE DANO NO BOSS */
+.boss-imagem.boss-levou-dano {
+    animation: danoBoss 0.55s ease;
+}
+
+@keyframes danoBoss {
+    0% {
+        transform: scale(1);
+        filter: drop-shadow(0 12px 28px rgba(0, 0, 0, 0.5));
+    }
+    20% {
+        transform: scale(0.92) translateX(-10px);
+        filter: brightness(2) drop-shadow(0 0 25px #ff2222);
+    }
+    40% {
+        transform: scale(1.08) translateX(10px);
+        filter: brightness(1.7) drop-shadow(0 0 20px #ff5555);
+    }
+    60% {
+        transform: scale(0.96) translateX(-5px);
+    }
+    80% {
+        transform: scale(1.03) translateX(3px);
+    }
+    100% {
+        transform: scale(1) translateX(0);
+        filter: drop-shadow(0 12px 28px rgba(0, 0, 0, 0.5));
+    }
+}
+
+/* ANIMAÇÃO DE DERROTA DO BOSS */
+.area-boss.boss-derrotado-animando {
+    animation: derrotaBoss 1.5s forwards cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+}
+
+@keyframes derrotaBoss {
+    0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    40% {
+        opacity: 0.8;
+        transform: translate(-50%, -50%) scale(1.12) rotate(6deg);
+        filter: brightness(1.5) grayscale(0.5);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.15) rotate(-25deg);
+        filter: grayscale(1) brightness(0.4);
+    }
+}
+
+/* PAINEL MATEMÁTICO DURANTE A BATALHA (POSICIONADO NA PARTE INFERIOR CENTRAL) */
+.fase-com-boss .painel-matematica {
+    position: absolute;
+    bottom: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(92vw, 680px);
     margin: 0;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 1.25rem;
-    font-weight: 800;
-    color: #1f2933;
-    text-align: center;
+    padding: 14px 28px;
+    z-index: 20;
+    background: rgba(255, 255, 255, 0.96);
+    border: 4px solid #1d63d6;
+    border-radius: 24px;
+    box-shadow: 0 10px 32px rgba(0, 0, 0, 0.35);
+    gap: 12px;
 }
 
-.boss-vida {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin: 0;
+.painel-matematica.painel-matematica-sumindo {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+    pointer-events: none;
 }
 
-.boss-coracoes {
-    font-size: 1.5rem;
-    letter-spacing: 2px;
+/* TRANSIÇÃO SUAVE PARA A ETAPA DE ORGANIZAÇÃO */
+.fade-in-organizacao {
+    animation: surgimentoOrganizacao 0.8s ease-out;
 }
 
-/* A contagem em texto acompanha os símbolos para que o estado dos corações não
-   dependa de enxergar a cor deles nem de contar os emojis. */
-.boss-contagem {
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: #24577a;
-}
-
-/* Sem corações: além do texto "0 de 5", a figura esmaece e perde a cor, para o
-   estado não ser comunicado só pela contagem de símbolos. */
-.area-boss.is-derrotado .boss-imagem {
-    opacity: 0.45;
-    filter: grayscale(1);
+@keyframes surgimentoOrganizacao {
+    from {
+        opacity: 0;
+        transform: scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 @media (max-width: 768px) {
-    .area-boss {
-        gap: 4px;
-        padding: 8px 16px;
+    .boss-hud-vidas {
+        top: 10px;
+        left: 64px;
+        padding: 4px 10px;
+        gap: 5px;
+    }
+
+    .boss-hud-vidas .coracao-vida {
+        font-size: 1.25rem;
     }
 
     .boss-imagem {
-        width: 72px;
+        width: clamp(160px, 34vw, 220px);
+        max-height: 36vh;
     }
 
-    .boss-nome {
+    .boss-risada {
+        width: clamp(95px, 20vw, 130px);
+        right: -24%;
+        top: -12%;
+    }
+
+    .fase-com-boss .painel-matematica {
+        bottom: 8px;
+        padding: 10px 14px;
+        gap: 8px;
+        border-width: 3px;
+        border-radius: 18px;
+    }
+
+    .fase-com-boss .pergunta-matematica {
+        font-size: 1.15rem;
+    }
+
+    .fase-com-boss .item-resumo {
+        padding: 4px 8px;
         font-size: 1rem;
     }
 
-    .boss-coracoes {
-        font-size: 1.2rem;
-    }
-
-    .boss-contagem {
-        font-size: 0.95rem;
+    .fase-com-boss .botao-opcao-matematica {
+        width: 62px;
+        height: 62px;
+        font-size: 1.5rem;
+        border-radius: 14px;
     }
 }
 

@@ -13,6 +13,8 @@
     <button class="btn-voltar-fase" id="btn-voltar-fase" type="button" aria-label="Voltar ao menu inicial">
         <img src="assets/images/mundo_4/botton_voltar.png" alt="Voltar ao menu" />
     </button>
+    <!-- HUD Superior esquerdo: Vidas dinâmicas do Monstro (Mundo 5) -->
+    <div id="boss-hud-vidas" class="boss-hud-vidas escondido" role="status" aria-label="Vidas do Monstro da Bagunça"></div>
     <button class="btn-som-fase" data-controle-som type="button" aria-label="Desativar música de fundo" aria-pressed="false">
         <span aria-hidden="true">🔊</span>
         <span data-texto-som>Som ligado</span>
@@ -54,7 +56,7 @@
             </section>
 
             <footer class="categorias" id="area-categorias">
-                <!-- Cestas geradas dinamicamente via game.js a partir da configuração da fase -->
+                <!-- Cestas geradas dinamicamente via game.js a partir da configuração da fase. Cada container de cesta inclui <span class="contador-itens">0</span> para contagem numérica dinâmica e <div class="itens-sobrepostos"></div> para sobreposição dos itens. -->
             </footer>
         </div>
 
@@ -73,9 +75,12 @@
             <!-- Adversário da fase e seus corações. Fica escondido até a fase
                  declarar um "boss"; quem preenche e revela é js/math.js. -->
             <section id="area-boss" class="area-boss escondido" aria-labelledby="boss-nome">
-                <img class="boss-imagem" id="boss-imagem" alt="" />
-                <p class="boss-nome" id="boss-nome"></p>
-                <p class="boss-vida" role="status" aria-live="polite">
+                <div class="boss-figura-container">
+                    <img class="boss-imagem" id="boss-imagem" alt="Monstro da Bagunça" />
+                    <img class="boss-risada" id="boss-risada" src="assets/images/mundo_5/risada_monstro.png" alt="HAHAHAHA!" />
+                </div>
+                <p class="boss-nome escondido" id="boss-nome"></p>
+                <p class="boss-vida escondido" role="status" aria-live="polite">
                     <span class="boss-coracoes" id="boss-coracoes" aria-hidden="true"></span>
                     <span class="boss-contagem" id="boss-contagem"></span>
                 </p>
