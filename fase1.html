@@ -15,10 +15,27 @@
     </button>
     <!-- HUD Superior esquerdo: Vidas dinâmicas do Monstro (Mundo 5) -->
     <div id="boss-hud-vidas" class="boss-hud-vidas escondido" role="status" aria-label="Vidas do Monstro da Bagunça"></div>
-    <button class="btn-som-fase" data-controle-som type="button" aria-label="Desativar música de fundo" aria-pressed="false">
-        <span aria-hidden="true">🔊</span>
-        <span data-texto-som>Som ligado</span>
-    </button>
+    <div
+        class="volume-container btn-som-fase"
+        id="volume-container-fase"
+        role="button"
+        tabindex="0"
+        aria-label="Controle de volume"
+    >
+        <img
+            class="volume-icone"
+            src="assets/images/tela_inicial/volume_full.png"
+            alt="Controle de volume"
+        />
+        <input
+            type="range"
+            min="0"
+            max="100"
+            value="100"
+            class="volume-slider"
+            aria-label="Ajustar volume"
+        />
+    </div>
     <main class="tela-fase1" id="play-area">
         <!-- ETAPA 1: ORGANIZAÇÃO DOS OBJETOS -->
         <div id="tela-organizacao" class="tela-organizacao">

@@ -39,16 +39,46 @@ body {
   top: 40px;
   right: 85px;
   display: flex;
-  gap: 13px;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 14px;
+  background: #ffffff;
+  border-radius: 999px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.14);
   z-index: 10;
+  transition: all 0.25s ease;
+}
+
+.controles-topo .volume-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+}
+
+.controles-topo .volume-slider {
+  position: static;
+  display: none;
+  width: 105px;
+  height: 24px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  outline: none;
+  transform: none;
+}
+
+.controles-topo .volume-container.ativo .volume-slider {
+  display: block;
 }
 
 .btn-icone {
   background: transparent;
   border: none;
   cursor: pointer;
-  padding: 6px;
-  display: flex;
+  padding: 0;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   transition: transform 0.2s ease;
@@ -58,10 +88,18 @@ body {
   transform: scale(1.15);
 }
 
-.btn-icone img {
-  width: 26px;
-  height: 26px;
+.btn-icone:focus-visible {
+  outline: 3px solid #ff5f95;
+  outline-offset: 3px;
+  border-radius: 999px;
+}
+
+.btn-icone img,
+#btn-config img {
+  width: 22px;
+  height: 22px;
   object-fit: contain;
+  display: block;
 }
 
 img {
@@ -243,6 +281,30 @@ button {
   width: 26px;
   height: 26px;
   object-fit: contain;
+}
+
+.pílula-controles .volume-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+}
+
+.pílula-controles .volume-slider {
+  position: static;
+  display: none;
+  width: 100px;
+  height: 24px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  outline: none;
+  transform: none;
+}
+
+.pílula-controles .volume-container.ativo .volume-slider {
+  display: block;
 }
 
 .btn-voltar {

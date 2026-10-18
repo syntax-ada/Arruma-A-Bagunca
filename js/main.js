@@ -115,5 +115,26 @@
     });
   }
 
+  // Isola a barra de volume da fase contra interferência dos eventos de arrastar do jogo
+  const sliderVolumeFase = document.querySelector("#volume-container-fase .volume-slider");
+  if (sliderVolumeFase) {
+    const eventosIsolamento = [
+      "mousedown",
+      "mousemove",
+      "mouseup",
+      "touchstart",
+      "touchmove",
+      "touchend",
+      "pointerdown",
+      "pointermove",
+      "pointerup"
+    ];
+    eventosIsolamento.forEach(function (eventoNome) {
+      sliderVolumeFase.addEventListener(eventoNome, function (evento) {
+        evento.stopPropagation();
+      });
+    });
+  }
+
   startGame(config);
 })();
