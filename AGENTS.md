@@ -101,6 +101,10 @@ Principais responsabilidades:
 - `index.html` → menu inicial (jogar, créditos) e seleção de mundos/fases;
 - `fase1.html` → tela de jogo genérica (organização de objetos + desafio matemático);
 - `menu.js` → navegação do menu, carrossel de mundos e modais de fases e créditos;
+- `jogador.js` → tela de identificação do jogador (apelido → confirmação com avatar 👤 → menu de mundos); o jogador confirmado fica em `sessionStorage` só para exibição;
+- `api/` → endpoints do servidor (`api/jogadores/*`) e funções compartilhadas em `api/_lib/` (validação de apelido, palavras bloqueadas, PIN e sessão administrativa). ⚠️ Os jogadores ainda ficam num armazenamento **temporário em memória** (`api/_lib/jogadores-temporario.js`), que só funciona no servidor local — não é o cadastro definitivo;
+- `scripts/servidor-local.js` → servidor de desenvolvimento (jogo + `api/`), sem dependências;
+- `testes/` → testes automatizados executados com `node --test`;
 - `main.js` → ponto de entrada (bootstrap) da fase: lê os parâmetros da URL (`?mundo=X&fase=Y`), resolve o mundo e a fase via `window.MUNDOS` e inicializa o motor com `startGame(config)`;
 - `game.js` → mecânica de organização dos objetos, motor compartilhado por todos os mundos e fases orquestrado por `startGame()`;
 - `math.js` → motor do desafio matemático desacoplado, resolvendo a conta via `window.OPERACOES` e disparando a progressão;
@@ -159,6 +163,7 @@ Sempre que aplicável, verificar:
 - comportamento funcional da alteração;
 - regressões em funcionalidades relacionadas;
 - `node --check` para arquivos JavaScript alterados;
+- `node --test` na raiz do projeto (testes da pasta `testes/`);
 - `git diff --check` antes de finalizar;
 - comportamento visual no navegador, quando relevante;
 - interação por teclado, mouse/touch e responsividade, quando fizerem parte da tarefa.

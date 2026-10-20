@@ -52,7 +52,7 @@ O projeto completo prevê:
 
 - configurações de acessibilidade; *(não implementado)*
 
-- seleção de avatar/apelido; *(não implementado)*
+- seleção de avatar/apelido; *(parcial — identificação por apelido com avatar padrão 👤, ainda sem banco de dados; ver seção 5)*
 
 - 4 mundos principais com fases progressivas, mais 1 mundo bônus; *(Mundos 1 a 4 implementados; mundo bônus implementado no engine — ver seções 3 e 5)*
 
@@ -109,6 +109,10 @@ Após a organização, as quantidades obtidas são utilizadas no desafio matemá
 ```text
 
 Tela inicial
+
+  ↓
+
+Identificação do jogador (apelido → confirmação com avatar 👤)
 
   ↓
 
@@ -176,6 +180,18 @@ Esta seção é uma fotografia do desenvolvimento real, refletindo o código atu
 
 - Progressão de fases: Fase 2 e Fase 3 ficam bloqueadas até a conclusão da fase anterior.
 
+### Identificação do jogador (primeiro incremento)
+
+- Depois de JOGAR, a criança digita um apelido (sem senha e sem dados pessoais) e vê uma confirmação: "Novo jogador!" ou "Encontramos você!", com o avatar padrão 👤 e a opção "Voltar e corrigir". Ao confirmar, segue para o menu de mundos, que mostra o apelido no topo.
+
+- O servidor valida o apelido (3 a 20 letras ou números, no máximo 4 números seguidos), filtra palavras ofensivas e nomes reservados (lista em `api/_lib/palavras-bloqueadas.js`) e trata como o mesmo jogador apelidos que só diferem em maiúsculas, acentos ou espaços ("Ana Clara" = "anaclara"). O filtro reduz o problema, mas **não garante moderação perfeita** — as limitações estão descritas no próprio arquivo da lista.
+
+- Sem conexão com o servidor, a tela mostra um aviso com o botão "Tentar de novo" e mantém o apelido digitado. Não existe modo convidado.
+
+- ⚠️ **Ainda não há banco de dados.** Nesta etapa, os jogadores ficam só na memória do servidor local (`api/_lib/jogadores-temporario.js`) e somem quando ele é reiniciado. Fora do servidor local, os endpoints respondem "serviço indisponível". O cadastro definitivo será feito com Supabase em etapa posterior.
+
+- O botão JOGAR continua apagando o progresso local a cada clique (comportamento intencional desta versão). O caminho `index.html?view=mundos` não apaga o progresso; se a aba ainda não tem jogador identificado, ele pede o apelido antes de mostrar os mundos.
+
 ### Fases do Mundo 1
 
 Todas as fases, de todos os mundos, usam o mesmo motor de jogo (`game.js`), com configurações próprias. No Mundo 1:
@@ -242,7 +258,9 @@ Os Mundos 2, 3 e 4 seguem o mesmo formato, com 3 fases cada e suas próprias cat
 
 - Configurações de acessibilidade (contraste, tamanho de fonte, etc.). A trilha sonora contínua entre menu e fases, com botão de ligar/desligar, já está implementada (`js/audio.js`).
 
-- Seleção de avatar/apelido (interface exibe um avatar/nome fixo).
+- Cadastro definitivo de jogadores em banco de dados (hoje só em memória no servidor local) e outros avatares além do 👤.
+
+- Login administrativo e restrição do painel DEV no site publicado (as funções de PIN e sessão já existem em `api/_lib/`, mas ainda não são usadas por nenhum endpoint).
 
 - Card do Mundo 5 no carrossel do menu e arte definitiva dessa fase.
 
@@ -269,6 +287,25 @@ Arruma-A-Bagunca/
 ├── style-fase1.css     → estilos da tela de fase
 ├── README.md
 ├── AGENTS.md
+├── .gitignore          → impede o commit de .env.local e outros arquivos locais
+├── .env.example        → nomes das variáveis de ambiente (sem valores reais)
+│
+├── api/                → endpoints do servidor (rodam no servidor local e, no futuro, na Vercel)
+│   ├── jogadores/
+│   │   ├── verificar.js → POST /api/jogadores/verificar: consulta um apelido sem gravar
+│   │   └── index.js     → POST /api/jogadores: cria ou recupera o jogador
+│   └── _lib/           → funções compartilhadas (não viram rota)
+│       ├── http.js                  → leitura de JSON e respostas/erros padronizados
+│       ├── apelido.js               → validação, normalização e filtro do apelido
+│       ├── palavras-bloqueadas.js   → lista de palavras bloqueadas e nomes reservados
+│       ├── jogadores-temporario.js  → ⚠️ armazenamento TEMPORÁRIO em memória (só servidor local)
+│       ├── pin.js                   → hash e conferência do PIN administrativo (ainda sem endpoint)
+│       └── sessao-admin.js          → token e cookie da sessão administrativa (ainda sem endpoint)
+│
+├── scripts/
+│   └── servidor-local.js → servidor de desenvolvimento (jogo + api/), sem dependências
+│
+├── testes/             → testes automatizados (node --test)
 │
 ├── js/
 │   ├── main.js         → ponto de entrada (bootstrap) da fase: lê parâmetros da URL
@@ -281,6 +318,7 @@ Arruma-A-Bagunca/
 │   │                     Multiplicação, Divisão e contas compostas)
 │   ├── progresso.js    → serviço de persistência de progresso (localStorage) multi-mundo e multi-fase;
 │   ├── audio.js        → trilha sonora contínua, mantida pela tela-base durante as transições de fases;
+│   ├── jogador.js      → tela de identificação do jogador (apelido → confirmação → menu)
 │   ├── menu.js         → navegação do menu, carrossel de mundos e modais de fases e créditos
 │   ├── dev.js          → ferramenta de desenvolvimento e testes (ativado por ?dev=true)
 │   │
@@ -334,6 +372,8 @@ Tecnologias utilizadas ou previstas:
 
 A implementação atual utiliza **JavaScript Vanilla**, sem build tooling, gerenciador de pacotes ou dependências externas no repositório.
 
+O servidor local, a pasta `api/` e os testes usam apenas o **Node.js** e seus módulos nativos (testado com Node 24; o `--env-file` exige Node 20.6 ou mais novo). Não há `package.json` nem `npm install`.
+
 O uso de tecnologias adicionais deve ser justificado pela necessidade do projeto.
 
 ---
@@ -386,6 +426,8 @@ O jogo não deve coletar dados pessoais reais de crianças sem necessidade. Evit
 
 Quando for necessário identificar o jogador, utilizar mecanismos genéricos, como avatar, apelido lúdico ou código/token. Atualmente, o progresso é salvo localmente (`localStorage`) e não contém nenhum dado pessoal.
 
+A identificação usa só apelido e avatar: a tela orienta a não usar o nome completo, e o servidor recusa sequências de 5 ou mais números (como telefone ou documento). O jogador confirmado fica no `sessionStorage` da aba apenas para exibição, e o servidor local não registra apelidos no log. Decisão da equipe: entrar num perfil existente basta digitar o apelido, sem senha — risco aceito para a primeira versão.
+
 ---
 
 ## 9. Processo de desenvolvimento
@@ -395,6 +437,21 @@ O projeto utiliza Git e GitHub para controle de versão, com deploy atual via Ve
 As tarefas do projeto são classificadas como Correção, Melhoria, Feature, UX/UI ou Arquitetura.
 
 Regras detalhadas de fluxo de trabalho, revisão e comportamento esperado de agentes/IA ao alterar o código estão documentadas em `AGENTS.md` e não são repetidas aqui.
+
+### Rodar o jogo e os testes localmente
+
+Na raiz do projeto:
+
+```text
+node scripts/servidor-local.js        → abre o jogo em http://localhost:3000
+node --test                           → roda os testes automatizados (pasta testes/)
+```
+
+- Para usar outra porta: `PORTA=3001 node scripts/servidor-local.js` (no PowerShell: `$env:PORTA=3001; node scripts/servidor-local.js`).
+- Para ler variáveis de um arquivo local: copie `.env.example` para `.env.local` e rode `node --env-file=.env.local scripts/servidor-local.js`. Nunca faça commit do `.env.local`.
+- ⚠️ Abrir o `index.html` direto (duplo clique ou Live Server) não permite passar da identificação, porque não há servidor para responder ao apelido — a tela mostra o aviso de conexão. Use o servidor local.
+- Os jogadores criados no servidor local ficam só na memória e somem ao reiniciá-lo.
+- O modo DEV continua funcionando como antes: `http://localhost:3000/?dev=true`.
 
 ---
 
@@ -406,7 +463,9 @@ Pontos identificados atualmente que ainda merecem atenção:
 
 - ampliar testes de responsividade em dispositivos móveis reais;
 
-- implementar configurações de acessibilidade e seleção de avatar/apelido;
+- implementar configurações de acessibilidade;
+
+- concluir a identificação do jogador: banco de dados (Supabase), login administrativo e implantação na Vercel;
 
 - definir a arte e o cenário definitivos do Mundo 5, hoje reaproveitados do Mundo 3;
 

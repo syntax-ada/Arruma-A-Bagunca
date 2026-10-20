@@ -849,3 +849,216 @@ button {
     bottom: 20px;
   }
 }
+
+/* ==========================================================
+   IDENTIFICAÇÃO DO JOGADOR (APELIDO + CONFIRMAÇÃO)
+   ========================================================== */
+.tela-identificacao {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+}
+
+.cartao-identificacao {
+  width: min(92vw, 520px);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 36px 32px;
+  color: #1f2933;
+  background: #ffffff;
+  border-radius: 32px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.32);
+  font-family: Arial, Helvetica, sans-serif;
+  text-align: center;
+}
+
+.titulo-identificacao {
+  margin-bottom: 14px;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 800;
+}
+
+.titulo-identificacao:focus {
+  outline: none;
+}
+
+.form-apelido {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: left;
+}
+
+.rotulo-apelido {
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+/* O CSS global desliga a seleção e esconde o cursor de texto; o campo precisa dos dois. */
+.campo-apelido {
+  width: 100%;
+  min-height: 56px;
+  padding: 10px 18px;
+  color: #1f2933;
+  background: #ffffff;
+  border: 3px solid #1f2933;
+  border-radius: 16px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  user-select: text;
+  -webkit-user-select: text;
+  caret-color: auto;
+}
+
+.campo-apelido:focus {
+  outline: 4px solid #1d63d6;
+  outline-offset: 2px;
+}
+
+.campo-apelido[aria-invalid="true"] {
+  border-color: #b3123f;
+}
+
+.dica-apelido {
+  color: #4a5560;
+  font-size: 1rem;
+}
+
+.erro-apelido {
+  padding: 10px 14px;
+  color: #b3123f;
+  background: #ffe8ee;
+  border-radius: 12px;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.erro-apelido::before {
+  content: "⚠️ ";
+}
+
+.acoes-identificacao {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.btn-identificacao {
+  min-width: 140px;
+  min-height: 52px;
+  padding: 12px 26px;
+  color: #ffffff;
+  background: #151515;
+  border: 3px solid #151515;
+  border-radius: 999px;
+  box-shadow: 0 4px 0 #000000;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1.2rem;
+  font-weight: 800;
+  transition: transform 0.2s ease;
+}
+
+.btn-identificacao-secundario {
+  color: #151515;
+  background: #ffffff;
+}
+
+.btn-identificacao:hover:not(:disabled) {
+  transform: translateY(-3px);
+}
+
+.btn-identificacao:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+/* O style-menu.css remove o contorno dos botões; aqui o foco do teclado fica visível. */
+.tela-identificacao button:focus-visible {
+  outline: 4px solid #1d63d6;
+  outline-offset: 3px;
+}
+
+#etapa-confirmacao {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.perfil-confirmacao {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+
+.avatar-confirmacao {
+  flex: 0 0 auto;
+  width: 72px;
+  height: 72px;
+  font-size: 2.4rem;
+}
+
+.apelido-confirmacao {
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.texto-confirmacao {
+  font-size: 1.2rem;
+}
+
+.aviso-conexao {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  color: #7a0b2b;
+  background: #fff4f6;
+  border: 3px dashed #b3123f;
+  border-radius: 16px;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+/* Apelido no topo do menu: o avatar nunca encolhe e, em telas estreitas, o
+   nome é cortado com reticências para não empurrar os outros controles. */
+#avatar-jogador {
+  flex-shrink: 0;
+}
+
+@media (max-width: 850px) {
+  #nome-jogador {
+    max-width: 9ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .cartao-identificacao {
+    padding: 28px 18px;
+    border-radius: 24px;
+  }
+
+  .acoes-identificacao {
+    flex-direction: column-reverse;
+  }
+
+  .perfil-confirmacao {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .btn-identificacao {
+    width: 100%;
+  }
+}
