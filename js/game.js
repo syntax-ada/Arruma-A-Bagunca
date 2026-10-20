@@ -263,16 +263,39 @@ function adicionarItemSobreposto(dropZone, item) {
     return;
   }
 
+  const imgOriginal = item.querySelector("img");
+  const src = imgOriginal ? imgOriginal.getAttribute("src") || imgOriginal.src : "";
+  if (!src) {
+    return;
+  }
+
+  // Identificador do tipo de item para deduplicação visual
+  const chaveItem = (item.dataset.itemName || imgOriginal.alt || src).trim();
+
+  // Deduplicação visual: se um item do mesmo tipo já estiver na cesta, ignora a inserção
+  const imagensExistentes = Array.from(containerSobrepostos.querySelectorAll("img"));
+  const jaExiste = imagensExistentes.some((imgExistente) => {
+    const mesmoSrc = (imgExistente.getAttribute("src") && imgExistente.getAttribute("src") === imgOriginal.getAttribute("src")) ||
+                     (imgExistente.src && imgOriginal.src && imgExistente.src === imgOriginal.src);
+    const mesmaChave = imgExistente.dataset.itemKey && imgExistente.dataset.itemKey === chaveItem;
+    const mesmoAlt = imgOriginal.alt && imgExistente.alt && imgExistente.alt === imgOriginal.alt;
+    return Boolean(mesmoSrc || mesmaChave || mesmoAlt);
+  });
+
+  if (jaExiste) {
+    return;
+  }
+
   if (containerSobrepostos.children.length < 3) {
-    const imgOriginal = item.querySelector("img");
-    const src = imgOriginal ? imgOriginal.getAttribute("src") || imgOriginal.src : "";
-    if (src) {
-      const imgSobreposta = document.createElement("img");
-      imgSobreposta.src = src;
-      imgSobreposta.alt = imgOriginal.alt || "";
-      imgSobreposta.className = "item-sobreposto";
-      containerSobrepostos.appendChild(imgSobreposta);
-    }
+    const imgSobreposta = document.createElement("img");
+    imgSobreposta.src = src;
+    imgSobreposta.alt = imgOriginal.alt || "";
+    imgSobreposta.dataset.itemKey = chaveItem;
+    imgSobreposta.className = "item-sobreposto";
+    imgSobreposta.draggable = false;
+    imgSobreposta.setAttribute("aria-hidden", "true");
+    imgSobreposta.style.filter = "brightness(0.95) contrast(1.1)";
+    containerSobrepostos.appendChild(imgSobreposta);
   }
 }
 

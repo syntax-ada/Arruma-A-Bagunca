@@ -20,3 +20,113 @@ img {
   border: 0;
   background: #ffffff;
 }
+
+/* ==========================================================================
+   Controle de Volume com Slider Interativo
+   ========================================================================== */
+
+.volume-container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.volume-icone {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+  cursor: pointer;
+  pointer-events: auto !important;
+  transition: transform 0.2s ease;
+  user-select: none;
+  -webkit-user-select: none;
+  display: block;
+}
+
+.volume-icone:hover {
+  transform: scale(1.15);
+}
+
+.volume-container:focus-visible,
+.volume-icone:focus-visible {
+  outline: 3px solid #ff5f95;
+  outline-offset: 3px;
+  border-radius: 999px;
+}
+
+.volume-slider {
+  display: none;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  outline: none;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.volume-container.ativo .volume-slider {
+  display: block;
+}
+
+/* Trilha (WebKit / Blink) */
+.volume-slider::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 999px;
+  background: linear-gradient(to right, #ff5f95 0%, #ff5f95 var(--progresso, 100%), #ffd2e2 var(--progresso, 100%), #ffd2e2 100%);
+  border: none;
+}
+
+/* Indicador / Thumb (WebKit / Blink) */
+.volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ff5f95;
+  cursor: pointer;
+  margin-top: -5px;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 5px rgba(255, 95, 149, 0.45);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.volume-slider::-webkit-slider-thumb:hover,
+.volume-slider::-webkit-slider-thumb:active {
+  transform: scale(1.18);
+  background: #e0487d;
+}
+
+/* Trilha (Firefox) */
+.volume-slider::-moz-range-track {
+  height: 8px;
+  border-radius: 999px;
+  background: #ffd2e2;
+  border: none;
+}
+
+/* Indicador / Thumb (Firefox) */
+.volume-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ff5f95;
+  cursor: pointer;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 5px rgba(255, 95, 149, 0.45);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.volume-slider::-moz-range-thumb:hover,
+.volume-slider::-moz-range-thumb:active {
+  transform: scale(1.18);
+  background: #e0487d;
+}
+
+.volume-slider::-moz-range-progress {
+  height: 8px;
+  border-radius: 999px;
+  background: #ff5f95;
+}

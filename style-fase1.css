@@ -60,12 +60,14 @@
     top: 14px;
     right: 16px;
     z-index: 200;
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 9px 14px;
+    justify-content: center;
+    padding: 8px;
+    min-width: 48px;
+    min-height: 48px;
     color: #1f2933;
-    background: rgba(255, 255, 255, 0.92);
+    background: rgba(255, 255, 255, 0.95);
     border: 3px solid #24577a;
     border-radius: 999px;
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
@@ -73,19 +75,57 @@
     font-size: 0.95rem;
     font-weight: 700;
     cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-som-fase:hover {
+    transform: scale(1.08);
 }
 
 .btn-som-fase:focus-visible {
-    outline: 4px solid #e05d2f;
+    outline: 4px solid #ff5f95;
     outline-offset: 3px;
+}
+
+.btn-som-fase .volume-slider {
+    display: none;
+    position: absolute;
+    top: 130%;
+    left: 50%;
+    margin-top: 32px;
+    width: 105px;
+    height: 28px;
+    padding: 0 10px;
+    background: #ffffff;
+    border: 2px solid #ffc2d8;
+    border-radius: 999px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+    transform: translateX(-50%) rotate(-90deg);
+    transform-origin: center center;
+    z-index: 500;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.btn-som-fase.ativo .volume-slider {
+    display: block;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
 }
 
 @media (max-width: 768px) {
     .btn-som-fase {
         top: 8px;
         right: 8px;
-        padding: 7px 10px;
-        font-size: 0.8rem;
+        padding: 6px;
+        min-width: 42px;
+        min-height: 42px;
+    }
+
+    .btn-som-fase .volume-slider {
+        margin-top: 28px;
     }
 }
 
@@ -260,6 +300,7 @@
     width: fit-content;
     gap: 5px;
     position: relative;
+    overflow: visible;
     transition: transform 0.15s ease;
 }
 
@@ -413,35 +454,223 @@
 
 /* ==========================================================
    SOBREPOSIÇÃO DINÂMICA DE ITENS NA CESTA
-   Exibe os objetos reais organizados dentro da abertura da cesta unificada.
+   Efeito máscara de recorte (overflow: hidden) simulando profundidade
+   e oclusão pela borda frontal da cesta unificada.
    ========================================================== */
 .itens-sobrepostos {
     position: absolute;
-    top: 19.5%;
-    left: 12%;
-    width: 60%;
-    height: 24%;
+    top: 10%;
+    left: 15%;
+    width: 70%;
+    height: 25%;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-end;
+    gap: -4px;
     pointer-events: none;
-    z-index: 2;
+    z-index: 1;
+    overflow: hidden;
 }
 
-.itens-sobrepostos img {
-    width: 40px;
-    max-width: 38%;
+.itens-sobrepostos img,
+.item-sobreposto {
+    --rotacao-item: 0deg;
+    --afundamento-y: 15%;
+    --margem-item: 0px;
+    width: clamp(32px, 4.5vw, 50px);
+    max-width: 44%;
     height: auto;
     max-height: 100%;
     object-fit: contain;
-    z-index: 1;
     pointer-events: none;
     user-select: none;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+    filter: brightness(0.95) contrast(1.1) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    transform: translateY(var(--afundamento-y)) rotate(var(--rotacao-item));
+    margin-left: var(--margem-item);
+    transform-origin: bottom center;
+    animation: animacaoItemSobreposto 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
 }
 
-.itens-sobrepostos img + img {
-    margin-left: -8px;
+/* Variações naturais e amontoado orgânico para até 3 itens */
+.itens-sobrepostos img:nth-child(1),
+.item-sobreposto:nth-child(1) {
+    --rotacao-item: -4deg;
+    --margem-item: 0px;
+    z-index: 1;
+}
+
+.itens-sobrepostos img:nth-child(2),
+.item-sobreposto:nth-child(2) {
+    --rotacao-item: 4deg;
+    --margem-item: -8px;
+    z-index: 2;
+}
+
+.itens-sobrepostos img:nth-child(3),
+.item-sobreposto:nth-child(3) {
+    --rotacao-item: -2deg;
+    --margem-item: -10px;
+    z-index: 3;
+}
+
+/* Animação suave de entrada */
+@keyframes animacaoItemSobreposto {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* ==========================================================
+   CALIBRAÇÃO ESPECÍFICA POR CATEGORIA E FORMATO DA CESTA
+   ========================================================== */
+
+/* 1. Desativação da Sobreposição na Mochila (Mundo 4 e 5) */
+.cesta-mochila .itens-sobrepostos,
+#cesta-mochila .itens-sobrepostos,
+[data-accepts="mochila"] .itens-sobrepostos {
+    display: none !important;
+}
+
+/* 2. Cestas de Vime com Alça (Comidas do M4 e Brinquedos do M2) */
+.cesta-comida-mundo4 .itens-sobrepostos,
+.cesta-comidas .itens-sobrepostos,
+.cesta-comida .itens-sobrepostos,
+.mundo-4 .cesta-comida .itens-sobrepostos,
+.mundo-4 .cesta-comidas .itens-sobrepostos,
+.mundo-4 [data-accepts="comida"] .itens-sobrepostos,
+.mundo-4 [data-accepts="comidas"] .itens-sobrepostos,
+.cesta-brinquedos-mundo2 .itens-sobrepostos,
+.mundo-2 .cesta-brinquedos .itens-sobrepostos,
+.mundo-2 #cesta-brinquedos .itens-sobrepostos,
+.mundo-2 [data-accepts="brinquedos"] .itens-sobrepostos {
+    top: 18%;
+    left: 16%;
+    width: 62%;
+    height: 20%;
+    overflow: hidden;
+    align-items: flex-end;
+}
+
+.cesta-comida-mundo4 .itens-sobrepostos img,
+.cesta-comidas .itens-sobrepostos img,
+.cesta-comida .itens-sobrepostos img,
+.mundo-4 .cesta-comida .itens-sobrepostos img,
+.mundo-4 .cesta-comidas .itens-sobrepostos img,
+.mundo-4 [data-accepts="comida"] .itens-sobrepostos img,
+.mundo-4 [data-accepts="comidas"] .itens-sobrepostos img,
+.cesta-brinquedos-mundo2 .itens-sobrepostos img,
+.mundo-2 .cesta-brinquedos .itens-sobrepostos img,
+.mundo-2 #cesta-brinquedos .itens-sobrepostos img,
+.mundo-2 [data-accepts="brinquedos"] .itens-sobrepostos img,
+.cesta-comida-mundo4 .itens-sobrepostos .item-sobreposto,
+.cesta-comidas .itens-sobrepostos .item-sobreposto,
+.cesta-brinquedos-mundo2 .itens-sobrepostos .item-sobreposto,
+.mundo-2 .cesta-brinquedos .itens-sobrepostos .item-sobreposto {
+    transform: translateY(5%) scale(1);
+}
+
+/* 3. Cestas do Estilo Mundo 1 (Comida, Brinquedos, Materiais) */
+.mundo-1 .itens-sobrepostos,
+.mundo-2 .cesta-comida .itens-sobrepostos,
+.mundo-2 [data-accepts="comida"] .itens-sobrepostos,
+.mundo-3 .cesta-comidas .itens-sobrepostos,
+.mundo-3 [data-accepts="comidas"] .itens-sobrepostos,
+.mundo-5 .cesta-comidas .itens-sobrepostos,
+.mundo-5 .cesta-materiais .itens-sobrepostos,
+.cesta-materiais .itens-sobrepostos,
+#cesta-materiais .itens-sobrepostos,
+[data-accepts="materiais"] .itens-sobrepostos {
+    top: 11%;
+    left: 18%;
+    width: 64%;
+    height: 22%;
+    overflow: hidden;
+    align-items: flex-end;
+}
+
+.mundo-1 .itens-sobrepostos img,
+.mundo-1 .itens-sobrepostos .item-sobreposto,
+.mundo-2 .cesta-comida .itens-sobrepostos img,
+.mundo-3 .cesta-comidas .itens-sobrepostos img,
+.mundo-5 .cesta-comidas .itens-sobrepostos img,
+.mundo-5 .cesta-materiais .itens-sobrepostos img,
+.cesta-materiais .itens-sobrepostos img,
+.cesta-materiais .itens-sobrepostos .item-sobreposto,
+#cesta-materiais .itens-sobrepostos img,
+[data-accepts="materiais"] .itens-sobrepostos img {
+    transform: translateY(18%) scale(1);
+}
+
+/* 4. Gaiola de Animais (Mundo 2) */
+.cesta-animais .itens-sobrepostos,
+#cesta-animais .itens-sobrepostos,
+[data-accepts="animais"] .itens-sobrepostos {
+    top: 31%;
+    left: 14%;
+    width: 44%;
+    height: 42%;
+    overflow: hidden;
+    justify-content: flex-start;
+    align-items: flex-end;
+}
+
+.cesta-animais .itens-sobrepostos img,
+.cesta-animais .itens-sobrepostos .item-sobreposto,
+#cesta-animais .itens-sobrepostos img,
+[data-accepts="animais"] .itens-sobrepostos img {
+    transform: scale(1.15) translateY(0);
+    margin-right: -2px;
+}
+
+/* 5. Cesta de Bebidas / Cooler (Mundo 3 e 5) */
+.cesta-bebidas .itens-sobrepostos,
+#cesta-bebidas .itens-sobrepostos,
+[data-accepts="bebidas"] .itens-sobrepostos {
+    top: 29%;
+    left: 16%;
+    width: 68%;
+    height: 21%;
+    overflow: hidden;
+    align-items: flex-end;
+}
+
+.cesta-bebidas .itens-sobrepostos img,
+.cesta-bebidas .itens-sobrepostos .item-sobreposto,
+#cesta-bebidas .itens-sobrepostos img,
+[data-accepts="bebidas"] .itens-sobrepostos img {
+    transform: scale(1.22) translateY(3px);
+    margin: 0 -1px;
+}
+
+/* 6. Cesta de Brinquedos (Mundo 3 e 5) / Balde Vermelho */
+.cesta-brinquedos-mundo3 .itens-sobrepostos,
+.cesta-brinquedos-mundo5 .itens-sobrepostos,
+.mundo-3 .cesta-brinquedos .itens-sobrepostos,
+.mundo-5 .cesta-brinquedos .itens-sobrepostos,
+.mundo-3 #cesta-brinquedos .itens-sobrepostos,
+.mundo-5 #cesta-brinquedos .itens-sobrepostos,
+.mundo-3 [data-accepts="brinquedos"] .itens-sobrepostos,
+.mundo-5 [data-accepts="brinquedos"] .itens-sobrepostos {
+    top: 2%;
+    left: 21%;
+    width: 58%;
+    height: 26%;
+    overflow: hidden;
+    align-items: flex-end;
+}
+
+.cesta-brinquedos-mundo3 .itens-sobrepostos img,
+.cesta-brinquedos-mundo5 .itens-sobrepostos img,
+.mundo-3 .cesta-brinquedos .itens-sobrepostos img,
+.mundo-5 .cesta-brinquedos .itens-sobrepostos img,
+.cesta-brinquedos-mundo3 .itens-sobrepostos .item-sobreposto,
+.cesta-brinquedos-mundo5 .itens-sobrepostos .item-sobreposto,
+.mundo-3 .cesta-brinquedos .itens-sobrepostos .item-sobreposto,
+.mundo-5 .cesta-brinquedos .itens-sobrepostos .item-sobreposto {
+    transform: translateY(8%) scale(1.05);
 }
 
 .drop-zone.is-over {
@@ -648,12 +877,9 @@
         padding: 0 !important;
     }
 
-    .itens-sobrepostos img {
-        width: 26px;
-    }
-
-    .itens-sobrepostos img + img {
-        margin-left: -6px;
+    .itens-sobrepostos img,
+    .item-sobreposto {
+        width: clamp(20px, 6vw, 28px);
     }
 }
 
