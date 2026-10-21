@@ -54,6 +54,182 @@ function gerarItensFase(cotas) {
 
 let activeConfig = null;
 let basketSprites = {};
+let tutorialFase1Ativo = false;
+let tutorialItemAlvo = null;
+let tutorialCestaAlvo = null;
+let timerBalaoTutorialConclusao = null;
+let timerCorFeedbackHud = null;
+
+function atualizarCoordenadasTutorialArraste() {
+  if (!tutorialFase1Ativo || !tutorialItemAlvo || !tutorialCestaAlvo) {
+    return;
+  }
+  const maozinha = document.querySelector("#tutorial-maozinha-arraste");
+  const balao = document.querySelector("#tutorial-balao-arraste");
+  const itemRect = tutorialItemAlvo.getBoundingClientRect();
+  const cestaRect = tutorialCestaAlvo.getBoundingClientRect();
+
+  if (maozinha) {
+    const startX = Math.round(itemRect.left + itemRect.width * 0.45);
+    const startY = Math.round(itemRect.top + itemRect.height * 0.35);
+    const endX = Math.round(cestaRect.left + cestaRect.width * 0.45);
+    const endY = Math.round(cestaRect.top + cestaRect.height * 0.25);
+    maozinha.style.setProperty("--tut-start-x", `${startX}px`);
+    maozinha.style.setProperty("--tut-start-y", `${startY}px`);
+    maozinha.style.setProperty("--tut-end-x", `${endX}px`);
+    maozinha.style.setProperty("--tut-end-y", `${endY}px`);
+  }
+
+  if (balao) {
+    const balaoX = Math.round(itemRect.left + itemRect.width / 2);
+    const balaoY = Math.max(80, Math.round(itemRect.top - 18));
+    balao.style.setProperty("--tut-balao-x", `${balaoX}px`);
+    balao.style.setProperty("--tut-balao-y", `${balaoY}px`);
+  }
+}
+
+function removerElementosTutorialArraste() {
+  tutorialFase1Ativo = false;
+  tutorialItemAlvo = null;
+  tutorialCestaAlvo = null;
+  window.removeEventListener("resize", atualizarCoordenadasTutorialArraste);
+
+  document.querySelector("#tutorial-overlay")?.remove();
+  document.querySelector("#tutorial-balao-arraste")?.remove();
+  document.querySelector("#tutorial-maozinha-arraste")?.remove();
+
+  document.querySelectorAll(".tutorial-destaque-item, .tutorial-destaque-slot, .tutorial-destaque-cesta, .tutorial-bloqueado").forEach((el) => {
+    el.classList.remove("tutorial-destaque-item", "tutorial-destaque-slot", "tutorial-destaque-cesta", "tutorial-bloqueado");
+  });
+}
+
+function iniciarTutorialArrasteFase1() {
+  removerElementosTutorialArraste();
+  if (timerBalaoTutorialConclusao) {
+    clearTimeout(timerBalaoTutorialConclusao);
+    timerBalaoTutorialConclusao = null;
+  }
+  document.querySelector("#tutorial-balao-conclusao")?.remove();
+
+  const telaOrganizacao = document.querySelector("#tela-organizacao");
+  if (!telaOrganizacao || draggableItems.length === 0 || dropZones.length === 0) {
+    return;
+  }
+
+  const itemUrsinho = Array.from(draggableItems).find(
+    (el) => el.id.includes("urso") || (el.dataset.itemName && el.dataset.itemName.includes("ursinho"))
+  ) || Array.from(draggableItems).find(
+    (el) => el.dataset.category === "brinquedos"
+  ) || draggableItems[0];
+
+  const cestaBrinquedos = findCorrectDropZone(itemUrsinho);
+  if (!itemUrsinho || !cestaBrinquedos) {
+    return;
+  }
+
+  tutorialFase1Ativo = true;
+  tutorialItemAlvo = itemUrsinho;
+  tutorialCestaAlvo = cestaBrinquedos;
+
+  const overlay = document.createElement("div");
+  overlay.id = "tutorial-overlay";
+  overlay.className = "tutorial-overlay-escuro";
+  overlay.setAttribute("aria-hidden", "true");
+  telaOrganizacao.appendChild(overlay);
+
+  const balao = document.createElement("div");
+  balao.id = "tutorial-balao-arraste";
+  balao.className = "tutorial-balao-fase";
+  balao.setAttribute("role", "status");
+  balao.setAttribute("aria-live", "polite");
+  balao.textContent = "Arraste o objeto para sua cesta!";
+  telaOrganizacao.appendChild(balao);
+
+  const maozinha = document.createElement("img");
+  maozinha.id = "tutorial-maozinha-arraste";
+  maozinha.className = "tutorial-maozinha-arraste";
+  maozinha.src = "assets/images/tela_fase1/maozinha.png";
+  maozinha.alt = "";
+  maozinha.setAttribute("aria-hidden", "true");
+  telaOrganizacao.appendChild(maozinha);
+
+  draggableItems.forEach((item) => {
+    const slot = item.closest(".slot-objeto");
+    if (item === tutorialItemAlvo) {
+      item.classList.add("tutorial-destaque-item");
+      slot?.classList.add("tutorial-destaque-slot");
+    } else {
+      item.classList.add("tutorial-bloqueado");
+      slot?.classList.add("tutorial-bloqueado");
+    }
+  });
+
+  dropZones.forEach((cesta) => {
+    if (cesta === tutorialCestaAlvo) {
+      cesta.classList.add("tutorial-destaque-cesta");
+    } else {
+      cesta.classList.add("tutorial-bloqueado");
+    }
+  });
+
+  requestAnimationFrame(() => {
+    atualizarCoordenadasTutorialArraste();
+  });
+  window.addEventListener("resize", atualizarCoordenadasTutorialArraste);
+}
+
+function concluirTutorialArrasteFase1() {
+  if (!tutorialFase1Ativo) {
+    return;
+  }
+  const cestaRecompensa = tutorialCestaAlvo;
+  removerElementosTutorialArraste();
+
+  const telaOrganizacao = document.querySelector("#tela-organizacao");
+  if (!telaOrganizacao) {
+    return;
+  }
+
+  if (cestaRecompensa) {
+    cestaRecompensa.classList.add("cesta-recompensa-tutorial");
+    const estrelasContainer = document.createElement("div");
+    estrelasContainer.className = "tutorial-estrelas-recompensa";
+    estrelasContainer.setAttribute("aria-hidden", "true");
+    ["⭐", "✨", "🌟", "✨", "⭐"].forEach((icone, idx) => {
+      const span = document.createElement("span");
+      span.className = `estrela-particula estrela-${idx + 1}`;
+      span.textContent = icone;
+      estrelasContainer.appendChild(span);
+    });
+    cestaRecompensa.appendChild(estrelasContainer);
+    setTimeout(() => {
+      cestaRecompensa.classList.remove("cesta-recompensa-tutorial");
+      estrelasContainer.remove();
+    }, 1600);
+  }
+
+  const balaoConclusao = document.createElement("div");
+  balaoConclusao.id = "tutorial-balao-conclusao";
+  balaoConclusao.className = "tutorial-balao-fase tutorial-balao-central tutorial-balao-recompensa";
+  balaoConclusao.setAttribute("role", "status");
+  balaoConclusao.setAttribute("aria-live", "polite");
+  balaoConclusao.textContent = "⭐ Muito bem! ⭐";
+  telaOrganizacao.appendChild(balaoConclusao);
+
+  timerBalaoTutorialConclusao = setTimeout(() => {
+    balaoConclusao.classList.remove("tutorial-balao-recompensa");
+    balaoConclusao.classList.add("tutorial-balao-pulo");
+    balaoConclusao.textContent = "Agora tente completar as outras!";
+
+    timerBalaoTutorialConclusao = setTimeout(() => {
+      balaoConclusao.classList.add("tutorial-balao-saindo");
+      setTimeout(() => {
+        balaoConclusao.remove();
+      }, 400);
+      timerBalaoTutorialConclusao = null;
+    }, 2600);
+  }, 1150);
+}
 
 function renderizarCestas(listaCategorias = []) {
   console.log("Tentando renderizar cestas:", listaCategorias);
@@ -165,6 +341,48 @@ function startGame(config) {
   activeConfig = config;
 
   document.body.classList.remove("cenario-arrumado");
+  if (activeConfig.fundoArrumado && typeof Image !== "undefined") {
+    const imgArrumado = new Image();
+    imgArrumado.src = activeConfig.fundoArrumado;
+  }
+  const mundoIdHud = typeof window.obterMundoAtivo === "function" ? window.obterMundoAtivo() : 1;
+  const usarHudHtmlPuro = true;
+  document.querySelectorAll(".hud-container").forEach((hudContainer) => {
+    const imgExistente = hudContainer.querySelector(".caixa-instrucoes");
+    const tituloExistente = hudContainer.querySelector(".hud-titulo, .hud-titulo-mundo2");
+    if (usarHudHtmlPuro) {
+      if (imgExistente) {
+        imgExistente.remove();
+      }
+      hudContainer.classList.remove("hud-instrucoes-mundo2");
+      hudContainer.classList.add("hud-instrucoes");
+      if (!tituloExistente) {
+        const spanTitulo = document.createElement("span");
+        spanTitulo.className = "hud-titulo";
+        spanTitulo.textContent = "Arrume a Bagunça!";
+        hudContainer.prepend(spanTitulo);
+      } else {
+        tituloExistente.className = "hud-titulo";
+      }
+    } else {
+      hudContainer.classList.remove("hud-instrucoes-mundo2");
+      if (tituloExistente) {
+        tituloExistente.remove();
+      }
+      if (!imgExistente) {
+        const novaImg = document.createElement("img");
+        novaImg.className = "caixa-instrucoes";
+        novaImg.src = activeConfig.hudImgSrc || "assets/images/tela_fase1/hud_branco.png";
+        novaImg.alt = "Caixa de instruções";
+        hudContainer.prepend(novaImg);
+      } else {
+        imgExistente.src = activeConfig.hudImgSrc || "assets/images/tela_fase1/hud_branco.png";
+      }
+    }
+  });
+  if (feedbackMessage) {
+    showFeedback("Coloque cada item em sua respectiva cesta.", "neutral");
+  }
   const fundoInicial = activeConfig.fundoBaguncado || activeConfig.fundo;
   if (fundoInicial) {
     document.body.style.backgroundImage = `url("${fundoInicial}")`;
@@ -186,6 +404,16 @@ function startGame(config) {
     : activeConfig.objetos;
 
   renderizarCestas(activeConfig.categorias);
+  const mundoAtivo = typeof window.obterMundoAtivo === "function" ? window.obterMundoAtivo() : 1;
+  const faseAtiva = typeof window.obterFaseAtiva === "function" ? window.obterFaseAtiva() : 1;
+  const deveExibirTutorialFase1 = Number(mundoAtivo) === 1 && Number(faseAtiva) === 1 && !activeConfig.boss;
+  if (deveExibirTutorialFase1 && Array.isArray(listaObjetos)) {
+    const idxUrso = listaObjetos.findIndex((obj) => obj && (String(obj.id).includes("urso") || String(obj.itemName).includes("ursinho")));
+    if (idxUrso > 0) {
+      const [ursoItem] = listaObjetos.splice(idxUrso, 1);
+      listaObjetos.unshift(ursoItem);
+    }
+  }
   renderizarGradeObjetos(listaObjetos);
 
   if (draggableItems.length === 0 || dropZones.length === 0 || !feedbackMessage) {
@@ -212,13 +440,15 @@ function startGame(config) {
   // exatamente como antes.
   if (activeConfig.boss && typeof iniciarEtapaMatematica === "function") {
     iniciarEtapaMatematica(null, activeConfig);
+  } else if (deveExibirTutorialFase1) {
+    iniciarTutorialArrasteFase1();
   }
 }
 
 function startDrag(event) {
   const item = event.currentTarget;
 
-  if (item.classList.contains("is-correct")) {
+  if (item.classList.contains("is-correct") || (tutorialFase1Ativo && item !== tutorialItemAlvo)) {
     return;
   }
 
@@ -241,6 +471,9 @@ function startDrag(event) {
 
   item.setPointerCapture(event.pointerId);
   item.classList.add("is-dragging");
+  if (tutorialFase1Ativo) {
+    document.querySelector("#tutorial-maozinha-arraste")?.classList.add("tutorial-maozinha-pausada");
+  }
   showFeedback(`Leve ${item.dataset.itemName} até a caixa.`, "neutral");
 }
 
@@ -312,8 +545,11 @@ function finishDrag(event) {
 
   const targetDropZone = findDropZoneAtPoint(event.clientX, event.clientY);
 
-  if (isCorrectDropZone(item, targetDropZone)) {
+  if (isCorrectDropZone(item, targetDropZone) && (!tutorialFase1Ativo || targetDropZone === tutorialCestaAlvo)) {
     placeItemInsideDropZone(item, targetDropZone);
+    if (tutorialFase1Ativo && item === tutorialItemAlvo) {
+      concluirTutorialArrasteFase1();
+    }
     item.classList.add("is-correct");
 
     const contadorItens = targetDropZone.querySelector(".contador-itens");
@@ -332,6 +568,12 @@ function finishDrag(event) {
 
     if (isOrganizationComplete()) {
       showFeedback("Parabéns! Você organizou todos os objetos!", "success");
+      if (activeConfig?.boss) {
+        document.body.classList.add("cenario-arrumado");
+        if (activeConfig.fundoArrumado) {
+          document.body.style.backgroundImage = `url("${activeConfig.fundoArrumado}")`;
+        }
+      }
 
       const resumoCategorias = getCategorySummary();
       setTimeout(() => {
@@ -349,6 +591,10 @@ function finishDrag(event) {
   } else {
     returnItemToStart(item);
     showFeedbackForIncorrectDrop(item);
+    if (tutorialFase1Ativo) {
+      document.querySelector("#tutorial-maozinha-arraste")?.classList.remove("tutorial-maozinha-pausada");
+      atualizarCoordenadasTutorialArraste();
+    }
 
     if (typeof window.tocarEfeito === "function") {
       window.tocarEfeito("errado");
@@ -399,6 +645,10 @@ function cancelDrag(event) {
   clearDropZoneHighlight();
   returnItemToStart(item);
   showFeedback("Tudo bem, tente arrastar de novo.", "error");
+  if (tutorialFase1Ativo) {
+    document.querySelector("#tutorial-maozinha-arraste")?.classList.remove("tutorial-maozinha-pausada");
+    atualizarCoordenadasTutorialArraste();
+  }
   activeDrag = null;
 }
 
@@ -538,14 +788,26 @@ function clearDropZoneHighlight() {
 
 function showFeedback(message, type) {
   feedbackMessage.textContent = message;
-  feedbackMessage.classList.remove("is-success", "is-error");
+  if (timerCorFeedbackHud) {
+    clearTimeout(timerCorFeedbackHud);
+    timerCorFeedbackHud = null;
+  }
+  feedbackMessage.classList.remove("is-success", "is-error", "hud-feedback-acerto", "hud-feedback-erro");
 
   if (type === "success") {
-    feedbackMessage.classList.add("is-success");
+    feedbackMessage.classList.add("is-success", "hud-feedback-acerto");
+    timerCorFeedbackHud = setTimeout(() => {
+      feedbackMessage.classList.remove("is-success", "hud-feedback-acerto");
+      timerCorFeedbackHud = null;
+    }, 1600);
   }
 
   if (type === "error") {
-    feedbackMessage.classList.add("is-error");
+    feedbackMessage.classList.add("is-error", "hud-feedback-erro");
+    timerCorFeedbackHud = setTimeout(() => {
+      feedbackMessage.classList.remove("is-error", "hud-feedback-erro");
+      timerCorFeedbackHud = null;
+    }, 1600);
   }
 }
 
@@ -576,6 +838,9 @@ function handleDropZoneKeyboard(event) {
 
   if (isCorrectDropZone(currentAvailableItem, event.currentTarget)) {
     placeItemInsideDropZone(currentAvailableItem, event.currentTarget);
+    if (tutorialFase1Ativo && currentAvailableItem === tutorialItemAlvo) {
+      concluirTutorialArrasteFase1();
+    }
     currentAvailableItem.classList.add("is-correct");
 
     const contadorItens = event.currentTarget.querySelector(".contador-itens");
@@ -594,6 +859,12 @@ function handleDropZoneKeyboard(event) {
 
     if (isOrganizationComplete()) {
       showFeedback("Parabéns! Você organizou todos os objetos!", "success");
+      if (activeConfig?.boss) {
+        document.body.classList.add("cenario-arrumado");
+        if (activeConfig.fundoArrumado) {
+          document.body.style.backgroundImage = `url("${activeConfig.fundoArrumado}")`;
+        }
+      }
 
       const resumoCategorias = getCategorySummary();
       setTimeout(() => {

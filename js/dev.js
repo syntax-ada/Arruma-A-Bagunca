@@ -238,7 +238,7 @@
    * sempre — a prova de que algo aconteceu é sempre o estado real da tela,
    * nunca o fim da espera.
    */
-  function aguardarProximoEstadoDoJogo(limiteMs = 5000) {
+  function aguardarProximoEstadoDoJogo(limiteMs = 8000) {
     const pronto = () => faseFoiConcluida() || haDesafioParaResponder() || haObjetoParaOrganizar();
 
     if (pronto()) {

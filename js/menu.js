@@ -157,6 +157,7 @@ function atualizarBotoesModalFases(mundoId) {
         tocarSomBotao();
         const sufixoDev = devAtivo ? "&dev=true" : "";
         abrirFase(`fase1.html?mundo=${mundoId}&fase=1${sufixoDev}`);
+        ocultarTutorialModalFases();
       };
     } else {
       btnIniciarFase1.disabled = true;
@@ -220,6 +221,25 @@ function atualizarBotoesModalFases(mundoId) {
 /**
  * Abre o modal de seleção de fases se o mundo estiver desbloqueado (ou via bypass do Modo Dev).
  */
+function ocultarTutorialModalFases() {
+  document.querySelector("#tutorial-modal-fases-overlay")?.classList.add("escondido");
+  document.querySelector("#tutorial-modal-fase1")?.classList.add("escondido");
+  document.querySelector("#tutorial-backdrop-modal")?.classList.add("escondido");
+  btnIniciarFase1?.classList.remove("tutorial-destaque-btn-fase");
+}
+
+function atualizarTutorialModalFases(mundoId, progresso, devAtivo) {
+  const fasesConcluidas = Array.isArray(progresso?.fasesConcluidas) ? progresso.fasesConcluidas : [];
+  const faseMaximaMundo1 = progresso?.faseMaximaPorMundo?.[1] || 1;
+  const mundosLiberados = Array.isArray(progresso?.mundosDesbloqueados) ? progresso.mundosDesbloqueados : [1];
+  const deveExibir = !devAtivo && Number(mundoId) === 1 && fasesConcluidas.length === 0 && faseMaximaMundo1 <= 1 && mundosLiberados.length <= 1;
+
+  document.querySelector("#tutorial-modal-fases-overlay")?.classList.toggle("escondido", !deveExibir);
+  document.querySelector("#tutorial-modal-fase1")?.classList.toggle("escondido", !deveExibir);
+  document.querySelector("#tutorial-backdrop-modal")?.classList.toggle("escondido", !deveExibir);
+  btnIniciarFase1?.classList.toggle("tutorial-destaque-btn-fase", deveExibir);
+}
+
 function abrirModalFases(mundoId) {
   const devAtivo = isModoDevAtivo();
   const progresso = typeof obterProgresso === "function"
@@ -239,6 +259,11 @@ function abrirModalFases(mundoId) {
 
   if (modalFases) {
     modalFases.classList.remove("escondido");
+    const tutorialMenuMundo1 = document.querySelector("#tutorial-menu-mundo1");
+    if (tutorialMenuMundo1) {
+      tutorialMenuMundo1.classList.add("escondido");
+    }
+    atualizarTutorialModalFases(mundoSelecionado, progresso, devAtivo);
   }
 }
 
@@ -304,6 +329,17 @@ function atualizarInterfaceProgresso() {
     textoProgresso.textContent = `${porcentagem}%`;
   }
 
+  // Tutorial do Menu Inicial (exibido no card do Mundo 1 quando o jogador ainda não tem progresso)
+  const tutorialMenuMundo1 = document.querySelector("#tutorial-menu-mundo1");
+  if (tutorialMenuMundo1) {
+    const fasesConcluidas = Array.isArray(progresso.fasesConcluidas) ? progresso.fasesConcluidas : [];
+    const modalAberto = modalFases && !modalFases.classList.contains("escondido");
+    const semProgresso = !devAtivo && !modalAberto && fasesConcluidas.length === 0 && faseMaximaMundo1 <= 1 && mundosLiberados.length <= 1;
+    tutorialMenuMundo1.classList.toggle("escondido", !semProgresso);
+  }
+  if (false) {
+  }
+
   // 4. Controle de exibição da Sidebar do Boss (Mundo 5) e Ícone Flutuante
   const bossDesbloqueado = devAtivo || mundosLiberados.includes(5);
   if (bossDesbloqueado) {
@@ -341,6 +377,8 @@ if (botaoVoltar && telaInicial && menuFases && controlesIniciais) {
     }
     if (modalFases) {
       modalFases.classList.add("escondido");
+    ocultarTutorialModalFases();
+    atualizarInterfaceProgresso();
     }
     menuFases.classList.add("escondido");
     telaInicial.classList.remove("escondido");
@@ -394,6 +432,8 @@ if (btnFecharModal && modalFases) {
   btnFecharModal.addEventListener("click", function () {
     tocarSomBotao();
     modalFases.classList.add("escondido");
+    ocultarTutorialModalFases();
+    atualizarInterfaceProgresso();
   });
 }
 
@@ -427,6 +467,8 @@ document.addEventListener("keydown", function (evento) {
     }
     if (modalFases && !modalFases.classList.contains("escondido")) {
       modalFases.classList.add("escondido");
+    ocultarTutorialModalFases();
+    atualizarInterfaceProgresso();
     }
   }
 });

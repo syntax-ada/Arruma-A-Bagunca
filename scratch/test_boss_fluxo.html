@@ -21,29 +21,43 @@
       const doc = iframe.contentDocument;
       const win = iframe.contentWindow;
 
+      const bossImg = doc.querySelector("#boss-imagem");
+      log(`Estado inicial do Boss: ${bossImg.dataset.estadoBoss} (${bossImg.getAttribute("src")})`);
+
       let contasRespondidas = 0;
 
       function responderProxima() {
         const desafio = win.obterDesafioMatematicoAtivo ? win.obterDesafioMatematicoAtivo() : null;
         if (!desafio) {
-          log("Boss derrotado! Aguardando transição para organização...");
-          setTimeout(verificarOrganizacao, 2500);
           return;
         }
 
-        const botoes = doc.querySelectorAll(".botao-opcao-matematica");
+        const botoes = doc.querySelectorAll(".botao-opcao-matematica:not([disabled])");
+        if (botoes.length === 0) {
+          log(`Boss derrotado! Estado atual: ${bossImg.dataset.estadoBoss} (${bossImg.getAttribute("src")}). Aguardando fim da desintegração (5.6s)...`);
+          setTimeout(verificarOrganizacao, 5800);
+          return;
+        }
+
         let achou = false;
         botoes.forEach(b => {
           if (Number(b.textContent) === desafio.resultadoCorreto) {
             contasRespondidas++;
-            log(`Conta ${contasRespondidas}/5 acertada (${desafio.resultadoCorreto}).`);
             b.click();
+            log(`Conta ${contasRespondidas}/5 acertada (${desafio.resultadoCorreto}) -> Estado: ${bossImg.dataset.estadoBoss} (${bossImg.getAttribute("src")})`);
             achou = true;
           }
         });
 
         if (achou) {
-          setTimeout(responderProxima, 1200);
+          if (contasRespondidas < 5) {
+            setTimeout(() => {
+              log(`Reversão pós-dano: ${bossImg.dataset.estadoBoss} (${bossImg.getAttribute("src")})`);
+              responderProxima();
+            }, 1350);
+          } else {
+            setTimeout(responderProxima, 200);
+          }
         } else {
           log("Erro: botão não encontrado.");
         }

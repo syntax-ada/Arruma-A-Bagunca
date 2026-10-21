@@ -49,7 +49,8 @@
   // ==========================================================
   // FUNDOS DE TELA (Sala à noite)
   // ==========================================================
-  const FUNDO_MUNDO_5 = "assets/images/mundo_5/sala_noite.jpeg";
+  const FUNDO_MUNDO_5_BAGUNCADO = "assets/images/mundo_5/sala_noite_bagunçada.jpeg";
+  const FUNDO_MUNDO_5_ARRUMADO = "assets/images/mundo_5/sala_noite.png";
 
   // ==========================================================
   // OS CINCO DESAFIOS DO DESAFIO FINAL
@@ -188,13 +189,20 @@
     // corações aparecerem.
     boss: {
       nome: "Monstro da Bagunça",
-      imgSrc: "assets/images/mundo_5/sprites_mundo5/monstro.png",
+      imgSrc: "assets/images/mundo_5/animação padrao.gif",
       imgAlt: "Monstro da Bagunça",
+      animacoes: {
+        idle: "assets/images/mundo_5/animação padrao.gif",
+        dano: "assets/images/mundo_5/Monstro tomando dano.gif",
+        derrota: "assets/images/mundo_5/monstro desintegrando.gif",
+      },
+      duracaoDanoMs: 1200,
+      duracaoDerrotaMs: 5600,
     },
 
-    fundo: FUNDO_MUNDO_5,
-    fundoBaguncado: FUNDO_MUNDO_5,
-    fundoArrumado: FUNDO_MUNDO_5,
+    fundo: FUNDO_MUNDO_5_BAGUNCADO,
+    fundoBaguncado: FUNDO_MUNDO_5_BAGUNCADO,
+    fundoArrumado: FUNDO_MUNDO_5_ARRUMADO,
     gerarObjetos: gerarItensMundo5Fase1,
     get objetos() {
       return gerarItensMundo5Fase1();

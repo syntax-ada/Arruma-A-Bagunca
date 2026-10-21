@@ -167,6 +167,7 @@
     fundo: FUNDO_MUNDO_2_BAGUNCADO,
     fundoBaguncado: FUNDO_MUNDO_2_BAGUNCADO,
     fundoArrumado: FUNDO_MUNDO_2_ARRUMADO,
+
     gerarObjetos: gerarItensMundo2Fase1,
     get objetos() {
       return gerarItensMundo2Fase1();
@@ -203,6 +204,7 @@
     fundo: FUNDO_MUNDO_2_BAGUNCADO,
     fundoBaguncado: FUNDO_MUNDO_2_BAGUNCADO,
     fundoArrumado: FUNDO_MUNDO_2_ARRUMADO,
+
     gerarObjetos: gerarItensMundo2Fase2,
     get objetos() {
       return gerarItensMundo2Fase2();
@@ -239,6 +241,7 @@
     fundo: FUNDO_MUNDO_2_BAGUNCADO,
     fundoBaguncado: FUNDO_MUNDO_2_BAGUNCADO,
     fundoArrumado: FUNDO_MUNDO_2_ARRUMADO,
+
     gerarObjetos: gerarItensMundo2Fase3,
     get objetos() {
       return gerarItensMundo2Fase3();

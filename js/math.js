@@ -30,9 +30,177 @@ let faseEmAndamento = null;
 // etapa matemática, para o ritmo do jogo não mudar de um lugar para o outro.
 const PAUSA_ENTRE_DESAFIOS_MS = 1000;
 
-// Pausa maior na virada de etapa (adversário vencido → arrumar a casa): a
-// criança precisa perceber que o adversário caiu antes de a cena mudar.
-const PAUSA_ANTES_DA_ORGANIZACAO_MS = 1800;
+// Durações sincronizadas com as animações GIF do Boss (Mundo 5):
+// - "Monstro tomando dano.gif": 30 quadros (1200ms)
+// - "monstro desintegrando.gif": 140 quadros (5600ms)
+const DURACAO_ANIMACAO_DANO_BOSS_MS = 1200;
+const DURACAO_ANIMACAO_DERROTA_BOSS_MS = 5600;
+
+// Pausa na virada de etapa (adversário vencido → arrumar a casa): aguarda a
+// conclusão completa da animação de desintegração antes de ocultar o monstro e o HUD.
+const PAUSA_ANTES_DA_ORGANIZACAO_MS = DURACAO_ANIMACAO_DERROTA_BOSS_MS;
+
+// Temporizador ativo para reverter a animação de dano de volta ao estado padrão (idle).
+let timerEstadoBoss = null;
+let tutorialMatematicaFase1Ativo = false;
+
+function removerTutorialMatematicaFase1() {
+    tutorialMatematicaFase1Ativo = false;
+    document.body.classList.remove("tutorial-matematica-ativo");
+    document.querySelector("#tutorial-matematica-overlay")?.remove();
+    document.querySelector("#tutorial-balao-matematica")?.remove();
+    document.querySelector("#tutorial-maozinha-matematica")?.remove();
+    document.querySelector("#tutorial-banner-acerto")?.remove();
+    document.querySelector("#tutorial-banner-incentivo")?.remove();
+}
+
+function iniciarTutorialMatematicaFase1() {
+    removerTutorialMatematicaFase1();
+    const telaMatematica = document.querySelector("#tela-matematica");
+    const opcoesContainer = document.querySelector("#opcoes-matematica");
+    if (!telaMatematica || !opcoesContainer) {
+        return;
+    }
+
+    tutorialMatematicaFase1Ativo = true;
+    document.body.classList.add("tutorial-matematica-ativo");
+
+    const overlay = document.createElement("div");
+    overlay.id = "tutorial-matematica-overlay";
+    overlay.className = "tutorial-overlay-escuro tutorial-overlay-matematica";
+    overlay.setAttribute("aria-hidden", "true");
+    telaMatematica.appendChild(overlay);
+
+    const balao = document.createElement("div");
+    balao.id = "tutorial-balao-matematica";
+    balao.className = "tutorial-balao-fase tutorial-balao-matematica";
+    balao.setAttribute("role", "status");
+    balao.setAttribute("aria-live", "polite");
+    balao.textContent = "Conte todos os itens e clique na resposta correta!";
+    opcoesContainer.appendChild(balao);
+
+    const maozinha = document.createElement("img");
+    maozinha.id = "tutorial-maozinha-matematica";
+    maozinha.className = "tutorial-maozinha-matematica";
+    maozinha.src = "assets/images/tela_fase1/maozinha.png";
+    maozinha.alt = "";
+    maozinha.setAttribute("aria-hidden", "true");
+    opcoesContainer.appendChild(maozinha);
+}
+
+function exibirComemoracaoTutorialMatematica(aoConcluir) {
+    document.querySelector("#tutorial-balao-matematica")?.remove();
+    document.querySelector("#tutorial-maozinha-matematica")?.remove();
+
+    const telaMatematica = document.querySelector("#tela-matematica");
+    if (!telaMatematica) {
+        removerTutorialMatematicaFase1();
+        if (typeof aoConcluir === "function") aoConcluir();
+        return;
+    }
+
+    const banner = document.createElement("div");
+    banner.id = "tutorial-banner-acerto";
+    banner.className = "tutorial-banner-comemoracao";
+    banner.setAttribute("role", "status");
+    banner.setAttribute("aria-live", "polite");
+    banner.textContent = "Isso!!!! Você acertou!!";
+    telaMatematica.appendChild(banner);
+
+    setTimeout(() => {
+        banner.remove();
+
+        const bannerIncentivo = document.createElement("div");
+        bannerIncentivo.id = "tutorial-banner-incentivo";
+        bannerIncentivo.className = "tutorial-banner-incentivo";
+        bannerIncentivo.setAttribute("role", "status");
+        bannerIncentivo.setAttribute("aria-live", "polite");
+        bannerIncentivo.innerHTML =
+            "Finalize as próximas fases para liberar um mundo novo!!!" +
+            '<span class="tutorial-subtexto-incentivo">(Clique para continuar)</span>';
+        telaMatematica.appendChild(bannerIncentivo);
+
+        let finalizado = false;
+        const finalizarIncentivo = () => {
+            if (finalizado) return;
+            finalizado = true;
+            removerTutorialMatematicaFase1();
+            if (typeof aoConcluir === "function") {
+                aoConcluir();
+            }
+        };
+
+        const timerLeitura = setTimeout(finalizarIncentivo, 3800);
+        const aoClicarFechar = () => {
+            clearTimeout(timerLeitura);
+            finalizarIncentivo();
+        };
+
+        bannerIncentivo.addEventListener("click", aoClicarFechar, { once: true });
+        document.querySelector("#tutorial-matematica-overlay")?.addEventListener("click", aoClicarFechar, { once: true });
+    }, 1600);
+}
+
+function limparTimerEstadoBoss() {
+    if (timerEstadoBoss !== null) {
+        clearTimeout(timerEstadoBoss);
+        timerEstadoBoss = null;
+    }
+}
+
+function obterSrcAnimacaoBoss(estado) {
+    if (!bossDaFase) {
+        return "";
+    }
+    const animacoes = bossDaFase.animacoes || {};
+    if (estado === "dano") {
+        return animacoes.dano || "assets/images/mundo_5/Monstro tomando dano.gif";
+    }
+    if (estado === "derrota") {
+        return animacoes.derrota || "assets/images/mundo_5/monstro desintegrando.gif";
+    }
+    return animacoes.idle || bossDaFase.imgSrc || "assets/images/mundo_5/animação padrao.gif";
+}
+
+function precarregarAnimacoesBoss() {
+    if (!bossDaFase || typeof Image === "undefined") {
+        return;
+    }
+    ["idle", "dano", "derrota"].forEach((estado) => {
+        const src = obterSrcAnimacaoBoss(estado);
+        if (src) {
+            const img = new Image();
+            img.src = src;
+        }
+    });
+}
+
+function definirEstadoVisualBoss(estado) {
+    const imagem = document.querySelector("#boss-imagem");
+    const area = document.querySelector("#area-boss");
+    if (!imagem || !bossDaFase) {
+        return;
+    }
+
+    const novoSrc = obterSrcAnimacaoBoss(estado);
+    if (!novoSrc) {
+        return;
+    }
+
+    imagem.dataset.estadoBoss = estado;
+    imagem.classList.remove("estado-idle", "estado-dano", "estado-derrota", "boss-levou-dano");
+    imagem.classList.add(`estado-${estado}`);
+
+    if (area) {
+        area.classList.toggle("boss-em-dano", estado === "dano");
+        area.classList.toggle("boss-desintegrando", estado === "derrota");
+    }
+
+    if (imagem.getAttribute("src") !== novoSrc) {
+        imagem.src = novoSrc;
+    }
+    imagem.alt = bossDaFase.imgAlt || bossDaFase.nome || "Adversário da fase";
+}
 
 function navegarEntreTelasDoJogo(destino, url) {
     if (window.parent !== window) {
@@ -105,6 +273,7 @@ function iniciarEtapaMatematica(dadosQuantidades, configDaFase) {
         return;
     }
 
+    limparTimerEstadoBoss();
     faseEmAndamento = configDaFase || null;
 
     const desafios = configDaFase && Array.isArray(configDaFase.desafios)
@@ -116,6 +285,10 @@ function iniciarEtapaMatematica(dadosQuantidades, configDaFase) {
         indiceDoDesafioAtual = 0;
         acertosNaSequencia = 0;
         bossDaFase = configDaFase.boss || null;
+        if (bossDaFase) {
+            precarregarAnimacoesBoss();
+            definirEstadoVisualBoss("idle");
+        }
         renderizarBoss();
         iniciarDesafioMatematico(desafios[0]);
         return;
@@ -150,7 +323,7 @@ function renderizarBoss() {
 
     if (!bossDaFase || !sequenciaDeDesafios) {
         area.classList.add("escondido");
-        area.classList.remove("is-derrotado");
+        area.classList.remove("is-derrotado", "boss-em-dano", "boss-desintegrando", "boss-derrotado-animando");
         if (hudVidas) {
             hudVidas.classList.add("escondido");
         }
@@ -163,9 +336,8 @@ function renderizarBoss() {
     const restantes = Math.max(0, total - acertosNaSequencia);
 
     const imagem = document.querySelector("#boss-imagem");
-    if (imagem && bossDaFase.imgSrc) {
-        imagem.src = bossDaFase.imgSrc;
-        imagem.alt = bossDaFase.imgAlt || bossDaFase.nome || "Adversário da fase";
+    if (imagem && !imagem.getAttribute("src")) {
+        definirEstadoVisualBoss("idle");
     }
 
     const nome = document.querySelector("#boss-nome");
@@ -220,6 +392,8 @@ function bossFoiVencido() {
 // está montada e com os eventos ligados desde o início da fase (game.js →
 // startGame). Nenhuma mecânica nova: só a troca de etapa e o aviso à criança.
 function abrirEtapaDeOrganizacao() {
+    limparTimerEstadoBoss();
+
     const telaMatematica = document.querySelector("#tela-matematica");
     if (telaMatematica) {
         telaMatematica.classList.add("escondido");
@@ -233,7 +407,7 @@ function abrirEtapaDeOrganizacao() {
     const areaBoss = document.querySelector("#area-boss");
     if (areaBoss) {
         areaBoss.classList.add("escondido");
-        areaBoss.classList.remove("boss-derrotado-animando");
+        areaBoss.classList.remove("boss-derrotado-animando", "boss-desintegrando", "boss-em-dano");
     }
 
     const painelMat = document.querySelector(".painel-matematica");
@@ -256,9 +430,10 @@ function abrirEtapaDeOrganizacao() {
         }
         const feedbackMsg = document.querySelector("#feedback-message");
         if (feedbackMsg) {
-            feedbackMsg.classList.add("hud-texto-oculto-boss");
+            feedbackMsg.classList.remove("hud-texto-oculto-boss");
         }
         if (faseEmAndamento?.fundoBaguncado || faseEmAndamento?.fundo) {
+            document.body.classList.remove("cenario-arrumado");
             document.body.style.backgroundImage = `url("${faseEmAndamento.fundoBaguncado || faseEmAndamento.fundo}")`;
         }
     }
@@ -303,7 +478,8 @@ function iniciarDesafioMatematico(dadosQuantidades, operacaoId) {
         }
         const tituloMatematica = document.querySelector("#titulo-matematica");
         if (tituloMatematica) {
-            tituloMatematica.classList.add("hud-texto-oculto-boss");
+            tituloMatematica.classList.remove("hud-texto-oculto-boss");
+            tituloMatematica.textContent = "Derrote o Monstro da Bagunça para ganhar!";
         }
     }
 
@@ -427,6 +603,14 @@ function iniciarDesafioMatematico(dadosQuantidades, operacaoId) {
     }
 
     mostrarFeedbackMatematica("Escolha uma das opções acima.", "neutral");
+
+    const mundoAtual = typeof window.obterMundoAtivo === "function" ? window.obterMundoAtivo() : 1;
+    const faseAtual = typeof window.obterFaseAtiva === "function" ? window.obterFaseAtiva() : 1;
+    if (Number(mundoAtual) === 1 && Number(faseAtual) === 1 && !bossDaFase) {
+        iniciarTutorialMatematicaFase1();
+    } else {
+        removerTutorialMatematicaFase1();
+    }
 }
 
 // Exposto para o DEV simular a resposta certa respeitando a operação da fase.
@@ -541,11 +725,22 @@ function verificarRespostaMatematica(valorEscolhido, resultadoCorreto, botaoClic
         if (sequenciaDeDesafios) {
             acertosNaSequencia++;
             renderizarBoss();
-            const bossImg = document.querySelector("#boss-imagem");
-            if (bossImg) {
-                bossImg.classList.remove("boss-levou-dano");
-                void bossImg.offsetWidth;
-                bossImg.classList.add("boss-levou-dano");
+
+            if (bossDaFase) {
+                limparTimerEstadoBoss();
+
+                if (bossFoiVencido()) {
+                    definirEstadoVisualBoss("derrota");
+                } else {
+                    const duracaoDano = Number(bossDaFase.duracaoDanoMs) || DURACAO_ANIMACAO_DANO_BOSS_MS;
+                    definirEstadoVisualBoss("dano");
+                    timerEstadoBoss = setTimeout(() => {
+                        timerEstadoBoss = null;
+                        if (!bossFoiVencido()) {
+                            definirEstadoVisualBoss("idle");
+                        }
+                    }, duracaoDano);
+                }
             }
         }
 
@@ -555,10 +750,13 @@ function verificarRespostaMatematica(valorEscolhido, resultadoCorreto, botaoClic
         // acerto da última conta.
         if (haProximoDesafio()) {
             mostrarFeedbackMatematica(operacao.mensagemSucesso(contaTexto), "success");
+            const pausaEntreDesafios = bossDaFase
+                ? (Number(bossDaFase.duracaoDanoMs) || DURACAO_ANIMACAO_DANO_BOSS_MS)
+                : PAUSA_ENTRE_DESAFIOS_MS;
             setTimeout(() => {
                 indiceDoDesafioAtual++;
                 iniciarDesafioMatematico(sequenciaDeDesafios[indiceDoDesafioAtual]);
-            }, PAUSA_ENTRE_DESAFIOS_MS);
+            }, pausaEntreDesafios);
             return;
         }
 
@@ -576,13 +774,20 @@ function verificarRespostaMatematica(valorEscolhido, resultadoCorreto, botaoClic
             if (painelMat) {
                 painelMat.classList.add("painel-matematica-sumindo");
             }
-            setTimeout(abrirEtapaDeOrganizacao, PAUSA_ANTES_DA_ORGANIZACAO_MS);
+            const duracaoDerrota = (bossDaFase && Number(bossDaFase.duracaoDerrotaMs)) || PAUSA_ANTES_DA_ORGANIZACAO_MS;
+            setTimeout(abrirEtapaDeOrganizacao, duracaoDerrota);
             return;
         }
 
         const faseAtual = registrarConclusaoDaFase();
         mostrarFeedbackMatematica(operacao.mensagemSucesso(contaTexto), "success");
-        exibirBotoesConclusao(faseAtual);
+        if (tutorialMatematicaFase1Ativo) {
+            exibirComemoracaoTutorialMatematica(() => {
+                exibirBotoesConclusao(faseAtual);
+            });
+        } else {
+            exibirBotoesConclusao(faseAtual);
+        }
     } else {
         if (typeof window.tocarEfeito === "function") {
             window.tocarEfeito("errado");
@@ -646,6 +851,10 @@ function exibirMensagemDeVitoria() {
 // casa: a casa ficou organizada, então agora sim a fase termina. Daqui para
 // frente é o mesmo caminho de conclusão e de progresso das outras fases.
 function concluirEtapaFinal() {
+    document.body.classList.add("cenario-arrumado");
+    if (faseEmAndamento?.fundoArrumado) {
+        document.body.style.backgroundImage = `url("${faseEmAndamento.fundoArrumado}")`;
+    }
     const painelVitoria = exibirMensagemDeVitoria();
     const faseAtual = registrarConclusaoDaFase();
     exibirBotoesConclusao(faseAtual, painelVitoria);
