@@ -44,7 +44,7 @@ A origem dos demais itens da tabela não está documentada neste repositório.
 | Suporte a teclado | Parcial (ver seção 3) |
 | Dispositivos móveis | Parcial: layouts responsivos, sem teste registrado em aparelhos reais |
 | Pontuação e conquistas | Não implementado |
-| Login administrativo e restrição do painel DEV | Planejado: as funções de PIN e sessão existem em `api/_lib/`, mas nenhum endpoint as usa |
+| Login administrativo e restrição do painel DEV | Implementado no código: login em `admin.html` com sessão conferida no servidor; `?dev=true` só vale em ambiente local. Validado em teste simulado e local; **sem deploy verificado** e **sem limite de tentativas** |
 | Integração com o Cruzeiro HUB via iframe | Planejado: sem código |
 
 ---
@@ -96,8 +96,9 @@ Supabase / PostgreSQL (tabela players)
 - `js/game.js` (organização), `js/math.js` (desafio) e `js/operacoes.js` (regras das operações): o motor compartilhado.
 - `js/main.js`: resolve `?mundo=X&fase=Y` e inicia a fase.
 - `js/progresso.js`: progresso local. `js/audio.js`: trilha e volume. `js/jogador.js`: tela de identificação. `js/menu.js`: navegação do menu. `js/dev.js`: ferramentas de desenvolvimento.
-- `api/jogadores/`: endpoints. `api/_lib/`: funções compartilhadas (não viram rotas).
-- `scripts/servidor-local.js`: servidor de desenvolvimento. `testes/`: testes automatizados.
+- `api/jogadores/` e `api/admin/`: endpoints. `api/_lib/`: funções compartilhadas (não viram rotas).
+- `admin.html` e `js/admin.js`: login administrativo da equipe (sem link na interface das crianças).
+- `scripts/servidor-local.js`: servidor de desenvolvimento. `scripts/gerar-hash-pin.js`: gera o hash do PIN administrativo. `testes/`: testes automatizados.
 
 **Menu ↔ fase:** a fase roda em um iframe da página do menu, para a trilha sonora não cortar. A fase avisa o menu com `postMessage` (`arruma-bagunca:navegacao`).
 
@@ -109,6 +110,7 @@ Supabase / PostgreSQL (tabela players)
 | Volume | `localStorage`, chave `arruma_bagunca_volume` | Até limpar o navegador |
 | Jogador identificado (só para exibição) | `sessionStorage`, chave `arruma_bagunca_jogador` | A aba |
 | Estado da trilha e modo DEV | `sessionStorage` | A aba |
+| Sessão administrativa | Cookie `ab_admin` (HttpOnly, SameSite=Strict, Path=/api; Secure em HTTPS) | 60 minutos ou até o logout |
 | Jogadores (apelido e avatar) | Supabase, tabela `players` | Permanente |
 
 ### API
@@ -134,6 +136,16 @@ Não há autenticação nos endpoints de jogador ([Decisão da equipe]: entrar n
 | 503 | `SERVICO_INDISPONIVEL` | Banco ou configuração indisponíveis |
 
 O servidor local também responde `404 NAO_ENCONTRADO` para rotas inexistentes.
+
+**API administrativa** (só para a equipe; a regra está em `api/_lib/admin.js`):
+
+| Endpoint | Função | Respostas |
+|---|---|---|
+| `POST /api/admin/login` | Recebe `{ codigo: "ADM01", pin }` e cria a sessão (cookie) | `200 { codigo, expiraEm }` · `401 CREDENCIAIS_INVALIDAS` (genérico) · `403 ORIGEM_NAO_PERMITIDA` · `400`, `405`, `413`, `415` · `503` sem configuração |
+| `POST /api/admin/logout` | Apaga o cookie da sessão | `204` · `403` · `503` |
+| `GET /api/admin/sessao` | Diz se há sessão válida | `200 { codigo, expiraEm }` · `401 NAO_AUTENTICADO` · `503` |
+
+Login e logout só são aceitos se o cabeçalho `Origin` for exatamente uma das origens de `ADMIN_ALLOWED_ORIGINS` (e, se o navegador informar `Sec-Fetch-Site`, ele precisa ser `same-origin`). Todo endpoint administrativo novo deve começar com `exigirSessaoAdmin(req)`.
 
 **Regras do apelido** (em `api/_lib/apelido.js`, única fonte):
 
@@ -167,11 +179,14 @@ RLS ligado, sem políticas, e permissões de `anon` e `authenticated` removidas:
 - Não se coleta nome real, e-mail, documentos, fotos nem localização, e a tabela não tem campo para IP. No navegador, o apelido, o avatar e o identificador ficam só no `sessionStorage` da aba, para exibição.
 - Os logs do backend registram status e códigos de erro, não apelidos nem chaves.
 - A chave secreta do Supabase existe só como variável de ambiente do servidor e da Vercel. O servidor recusa a chave publicável. `.env.local` é ignorado pelo git.
+- O PIN administrativo nunca é guardado: só o hash (`ADMIN_PIN_HASH`), em variável de ambiente do servidor, junto com o segredo que assina a sessão.
 
 ### Limitações conhecidas
 
 - **Entrar só com o apelido** ([Decisão da equipe], risco aceito): quem souber o apelido de outra criança entra no perfil dela. Hoje o perfil só guarda apelido e avatar; isso deve ser reavaliado quando o progresso for para o banco.
-- **Modo DEV por URL (vulnerabilidade conhecida, correção pendente):** `?dev=true` ativa o painel de desenvolvimento em **qualquer ambiente, inclusive no site publicado**, e libera todos os mundos e fases. A restrição de acesso no ambiente publicado ainda não foi implementada. O painel só altera dados locais do navegador.
+- **Modo DEV:** no site publicado, `?dev=true` sozinho não liga mais o painel; ele só abre depois do login em `admin.html` e da conferência da sessão no servidor. Em ambiente local (`localhost`, `127.0.0.1`, `file://`), `?dev=true` continua valendo. O painel roda no navegador e só altera dados locais: quem usa o DevTools ainda consegue mexer nos próprios dados, e isso não é protegido.
+- **Login administrativo sem limite de tentativas:** a defesa é um PIN longo (10 a 12 dígitos). Uma regra de limite de requisições na Vercel está pendente.
+- **Sessão administrativa não revogável no servidor:** o logout apaga o cookie do navegador, mas um token copiado antes continua válido até expirar (60 minutos).
 - O filtro de palavras não é moderação perfeita. Não há limite de requisições na API.
 - Concluir a última fase do Mundo 5 grava no progresso um "Mundo 6" que não existe (sem efeito visível).
 
@@ -193,7 +208,9 @@ RLS ligado, sem políticas, e permissões de `anon` e `authenticated` removidas:
 | `SUPABASE_URL` | Endereço `https` do projeto. Obrigatória para a identificação |
 | `SUPABASE_SECRET_KEY` | Chave **secreta** (`sb_secret_...`). Obrigatória; só no servidor |
 | `PORTA`, `HOST` | Opcionais (padrão 3000 e 127.0.0.1) |
-| `ADMIN_SESSION_SECRET` | Reservada para o login administrativo; ainda não usada |
+| `ADMIN_PIN_HASH` | Hash do PIN administrativo (gerado por `node scripts/gerar-hash-pin.js`). Necessária para o login e para o painel DEV no site publicado |
+| `ADMIN_SESSION_SECRET` | Texto aleatório (32+ caracteres) que assina a sessão administrativa. Trocá-lo encerra todas as sessões |
+| `ADMIN_ALLOWED_ORIGINS` | Origens de onde o login é aceito, separadas por vírgula (ex.: `https://seu-jogo.vercel.app`; no servidor local, `http://localhost:3000`) |
 
 **Executar localmente:** copie `.env.example` para `.env.local`, preencha e rode na raiz do projeto:
 
@@ -204,7 +221,7 @@ node --env-file=.env.local scripts/servidor-local.js    → http://localhost:300
 - ⚠️ Com o `.env.local` configurado, o servidor local grava no banco **real** do Supabase indicado nele.
 - Sem as variáveis, a identificação mostra "Não conseguimos conectar agora". Abrir o `index.html` direto no navegador também não passa dessa tela: é preciso o servidor.
 - **JOGAR** apaga o progresso local a cada clique ([Decisão da equipe], intencional nesta versão). `index.html?view=mundos` abre o menu direto e **não** apaga o progresso; se a aba ainda não tem jogador identificado, pede o apelido antes.
-- **Modo DEV:** `?dev=true` abre um painel flutuante, com atalhos Shift+C (completar etapa), Shift+N (próxima fase), Shift+R (resetar progresso) e Shift+D (desbloquear tudo). `?dev=false` desliga.
+- **Modo DEV:** em ambiente local, `?dev=true` abre um painel flutuante, com atalhos Shift+C (completar etapa), Shift+N (próxima fase), Shift+R (resetar progresso) e Shift+D (desbloquear tudo); `?dev=false` desliga. No site publicado, entre por `/admin.html` com o código e o PIN; depois disso o painel aparece no jogo, e "Sair" (ou `dev.desativar()`) encerra a sessão.
 
 ---
 
@@ -214,7 +231,7 @@ node --env-file=.env.local scripts/servidor-local.js    → http://localhost:300
 node --test        → testes automatizados (pasta testes/)
 ```
 
-Cobrem as regras do apelido, o PIN e a sessão administrativa, o servidor local e os endpoints de jogadores **com um Supabase simulado**: não usam credenciais nem rede. Não há testes de interface versionados no repositório; o comportamento visual e de interação é verificado à parte (manualmente ou com scripts avulsos).
+Cobrem as regras do apelido, o PIN e a sessão administrativa, o login administrativo (`api/admin/*`), quem pode ligar o painel DEV (o `js/dev.js` real numa sandbox), o servidor local e os endpoints de jogadores **com um Supabase simulado**: não usam credenciais nem rede. Não há testes de interface versionados no repositório; o comportamento visual e de interação é verificado à parte (manualmente ou com scripts avulsos).
 
 ### O que cada nível de verificação garante
 
@@ -248,6 +265,7 @@ Configuração informada pela equipe (esquema do banco, variáveis na Vercel) n�
 O projeto está pensado para a **Vercel**: a raiz como site estático e `api/` como funções. Não há `vercel.json` nem `package.json`.
 
 - Informado pela equipe: `SUPABASE_URL` e `SUPABASE_SECRET_KEY` estão configuradas na Vercel, com a chave secreta (e não a publicável).
+- ⚠️ `ADMIN_PIN_HASH`, `ADMIN_SESSION_SECRET` e `ADMIN_ALLOWED_ORIGINS` ainda precisam ser configuradas na Vercel. Sem elas, o login administrativo responde "indisponível" e o painel DEV não abre no site publicado.
 - ⚠️ **A confirmar** (nenhum deploy foi verificado; não é possível verificar a partir do repositório): projeto e URL, branch de produção, se o deploy é automático pelo GitHub, e o funcionamento real dos endpoints na Vercel (inclusive a leitura do corpo da requisição).
 - Sem `.vercelignore`, pastas como `testes/` e `scripts/` também seriam publicadas como arquivos estáticos. Não contêm segredos.
 
@@ -272,7 +290,7 @@ Não são obrigações imediatas; cada incremento deve ser avaliado antes de com
 - Definir o fluxo de branches e a configuração da Vercel (itens da seção 8).
 - Decidir onde e como persistir o progresso por jogador (o comentário em `js/progresso.js` cita um "backend do Cruzeiro HUB", sem relação com a escolha do Supabase). Isso exigirá alterar `progresso.js` e o comportamento do JOGAR.
 - Definir o Cruzeiro HUB: como será a integração via iframe.
-- **Restringir o acesso ao painel `?dev=true` no ambiente publicado** (vulnerabilidade conhecida, ainda não corrigida) e implementar o login administrativo.
+- Configurar as variáveis administrativas na Vercel e validar o login e o painel DEV no site publicado; limitar as tentativas de login (regra de firewall da Vercel) e decidir se a sessão precisa de revogação no servidor.
 - Migração SQL do banco, revisada pela equipe (tarefa futura). Criar `.vercelignore` e limitar requisições à API.
 - Confirmar se a arte do Mundo 5 é a definitiva (o comentário no topo de `js/mundos/mundo5.js` ainda diz "provisório" e está desatualizado).
 - Teclado completo, configurações de acessibilidade, instruções por áudio e testes em dispositivos reais.

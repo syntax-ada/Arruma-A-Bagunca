@@ -3,7 +3,7 @@
 
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
-const { gerarHashPin, pinTemFormatoValido, verificarPin } = require("../api/_lib/pin");
+const { gerarHashPin, hashTemFormatoValido, pinTemFormatoValido, verificarPin } = require("../api/_lib/pin");
 
 test("formato do PIN: de 6 a 12 dígitos", () => {
   assert.equal(pinTemFormatoValido("123456"), true);
@@ -59,4 +59,24 @@ test("hash adulterado não confere", () => {
   const ultimo = partes[5];
   partes[5] = (ultimo[0] === "A" ? "B" : "A") + ultimo.slice(1);
   assert.equal(verificarPin("482913", partes.join("$")), false);
+});
+
+test("hash truncado, com tamanho diferente ou com caracteres estranhos é recusado, mesmo com o PIN certo", () => {
+  // Um hash colado pela metade seria conferido só nos primeiros bytes: com 1
+  // byte, cerca de 1 em cada 256 PINs errados passaria. Agora é recusado.
+  const hash = gerarHashPin("482913");
+  const partes = hash.split("$");
+  assert.equal(hashTemFormatoValido(hash), true);
+
+  for (const caracteres of [2, 3, 11, 42]) {
+    const truncado = [...partes.slice(0, 5), partes[5].slice(0, caracteres)].join("$");
+    assert.equal(verificarPin("482913", truncado), false, `hash com ${caracteres} caracteres`);
+    assert.equal(hashTemFormatoValido(truncado), false);
+  }
+
+  const salCurto = [...partes.slice(0, 4), partes[4].slice(0, 10), partes[5]].join("$");
+  assert.equal(verificarPin("482913", salCurto), false);
+  assert.equal(verificarPin("482913", hash + "!"), false);
+  assert.equal(verificarPin("482913", `"${hash}"`), false); // colado com aspas
+  assert.equal(hashTemFormatoValido(undefined), false);
 });

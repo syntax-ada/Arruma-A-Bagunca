@@ -14,33 +14,38 @@
   }
 
   // ==========================================================
-  // 1. DETECÇÃO E PERSISTÊNCIA DA SESSÃO DEV
+  // 1. QUEM PODE LIGAR O MODO DEV
   // ==========================================================
+  // Em ambiente local (localhost, 127.0.0.1, file://), ?dev=true continua
+  // ligando o painel, como sempre. No site publicado, ?dev=true sozinho é
+  // ignorado: o painel só abre com uma sessão administrativa criada em
+  // admin.html e CONFERIDA NO SERVIDOR (GET /api/admin/sessao). Editar o
+  // sessionStorage não basta. A decisão é tomada no fim deste arquivo.
+  //
+  // ⚠️ Isto roda no navegador: tira o painel da interface normal, mas não
+  // protege contra quem usa o DevTools. A proteção real de operações
+  // administrativas fica no servidor (exigirSessaoAdmin em api/_lib/admin.js).
   const urlParams = new URLSearchParams(window.location.search);
   const devParam = urlParams.get("dev");
+  const devDesligadoNaUrl = devParam === "false" || devParam === "0";
+  const devPedidoNaUrl = urlParams.has("dev") && !devDesligadoNaUrl;
+  const ambienteLocal = ehAmbienteLocal();
 
-  if (devParam === "false" || devParam === "0") {
-    storageSession.removeItem(CHAVE_SESSION_DEV);
-    return;
-  }
-
-  if (devParam === "true" || devParam === "1" || urlParams.has("dev")) {
-    storageSession.setItem(CHAVE_SESSION_DEV, "true");
-  }
-
-  const isDevAtivo = storageSession.getItem(CHAVE_SESSION_DEV) === "true";
-  if (!isDevAtivo) {
-    return;
+  function ehAmbienteLocal() {
+    const { protocol, hostname } = window.location;
+    return protocol === "file:" || ["localhost", "127.0.0.1", "[::1]", "::1"].includes(hostname);
   }
 
   // Se o catálogo de mundos não foi carregado na página (ex: index.html), carrega dinamicamente
-  if (typeof window.MUNDOS === "undefined" && typeof document !== "undefined") {
-    const scriptMundo = document.createElement("script");
-    scriptMundo.src = "js/mundos/mundo1.js";
-    scriptMundo.onload = () => {
-      atualizarOpcoesPainelDev();
-    };
-    document.head.appendChild(scriptMundo);
+  function carregarCatalogoDeMundosSeNecessario() {
+    if (typeof window.MUNDOS === "undefined" && typeof document !== "undefined") {
+      const scriptMundo = document.createElement("script");
+      scriptMundo.src = "js/mundos/mundo1.js";
+      scriptMundo.onload = () => {
+        atualizarOpcoesPainelDev();
+      };
+      document.head.appendChild(scriptMundo);
+    }
   }
 
   // ==========================================================
@@ -492,10 +497,22 @@
 
   function desativarModoDev() {
     storageSession.removeItem(CHAVE_SESSION_DEV);
+    window.modoDevLiberado = false;
     const params = new URLSearchParams(window.location.search);
     params.delete("dev");
     const query = params.toString() ? `?${params.toString()}` : "";
-    window.location.href = `${window.location.pathname}${query}`;
+    const destino = `${window.location.pathname}${query}`;
+
+    if (ambienteLocal) {
+      window.location.href = destino;
+      return;
+    }
+    // No site publicado, sair do modo DEV também encerra a sessão administrativa.
+    fetch("/api/admin/logout", { method: "POST", credentials: "same-origin" })
+      .catch(() => {})
+      .finally(() => {
+        window.location.href = destino;
+      });
   }
 
   function exibirAjudaDev() {
@@ -523,25 +540,27 @@
   // ==========================================================
   // 6. DEV 04 — ATALHOS DE TECLADO
   // ==========================================================
-  window.addEventListener("keydown", (e) => {
-    if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")) {
-      return;
-    }
+  function registrarAtalhosDeTeclado() {
+    window.addEventListener("keydown", (e) => {
+      if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")) {
+        return;
+      }
 
-    if (e.shiftKey && (e.key === "C" || e.key === "c")) {
-      e.preventDefault();
-      completarEtapa();
-    } else if (e.shiftKey && (e.key === "N" || e.key === "n")) {
-      e.preventDefault();
-      proximaFase();
-    } else if (e.shiftKey && (e.key === "R" || e.key === "r")) {
-      e.preventDefault();
-      resetarProgresso();
-    } else if (e.shiftKey && (e.key === "D" || e.key === "d")) {
-      e.preventDefault();
-      desbloquearTudo();
-    }
-  });
+      if (e.shiftKey && (e.key === "C" || e.key === "c")) {
+        e.preventDefault();
+        completarEtapa();
+      } else if (e.shiftKey && (e.key === "N" || e.key === "n")) {
+        e.preventDefault();
+        proximaFase();
+      } else if (e.shiftKey && (e.key === "R" || e.key === "r")) {
+        e.preventDefault();
+        resetarProgresso();
+      } else if (e.shiftKey && (e.key === "D" || e.key === "d")) {
+        e.preventDefault();
+        desbloquearTudo();
+      }
+    });
+  }
 
   // ==========================================================
   // 7. INTERCEPTAÇÃO AMIGÁVEL NO MENU (PRESERVAR PROGRESSO DEV)
@@ -553,21 +572,23 @@
     }
   }
 
-  const botaoJogar = document.querySelector("#botao-jogar");
-  if (botaoJogar) {
-    // Ao clicar em JOGAR, menu.js chama removeItem. No modo DEV, preservamos o progresso.
-    botaoJogar.addEventListener("click", () => {
-      const backupProgresso = storageLocal.getItem(CHAVE_STORAGE_PROGRESSO);
-      setTimeout(() => {
-        if (backupProgresso && !storageLocal.getItem(CHAVE_STORAGE_PROGRESSO)) {
-          storageLocal.setItem(CHAVE_STORAGE_PROGRESSO, backupProgresso);
-          if (typeof atualizarInterfaceProgresso === "function") {
-            atualizarInterfaceProgresso();
+  function preservarProgressoAoJogar() {
+    const botaoJogar = document.querySelector("#botao-jogar");
+    if (botaoJogar) {
+      // Ao clicar em JOGAR, menu.js chama removeItem. No modo DEV, preservamos o progresso.
+      botaoJogar.addEventListener("click", () => {
+        const backupProgresso = storageLocal.getItem(CHAVE_STORAGE_PROGRESSO);
+        setTimeout(() => {
+          if (backupProgresso && !storageLocal.getItem(CHAVE_STORAGE_PROGRESSO)) {
+            storageLocal.setItem(CHAVE_STORAGE_PROGRESSO, backupProgresso);
+            if (typeof atualizarInterfaceProgresso === "function") {
+              atualizarInterfaceProgresso();
+            }
           }
-        }
-        desbloquearMenuVisualSeNecessario();
-      }, 0);
-    }, true);
+          desbloquearMenuVisualSeNecessario();
+        }, 0);
+      }, true);
+    }
   }
 
   // ==========================================================
@@ -899,32 +920,94 @@
     desbloquearMenuVisualSeNecessario();
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", criarPainelDevDOM);
-  } else {
-    criarPainelDevDOM();
+  // ==========================================================
+  // 9. ATIVAÇÃO DO MODO DEV E OBJETO PÚBLICO WINDOW.DEV
+  // ==========================================================
+  function ativarModoDev() {
+    // menu.js lê este valor em isModoDevAtivo() para liberar mundos e fases.
+    window.modoDevLiberado = true;
+
+    carregarCatalogoDeMundosSeNecessario();
+    registrarAtalhosDeTeclado();
+    preservarProgressoAoJogar();
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", criarPainelDevDOM);
+    } else {
+      criarPainelDevDOM();
+    }
+
+    window.dev = {
+      irPara,
+      irParaMenu,
+      desbloquearTudo,
+      resetarProgresso,
+      completarEtapa,
+      completarFase,
+      proximaFase,
+      desativar: desativarModoDev,
+      abrirPainel: () => {
+        document.querySelector("#dev-painel-janela")?.classList.remove("escondido");
+      },
+      fecharPainel: () => {
+        document.querySelector("#dev-painel-janela")?.classList.add("escondido");
+      },
+      ajuda: exibirAjudaDev,
+    };
+
+    exibirAjudaDev();
   }
 
-  // ==========================================================
-  // 9. OBJETO PÚBLICO WINDOW.DEV
-  // ==========================================================
-  window.dev = {
-    irPara,
-    irParaMenu,
-    desbloquearTudo,
-    resetarProgresso,
-    completarEtapa,
-    completarFase,
-    proximaFase,
-    desativar: desativarModoDev,
-    abrirPainel: () => {
-      document.querySelector("#dev-painel-janela")?.classList.remove("escondido");
-    },
-    fecharPainel: () => {
-      document.querySelector("#dev-painel-janela")?.classList.add("escondido");
-    },
-    ajuda: exibirAjudaDev,
-  };
+  // "valida" (200), "invalida" (401) ou "indisponivel" (rede, 503, outro erro).
+  async function consultarSessaoAdmin() {
+    try {
+      const resposta = await fetch("/api/admin/sessao", { cache: "no-store", credentials: "same-origin" });
+      if (resposta.status === 200) {
+        return "valida";
+      }
+      return resposta.status === 401 ? "invalida" : "indisponivel";
+    } catch (erro) {
+      return "indisponivel";
+    }
+  }
 
-  exibirAjudaDev();
+  function decidirModoDev() {
+    if (devDesligadoNaUrl) {
+      storageSession.removeItem(CHAVE_SESSION_DEV);
+      return;
+    }
+
+    // Ambiente local: o fluxo de sempre (?dev=true liga e fica lembrado na aba).
+    if (ambienteLocal) {
+      if (devPedidoNaUrl) {
+        storageSession.setItem(CHAVE_SESSION_DEV, "true");
+      }
+      if (storageSession.getItem(CHAVE_SESSION_DEV) === "true") {
+        ativarModoDev();
+      }
+      return;
+    }
+
+    // Site publicado: ?dev=true não grava nada. Só quem fez login em
+    // admin.html tem o indicador na aba, e mesmo assim o servidor confere.
+    if (storageSession.getItem(CHAVE_SESSION_DEV) !== "true") {
+      if (devPedidoNaUrl) {
+        console.info("[DEV] No site publicado, o painel exige login administrativo (admin.html).");
+      }
+      return;
+    }
+
+    consultarSessaoAdmin().then((estado) => {
+      if (estado === "valida") {
+        ativarModoDev();
+        return;
+      }
+      if (estado === "invalida") {
+        storageSession.removeItem(CHAVE_SESSION_DEV);
+      }
+      console.info("[DEV] Painel bloqueado: sessão administrativa ausente, expirada ou indisponível (admin.html).");
+    });
+  }
+
+  decidirModoDev();
 })();

@@ -9,7 +9,8 @@
  * Os parâmetros ficam no próprio texto para poderem mudar no futuro sem
  * invalidar hashes antigos.
  *
- * ⚠️ Ainda não há endpoint usando este arquivo (etapa 7 do planejamento).
+ * Usado por POST /api/admin/login, que confere o PIN contra ADMIN_PIN_HASH.
+ * Para gerar o hash: node scripts/gerar-hash-pin.js
  */
 
 const crypto = require("node:crypto");
@@ -42,17 +43,19 @@ function gerarHashPin(pin) {
 }
 
 /**
- * Confere um PIN contra o hash guardado. Nunca lança erro: qualquer entrada
- * inválida (PIN fora do formato, hash malformado) simplesmente devolve false.
+ * Separa e confere as partes de um hash guardado. Devolve null se o texto não
+ * estiver EXATAMENTE no formato gerado por gerarHashPin. Isso inclui o tamanho:
+ * um hash truncado (por exemplo, colado pela metade numa variável de ambiente)
+ * seria conferido só nos primeiros bytes e passaria a aceitar PINs errados.
  */
-function verificarPin(pin, hashGuardado) {
-  if (!pinTemFormatoValido(pin) || typeof hashGuardado !== "string") {
-    return false;
+function lerPartesDoHash(hashGuardado) {
+  if (typeof hashGuardado !== "string") {
+    return null;
   }
 
   const partes = hashGuardado.split("$");
   if (partes.length !== 6 || partes[0] !== "scrypt") {
-    return false;
+    return null;
   }
 
   const [, textoN, textoR, textoP, salTexto, hashTexto] = partes;
@@ -66,14 +69,40 @@ function verificarPin(pin, hashGuardado) {
     Number.isInteger(p) && p >= 1 && p <= 16 &&
     128 * N * r <= MEMORIA_MAXIMA_BYTES;
   if (!parametrosValidos) {
+    return null;
+  }
+
+  const base64url = /^[A-Za-z0-9_-]+$/;
+  if (!base64url.test(salTexto) || !base64url.test(hashTexto)) {
+    return null;
+  }
+  const sal = Buffer.from(salTexto, "base64url");
+  const esperado = Buffer.from(hashTexto, "base64url");
+  if (sal.length !== TAMANHO_SAL_BYTES || esperado.length !== TAMANHO_HASH_BYTES) {
+    return null;
+  }
+
+  return { N, r, p, sal, esperado };
+}
+
+function hashTemFormatoValido(hashGuardado) {
+  return lerPartesDoHash(hashGuardado) !== null;
+}
+
+/**
+ * Confere um PIN contra o hash guardado. Nunca lança erro: qualquer entrada
+ * inválida (PIN fora do formato, hash malformado ou truncado) devolve false.
+ */
+function verificarPin(pin, hashGuardado) {
+  if (!pinTemFormatoValido(pin)) {
     return false;
   }
 
-  const sal = Buffer.from(salTexto, "base64url");
-  const esperado = Buffer.from(hashTexto, "base64url");
-  if (sal.length === 0 || esperado.length === 0) {
+  const partesDoHash = lerPartesDoHash(hashGuardado);
+  if (!partesDoHash) {
     return false;
   }
+  const { N, r, p, sal, esperado } = partesDoHash;
 
   try {
     const calculado = crypto.scryptSync(pin, sal, esperado.length, {
@@ -93,6 +122,7 @@ module.exports = {
   PIN_MAXIMO,
   PIN_MINIMO,
   gerarHashPin,
+  hashTemFormatoValido,
   pinTemFormatoValido,
   verificarPin,
 };

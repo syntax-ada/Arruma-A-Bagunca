@@ -58,7 +58,8 @@ Principais responsabilidades:
 - `math.js` → motor do desafio matemático desacoplado, resolvendo a conta via `window.OPERACOES` e disparando a progressão;
 - `operacoes.js` → catálogo e regras das operações matemáticas (Soma, Subtração, Multiplicação, Divisão e contas compostas);
 - `progresso.js` → serviço de persistência de progresso (`localStorage`) multi-mundo e multi-fase;
-- `dev.js` → ferramenta de desenvolvimento e painel de testes (ativado por `?dev=true` ou `sessionStorage`);
+- `dev.js` → ferramenta de desenvolvimento e painel de testes. Só ele decide se o modo DEV liga: em ambiente local (`localhost`, `127.0.0.1`, `file://`), por `?dev=true`; no site publicado, `?dev=true` ou o `sessionStorage` sozinhos **não** ligam — o painel só abre depois do login em `admin.html` e da conferência da sessão no servidor (`GET /api/admin/sessao`). O `menu.js` apenas lê o resultado (`window.modoDevLiberado`);
+- `admin.html` + `js/admin.js` → login administrativo da equipe; `api/admin/*` e `api/_lib/admin.js` → login, logout e sessão no servidor (use `exigirSessaoAdmin(req)` em todo endpoint administrativo);
 - `js/mundos/` → arquivos declarativos de configuração de cada mundo (`mundo1.js` a `mundo5.js`), auto-registrados em `window.MUNDOS`.
 
 Não altere responsabilidades arquiteturais importantes sem sinalizar o impacto antes.

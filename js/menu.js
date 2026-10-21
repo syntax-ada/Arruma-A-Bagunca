@@ -101,25 +101,13 @@ if (btnSetaDireita && carrosselMundos) {
 let mundoSelecionado = 1;
 
 /**
- * Detecta se o Modo Dev está ativo via query string (?dev=true) ou sessionStorage.
+ * O Modo Dev é decidido só por js/dev.js: em ambiente local, por ?dev=true; no
+ * site publicado, depois de conferir a sessão administrativa no servidor.
+ * Aqui apenas se lê o resultado (menu.js carrega antes; quando dev.js liga o
+ * modo, ele chama atualizarInterfaceProgresso() de novo).
  */
 function isModoDevAtivo() {
-  try {
-    const params = new URLSearchParams(window.location.search);
-    const devParam = params.get("dev");
-    if (devParam === "false" || devParam === "0") {
-      return false;
-    }
-    if (devParam === "true" || devParam === "1" || params.has("dev")) {
-      return true;
-    }
-    if (typeof window !== "undefined" && window.sessionStorage) {
-      return window.sessionStorage.getItem("arruma_bagunca_dev") === "true";
-    }
-  } catch (e) {
-    // Tratamento defensivo caso o acesso a storage falhe
-  }
-  return false;
+  return window.modoDevLiberado === true;
 }
 
 /**

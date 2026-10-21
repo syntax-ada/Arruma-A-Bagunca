@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Arruma a Bagunça — Acesso administrativo</title>
+    <!-- Página da equipe (não faz parte do jogo e não tem link na interface das crianças).
+         Abre a sessão administrativa que libera o painel DEV no site publicado. -->
+    <style>
+      :root {
+        color-scheme: light;
+        --fundo: #f4f5f7;
+        --cartao: #ffffff;
+        --texto: #1f2933;
+        --suave: #4a5560;
+        --destaque: #1d63d6;
+        --erro: #b3123f;
+        --ok: #1b7a3a;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 16px;
+        background: var(--fundo);
+        color: var(--texto);
+        font-family: Arial, Helvetica, sans-serif;
+      }
+      main {
+        width: min(100%, 420px);
+        padding: 28px;
+        background: var(--cartao);
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      }
+      h1 { margin: 0 0 6px; font-size: 1.5rem; }
+      .aviso { margin: 0 0 20px; color: var(--suave); }
+      form, .acoes { display: flex; flex-direction: column; gap: 10px; }
+      label { font-weight: 700; }
+      input {
+        min-height: 44px;
+        padding: 8px 12px;
+        font-size: 1rem;
+        border: 2px solid var(--suave);
+        border-radius: 8px;
+      }
+      button, .botao-link {
+        min-height: 44px;
+        padding: 10px 16px;
+        font-size: 1rem;
+        font-weight: 700;
+        border: 2px solid var(--texto);
+        border-radius: 999px;
+        background: var(--texto);
+        color: #ffffff;
+        text-align: center;
+        text-decoration: none;
+        cursor: pointer;
+      }
+      .secundario { background: #ffffff; color: var(--texto); }
+      button:disabled { opacity: 0.6; cursor: wait; }
+      input:focus-visible, button:focus-visible, .botao-link:focus-visible {
+        outline: 3px solid var(--destaque);
+        outline-offset: 2px;
+      }
+      #mensagem { min-height: 1.5em; margin: 16px 0 0; font-weight: 700; }
+      #mensagem.erro { color: var(--erro); }
+      #mensagem.ok { color: var(--ok); }
+      [hidden] { display: none !important; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Acesso administrativo</h1>
+      <p class="aviso">Área da equipe de desenvolvimento. Não faz parte do jogo.</p>
+
+      <form id="form-login" novalidate>
+        <label for="campo-codigo">Código</label>
+        <input id="campo-codigo" name="codigo" autocomplete="username" maxlength="20" required />
+        <label for="campo-pin">PIN</label>
+        <input id="campo-pin" name="pin" type="password" inputmode="numeric" autocomplete="current-password" maxlength="12" required />
+        <button type="submit" id="btn-entrar">Entrar</button>
+      </form>
+
+      <section id="secao-sessao" class="acoes" hidden>
+        <p id="texto-sessao"></p>
+        <a class="botao-link" id="link-jogo" href="index.html">Abrir o jogo com o painel DEV</a>
+        <button type="button" class="secundario" id="btn-sair">Sair</button>
+      </section>
+
+      <p id="mensagem" role="status" aria-live="polite"></p>
+    </main>
+    <script src="js/admin.js"></script>
+  </body>
+</html>

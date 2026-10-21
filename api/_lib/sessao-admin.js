@@ -10,8 +10,8 @@
  * Trocar ADMIN_SESSION_SECRET derruba todas as sessões de uma vez.
  *
  * ⚠️ Funções puras: recebem o segredo e o horário por parâmetro, para poderem
- * ser testadas sem servidor nem banco. Ainda não há endpoint usando este
- * arquivo (etapa 7 do planejamento). "?dev=true" e sessionStorage NUNCA
+ * ser testadas sem servidor nem banco. Quem lê o ambiente e usa estas funções
+ * nos endpoints é api/_lib/admin.js. "?dev=true" e sessionStorage NUNCA
  * substituem a verificação deste token.
  */
 
@@ -104,13 +104,18 @@ function lerCookie(cabecalho, nome = NOME_COOKIE) {
  * HttpOnly: o JavaScript da página não lê o cookie.
  * Secure + SameSite=Strict: só vai por HTTPS e só em pedidos do próprio site.
  * Path=/api: o cookie só é enviado para a API, não para as páginas do jogo.
+ *
+ * "seguro: false" só deve ser usado quando a origem confiável é http (servidor
+ * local): alguns navegadores recusam cookies Secure em http://localhost.
  */
-function montarCookieSessao(token, maxAgeSegundos = DURACAO_PADRAO_MS / 1000) {
-  return `${NOME_COOKIE}=${token}; HttpOnly; Secure; SameSite=Strict; Path=/api; Max-Age=${Math.floor(maxAgeSegundos)}`;
+function montarCookieSessao(token, maxAgeSegundos = DURACAO_PADRAO_MS / 1000, { seguro = true } = {}) {
+  const atributoSecure = seguro ? " Secure;" : "";
+  return `${NOME_COOKIE}=${token}; HttpOnly;${atributoSecure} SameSite=Strict; Path=/api; Max-Age=${Math.floor(maxAgeSegundos)}`;
 }
 
-function montarCookieLimpeza() {
-  return `${NOME_COOKIE}=; HttpOnly; Secure; SameSite=Strict; Path=/api; Max-Age=0`;
+function montarCookieLimpeza({ seguro = true } = {}) {
+  const atributoSecure = seguro ? " Secure;" : "";
+  return `${NOME_COOKIE}=; HttpOnly;${atributoSecure} SameSite=Strict; Path=/api; Max-Age=0`;
 }
 
 module.exports = {
