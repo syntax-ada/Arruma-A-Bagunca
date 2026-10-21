@@ -59,12 +59,59 @@
         </div>
       </div>
 
+      <!-- Identificação do jogador (js/jogador.js): apelido → confirmação → menu de mundos -->
+      <section id="tela-identificacao" class="tela-identificacao escondido" aria-label="Identificação do jogador">
+        <div class="cartao-identificacao">
+          <div id="etapa-apelido">
+            <h2 class="titulo-identificacao">Qual é o seu apelido?</h2>
+            <form id="form-apelido" class="form-apelido" novalidate>
+              <label class="rotulo-apelido" for="campo-apelido">Seu apelido</label>
+              <input
+                id="campo-apelido"
+                class="campo-apelido"
+                type="text"
+                name="apelido"
+                maxlength="20"
+                autocomplete="off"
+                autocapitalize="off"
+                spellcheck="false"
+                aria-describedby="dica-apelido erro-apelido"
+              />
+              <p id="dica-apelido" class="dica-apelido">Use de 3 a 20 letras ou números. Não use seu nome completo.</p>
+              <p id="erro-apelido" class="erro-apelido escondido" role="alert"></p>
+              <div class="acoes-identificacao">
+                <button class="btn-identificacao btn-identificacao-secundario" id="btn-voltar-identificacao" type="button">Voltar</button>
+                <button class="btn-identificacao" id="btn-continuar-apelido" type="submit">Continuar</button>
+              </div>
+            </form>
+          </div>
+
+          <div id="etapa-confirmacao" class="escondido">
+            <h2 id="titulo-confirmacao" class="titulo-identificacao" tabindex="-1">Novo jogador!</h2>
+            <p class="perfil-confirmacao">
+              <span id="avatar-confirmacao" class="avatar-usuario avatar-confirmacao" aria-hidden="true">👤</span>
+              <span id="apelido-confirmacao" class="apelido-confirmacao"></span>
+            </p>
+            <p id="texto-confirmacao" class="texto-confirmacao"></p>
+            <div class="acoes-identificacao">
+              <button class="btn-identificacao btn-identificacao-secundario" id="btn-corrigir-apelido" type="button">Voltar e corrigir</button>
+              <button class="btn-identificacao" id="btn-confirmar-apelido" type="button">Confirmar</button>
+            </div>
+          </div>
+
+          <div id="aviso-conexao" class="aviso-conexao escondido" role="alert">
+            <p><span aria-hidden="true">📡</span> Não conseguimos conectar agora. Tente de novo!</p>
+            <button class="btn-identificacao" id="btn-tentar-novamente" type="button">Tentar de novo</button>
+          </div>
+        </div>
+      </section>
+
       <section id="menu-fases" class="escondido" aria-label="Seleção de mundos">
         <header class="topo-mundos">
           <div class="pílula-controles">
             <div class="perfil-usuario">
-              <span class="avatar-usuario" aria-hidden="true">👤</span>
-              <span>Jogador</span>
+              <span class="avatar-usuario" id="avatar-jogador" aria-hidden="true">👤</span>
+              <span id="nome-jogador">Jogador</span>
             </div>
             <div
               class="volume-container controle-mundo"
@@ -187,6 +234,7 @@
     <script src="js/mundos/mundo4.js"></script>
     <script src="js/mundos/mundo5.js"></script>
     <script src="js/audio.js"></script>
+    <script src="js/jogador.js"></script>
     <script src="js/menu.js"></script>
     <script src="js/dev.js"></script>
   </body>

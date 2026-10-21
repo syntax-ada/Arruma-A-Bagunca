@@ -356,16 +356,49 @@ function atualizarInterfaceProgresso() {
   }
 }
 
+/**
+ * Mostra o menu de mundos. Usado depois da identificação do jogador e pelo
+ * caminho ?view=mundos.
+ */
+function entrarNoMenuDeMundos() {
+  telaInicial?.classList.add("escondido");
+  controlesIniciais?.classList.add("escondido");
+  menuFases?.classList.remove("escondido");
+  atualizarInterfaceProgresso();
+}
+
+/**
+ * Abre a tela de identificação (js/jogador.js). Ao confirmar o apelido, segue
+ * para o menu de mundos; ao voltar, retorna à tela inicial.
+ * Não mexe no progresso salvo.
+ */
+function abrirIdentificacaoDoJogador() {
+  if (typeof window.iniciarIdentificacao !== "function") {
+    console.error("[menu.js] js/jogador.js não foi carregado antes de menu.js.");
+    return;
+  }
+
+  telaInicial?.classList.add("escondido");
+  controlesIniciais?.classList.add("escondido");
+  window.iniciarIdentificacao({
+    aoConcluir: entrarNoMenuDeMundos,
+    aoVoltar: function () {
+      telaInicial?.classList.remove("escondido");
+      controlesIniciais?.classList.remove("escondido");
+    },
+  });
+}
+
 // Navegação básica da tela inicial e menus
 if (botaoJogar && telaInicial && menuFases && controlesIniciais) {
   botaoJogar.addEventListener("click", function () {
     tocarSomBotao();
+    // Intencional nesta versão: cada JOGAR recomeça o progresso local.
+    // Mantido no clique (antes da identificação) porque dev.js faz o backup
+    // do progresso num listener de captura deste mesmo clique.
     localStorage.removeItem("arruma_bagunca_progresso");
 
-    telaInicial.classList.add("escondido");
-    controlesIniciais.classList.add("escondido");
-    menuFases.classList.remove("escondido");
-    atualizarInterfaceProgresso();
+    abrirIdentificacaoDoJogador();
   });
 }
 
@@ -493,15 +526,22 @@ window.addEventListener("message", function (evento) {
 
 /**
  * Verifica se a URL contém o parâmetro ?view=mundos para exibir diretamente a seleção de mundos.
+ * Se ainda não há jogador identificado nesta aba, pede o apelido antes —
+ * sem apagar o progresso (diferente do botão JOGAR).
  */
 function verificarParametroView() {
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.get("view") === "mundos") {
     if (telaInicial && controlesIniciais && menuFases) {
-      telaInicial.classList.add("escondido");
-      controlesIniciais.classList.add("escondido");
-      menuFases.classList.remove("escondido");
-      atualizarInterfaceProgresso();
+      const jogador = typeof window.obterJogadorIdentificado === "function"
+        ? window.obterJogadorIdentificado()
+        : null;
+
+      if (jogador) {
+        entrarNoMenuDeMundos();
+      } else {
+        abrirIdentificacaoDoJogador();
+      }
     }
   }
 }

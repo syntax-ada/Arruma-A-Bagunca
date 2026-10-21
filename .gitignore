@@ -1,0 +1,11 @@
+# Segredos e configurações locais — nunca versionar.
+# Use .env.example como modelo (só nomes, sem valores reais).
+.env
+.env.*
+!.env.example
+
+# Pasta criada pela Vercel CLI
+.vercel/
+
+# Dependências (o projeto não usa hoje; evita commit acidental)
+node_modules/
