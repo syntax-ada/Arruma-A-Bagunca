@@ -232,7 +232,7 @@ function concluirTutorialArrasteFase1() {
 }
 
 function renderizarCestas(listaCategorias = []) {
-  console.log("Tentando renderizar cestas:", listaCategorias);
+
   const containerCategorias = document.querySelector(".categorias");
   if (!containerCategorias) {
     return;
@@ -345,7 +345,7 @@ function startGame(config) {
     const imgArrumado = new Image();
     imgArrumado.src = activeConfig.fundoArrumado;
   }
-  const mundoIdHud = typeof window.obterMundoAtivo === "function" ? window.obterMundoAtivo() : 1;
+
   const usarHudHtmlPuro = true;
   document.querySelectorAll(".hud-container").forEach((hudContainer) => {
     const imgExistente = hudContainer.querySelector(".caixa-instrucoes");
@@ -372,11 +372,11 @@ function startGame(config) {
       if (!imgExistente) {
         const novaImg = document.createElement("img");
         novaImg.className = "caixa-instrucoes";
-        novaImg.src = activeConfig.hudImgSrc || "assets/images/tela_fase1/hud_branco.png";
+
         novaImg.alt = "Caixa de instruções";
         hudContainer.prepend(novaImg);
       } else {
-        imgExistente.src = activeConfig.hudImgSrc || "assets/images/tela_fase1/hud_branco.png";
+
       }
     }
   });

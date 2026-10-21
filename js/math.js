@@ -425,7 +425,7 @@ function abrirEtapaDeOrganizacao() {
     if (bossDaFase) {
         const hudOrgImg = document.querySelector("#tela-organizacao .caixa-instrucoes");
         if (hudOrgImg) {
-            hudOrgImg.src = "assets/images/mundo_5/hud_branco2.png";
+
             hudOrgImg.alt = "Coloque cada item em sua respectiva cesta.";
         }
         const feedbackMsg = document.querySelector("#feedback-message");
@@ -473,7 +473,7 @@ function iniciarDesafioMatematico(dadosQuantidades, operacaoId) {
         document.body.classList.add("fase-com-boss");
         const hudMatematicaImg = document.querySelector("#tela-matematica .caixa-instrucoes");
         if (hudMatematicaImg) {
-            hudMatematicaImg.src = "assets/images/mundo_5/hud_branco.png";
+
             hudMatematicaImg.alt = "Arrume a Bagunça! Derrote o boss da bagunça para ganhar!";
         }
         const tituloMatematica = document.querySelector("#titulo-matematica");

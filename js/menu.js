@@ -396,7 +396,9 @@ if (botaoJogar && telaInicial && menuFases && controlesIniciais) {
     // Intencional nesta versão: cada JOGAR recomeça o progresso local.
     // Mantido no clique (antes da identificação) porque dev.js faz o backup
     // do progresso num listener de captura deste mesmo clique.
-    localStorage.removeItem("arruma_bagunca_progresso");
+    try {
+      localStorage.removeItem("arruma_bagunca_progresso");
+    } catch (_) {}
 
     abrirIdentificacaoDoJogador();
   });
