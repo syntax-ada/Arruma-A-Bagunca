@@ -4,12 +4,10 @@
 
 (function inicializarModoDev() {
   const CHAVE_SESSION_DEV = "arruma_bagunca_dev";
-  const CHAVE_STORAGE_PROGRESSO = "arruma_bagunca_progresso";
 
   const storageSession = typeof window !== "undefined" && window.sessionStorage ? window.sessionStorage : null;
-  const storageLocal = typeof window !== "undefined" && window.localStorage ? window.localStorage : null;
 
-  if (!storageSession || !storageLocal) {
+  if (!storageSession) {
     return;
   }
 
@@ -119,55 +117,55 @@
   }
 
   // ==========================================================
-  // 4. DEV 02 — CONTROLE DE PROGRESSO
+  // 4. DEV 02 — CONTROLE DE PROGRESSO (SÓ O PROGRESSO DE TESTE)
   // ==========================================================
+  // Com o modo DEV ligado, js/progresso.js usa um "progresso de teste"
+  // separado: Desbloquear Tudo e Resetar mexem só nele. O progresso dos
+  // jogadores (no navegador e no banco) nunca é alterado ou apagado por aqui.
+  function gravarProgressoDeTeste(fasesConcluidas) {
+    const servico = window.ServicoProgresso;
+    if (!servico || typeof servico.definirProgressoDeTeste !== "function") {
+      notificarDev("progresso.js não está carregado nesta tela — nada foi alterado.");
+      return false;
+    }
+    servico.definirProgressoDeTeste(fasesConcluidas);
+    return true;
+  }
+
   function desbloquearTudo() {
     const mundos = obterMundosDisponiveis();
-    const mundosDesbloqueados = [];
-    const faseMaximaPorMundo = {};
     const fasesConcluidas = [];
 
     Object.values(mundos).forEach((m) => {
       const mId = Number(m.id);
-      mundosDesbloqueados.push(mId);
       const total = Number(m.totalFases) || 3;
-      faseMaximaPorMundo[mId] = total;
-
       for (let f = 1; f <= total; f++) {
         fasesConcluidas.push(`${mId}-${f}`);
       }
     });
 
-    const progressoTotal = {
-      mundosDesbloqueados,
-      faseMaximaPorMundo,
-      fasesConcluidas,
-    };
-
-    storageLocal.setItem(CHAVE_STORAGE_PROGRESSO, JSON.stringify(progressoTotal));
+    if (!gravarProgressoDeTeste(fasesConcluidas)) {
+      return;
+    }
 
     if (typeof atualizarInterfaceProgresso === "function") {
       atualizarInterfaceProgresso();
     }
     desbloquearMenuVisualSeNecessario();
 
-    notificarDev("Todas as fases e mundos foram desbloqueados com sucesso!");
+    notificarDev("Progresso de teste: todas as fases desbloqueadas. O progresso do jogador não muda.");
   }
 
   function resetarProgresso() {
-    const progressoInicial = {
-      mundosDesbloqueados: [1],
-      faseMaximaPorMundo: { 1: 1 },
-      fasesConcluidas: [],
-    };
-
-    storageLocal.setItem(CHAVE_STORAGE_PROGRESSO, JSON.stringify(progressoInicial));
+    if (!gravarProgressoDeTeste([])) {
+      return;
+    }
 
     if (typeof atualizarInterfaceProgresso === "function") {
       atualizarInterfaceProgresso();
     }
 
-    notificarDev("Progresso resetado para o início (Mundo 1, Fase 1).");
+    notificarDev("Progresso de teste reiniciado (Mundo 1, Fase 1). O progresso do jogador e o banco não mudam.");
   }
 
   // ==========================================================
@@ -521,8 +519,8 @@
       "Atalhos de teclado:\n" +
       "  Shift + C → Completar etapa atual / responder matemática\n" +
       "  Shift + N → Ir para a próxima fase\n" +
-      "  Shift + R → Resetar progresso\n" +
-      "  Shift + D → Desbloquear todas as fases e mundos\n\n" +
+      "  Shift + R → Resetar o progresso de teste\n" +
+      "  Shift + D → Desbloquear todas as fases e mundos (progresso de teste)\n\n" +
       "Funções no console:\n" +
       "  dev.irPara(mundo, fase)\n" +
       "  dev.irParaMenu('menu' | 'mundos')\n" +
@@ -563,31 +561,12 @@
   }
 
   // ==========================================================
-  // 7. INTERCEPTAÇÃO AMIGÁVEL NO MENU (PRESERVAR PROGRESSO DEV)
+  // 7. ATUALIZAÇÃO VISUAL DO MENU
   // ==========================================================
   function desbloquearMenuVisualSeNecessario() {
     // Delega ao menu.js a atualização visual e liberação de fases no Modo Dev
     if (typeof atualizarInterfaceProgresso === "function") {
       atualizarInterfaceProgresso();
-    }
-  }
-
-  function preservarProgressoAoJogar() {
-    const botaoJogar = document.querySelector("#botao-jogar");
-    if (botaoJogar) {
-      // Ao clicar em JOGAR, menu.js chama removeItem. No modo DEV, preservamos o progresso.
-      botaoJogar.addEventListener("click", () => {
-        const backupProgresso = storageLocal.getItem(CHAVE_STORAGE_PROGRESSO);
-        setTimeout(() => {
-          if (backupProgresso && !storageLocal.getItem(CHAVE_STORAGE_PROGRESSO)) {
-            storageLocal.setItem(CHAVE_STORAGE_PROGRESSO, backupProgresso);
-            if (typeof atualizarInterfaceProgresso === "function") {
-              atualizarInterfaceProgresso();
-            }
-          }
-          desbloquearMenuVisualSeNecessario();
-        }, 0);
-      }, true);
     }
   }
 
@@ -929,7 +908,6 @@
 
     carregarCatalogoDeMundosSeNecessario();
     registrarAtalhosDeTeclado();
-    preservarProgressoAoJogar();
 
     if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", criarPainelDevDOM);

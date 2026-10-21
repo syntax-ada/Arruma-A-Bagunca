@@ -17,6 +17,8 @@
  *
  * O jogador confirmado fica em sessionStorage (só nesta aba) apenas para
  * EXIBIÇÃO e para o caminho index.html?view=mundos. Não é prova de nada.
+ * A sessão assinada pelo servidor (resposta de POST /api/jogadores) é
+ * entregue a js/progresso.js, que carrega e salva o progresso deste jogador.
  *
  * Expõe: window.iniciarIdentificacao({ aoConcluir, aoVoltar })
  *        window.obterJogadorIdentificado()
@@ -236,7 +238,25 @@
   }
 
   /**
-   * Etapa 2: cria ou recupera o jogador e segue para o menu de mundos.
+   * Carrega o progresso DESTE jogador (navegador + banco) por js/progresso.js.
+   * Falha de rede não impede a entrada: o progresso guardado no navegador
+   * continua valendo e é enviado ao servidor depois.
+   */
+  async function carregarProgressoDoJogador(jogador, sessao) {
+    const servico = window.ServicoProgresso;
+    if (!servico || typeof servico.iniciarProgressoDoJogador !== "function") {
+      return;
+    }
+    try {
+      await servico.iniciarProgressoDoJogador(jogador, sessao || null);
+    } catch (erro) {
+      // Segue com o progresso do navegador.
+    }
+  }
+
+  /**
+   * Etapa 2: cria ou recupera o jogador, carrega o progresso dele e segue
+   * para o menu de mundos.
    */
   async function confirmarPerfil() {
     if (btnConfirmarApelido.disabled || !perfilEmConfirmacao) {
@@ -246,6 +266,12 @@
     esconderAvisoConexao();
     definirOcupado(btnConfirmarApelido, true, "Entrando…");
     const resultado = await chamarApi("/api/jogadores", { apelido: campoApelido.value });
+    const jogador = resultado.tipo === "ok" ? resultado.dados?.jogador : null;
+    if (jogador) {
+      guardarJogadorIdentificado(jogador);
+      atualizarPerfilNoMenu(jogador);
+      await carregarProgressoDoJogador(jogador, resultado.dados.sessao);
+    }
     definirOcupado(btnConfirmarApelido, false);
 
     if (resultado.tipo === "validacao") {
@@ -253,14 +279,10 @@
       mostrarErroApelido(resultado.mensagem);
       return;
     }
-    if (resultado.tipo === "indisponivel" || !resultado.dados?.jogador) {
+    if (!jogador) {
       mostrarAvisoConexao(confirmarPerfil);
       return;
     }
-
-    const jogador = resultado.dados.jogador;
-    guardarJogadorIdentificado(jogador);
-    atualizarPerfilNoMenu(jogador);
 
     telaIdentificacao.classList.add("escondido");
     if (typeof aoConcluirIdentificacao === "function") {

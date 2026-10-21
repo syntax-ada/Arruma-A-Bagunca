@@ -39,6 +39,7 @@
       h1 { margin: 0 0 6px; font-size: 1.5rem; }
       .aviso { margin: 0 0 20px; color: var(--suave); }
       form, .acoes { display: flex; flex-direction: column; gap: 10px; }
+      .revogar { margin-top: 16px; padding-top: 16px; border-top: 1px solid #d5d9de; }
       label { font-weight: 700; }
       input {
         min-height: 44px;
@@ -89,6 +90,12 @@
         <p id="texto-sessao"></p>
         <a class="botao-link" id="link-jogo" href="index.html">Abrir o jogo com o painel DEV</a>
         <button type="button" class="secundario" id="btn-sair">Sair</button>
+
+        <form id="form-revogar" class="revogar" novalidate>
+          <label for="campo-apelido-revogar">Encerrar as sessões de um jogador</label>
+          <input id="campo-apelido-revogar" name="apelido" autocomplete="off" maxlength="40" />
+          <button type="submit" class="secundario" id="btn-revogar">Encerrar sessões</button>
+        </form>
       </section>
 
       <p id="mensagem" role="status" aria-live="polite"></p>

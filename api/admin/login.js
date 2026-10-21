@@ -6,13 +6,17 @@
  *           + cookie de sessão HttpOnly (o token nunca vai no corpo).
  * Erros:    400 REQUISICAO_INVALIDA · 401 CREDENCIAIS_INVALIDAS (genérico para
  *           código ou PIN errados) · 403 ORIGEM_NAO_PERMITIDA · 405 · 413 · 415
- *           503 SERVICO_INDISPONIVEL (configuração ausente)
+ *           429 MUITAS_TENTATIVAS (limite de tentativas; ver api/_lib/limite.js)
+ *           503 SERVICO_INDISPONIVEL (configuração ausente ou limite indisponível)
  *
- * ⚠️ Sem limite de tentativas nesta versão (ver api/_lib/admin.js).
+ * Limite de tentativas: conferido ANTES do PIN, então tentativas além do
+ * limite nem chegam a calcular o hash. Se o banco que guarda os contadores não
+ * responder, o login é recusado (falha fechada).
  */
 
 const { ErroHttp, aceitarMetodo, lerJson, responderJson, tratarErro } = require("../_lib/http");
 const { DURACAO_PADRAO_MS, criarTokenSessao, montarCookieSessao } = require("../_lib/sessao-admin");
+const { aplicarLimite } = require("../_lib/limite");
 const admin = require("../_lib/admin");
 
 module.exports = async function loginAdmin(req, res) {
@@ -36,6 +40,8 @@ module.exports = async function loginAdmin(req, res) {
     if (!formatoValido) {
       throw new ErroHttp(400, "REQUISICAO_INVALIDA", "Envie o código e o PIN.");
     }
+
+    await aplicarLimite(req, "adminLogin", { falharFechado: true });
 
     if (!admin.credenciaisCorretas(corpo.codigo.trim(), corpo.pin.trim(), hashPin)) {
       throw new ErroHttp(401, "CREDENCIAIS_INVALIDAS", "Código ou PIN inválidos.");

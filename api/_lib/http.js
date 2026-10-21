@@ -17,11 +17,13 @@ const LIMITE_CORPO_BYTES = 10 * 1024;
  * erro e "tratarErro" transforma em resposta JSON.
  */
 class ErroHttp extends Error {
-  constructor(status, codigo, mensagem, extras) {
+  constructor(status, codigo, mensagem, extras, cabecalhos) {
     super(mensagem);
     this.status = status;
     this.codigo = codigo;
     this.extras = extras;
+    // Cabeçalhos extras da resposta de erro (ex.: Retry-After no 429).
+    this.cabecalhos = cabecalhos;
   }
 }
 
@@ -29,6 +31,7 @@ function responderJson(res, status, corpo) {
   res.statusCode = status;
   res.setHeader("Content-Type", "application/json; charset=utf-8");
   res.setHeader("Cache-Control", "no-store");
+  res.setHeader("X-Content-Type-Options", "nosniff");
   res.end(JSON.stringify(corpo));
 }
 
@@ -53,6 +56,10 @@ function aceitarMetodo(req, res, metodo) {
 
 function interpretarJson(conteudo) {
   if (conteudo !== null && typeof conteudo === "object" && !Buffer.isBuffer(conteudo)) {
+    // Corpo já lido pela Vercel: o limite de tamanho vale do mesmo jeito.
+    if (Buffer.byteLength(JSON.stringify(conteudo)) > LIMITE_CORPO_BYTES) {
+      throw new ErroHttp(413, "CORPO_GRANDE_DEMAIS", "Os dados enviados são grandes demais.");
+    }
     return conteudo;
   }
   const texto = Buffer.isBuffer(conteudo) ? conteudo.toString("utf8") : String(conteudo);
@@ -127,6 +134,9 @@ async function lerJson(req) {
  */
 function tratarErro(res, erro) {
   if (erro instanceof ErroHttp) {
+    for (const [nome, valor] of Object.entries(erro.cabecalhos || {})) {
+      res.setHeader(nome, valor);
+    }
     responderErro(res, erro.status, erro.codigo, erro.message, erro.extras);
     return;
   }

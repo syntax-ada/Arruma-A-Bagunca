@@ -13,12 +13,13 @@
  * servidor (nunca o valor). Credencial errada → 401 genérico. Origem que não
  * está na lista → 403.
  *
- * ⚠️ Limites conhecidos desta versão:
- * - NÃO há limite de tentativas de PIN. A defesa é um PIN longo (10 a 12
- *   dígitos) e, quando houver acesso à Vercel, uma regra de limite de
- *   requisições para /api/admin/login.
- * - A sessão NÃO é revogável no servidor: o logout apaga o cookie do
- *   navegador, mas um token copiado antes continua válido até expirar.
+ * Tentativas de PIN: limitadas por rede e no total (api/_lib/limite.js,
+ * regra "adminLogin"), com contadores no banco compartilhados entre
+ * instâncias. Ainda assim, use um PIN longo (10 a 12 dígitos).
+ *
+ * ⚠️ Limite conhecido: a sessão ADMINISTRATIVA não é revogável no servidor:
+ * o logout apaga o cookie do navegador, mas um token copiado antes continua
+ * válido até expirar (60 min). (As sessões de JOGADOR são revogáveis.)
  */
 
 const { ErroHttp } = require("./http");

@@ -1,6 +1,6 @@
 # Tutorial: acesso administrativo e painel DEV
 
-Este guia explica como configurar e usar o acesso administrativo do **Arruma a Bagunça** e o **painel DEV**, a ferramenta da equipe para testar o jogo (pular etapas, liberar mundos, zerar o progresso etc.). O painel **não** é para as crianças.
+Este guia explica como configurar e usar o acesso administrativo do **Arruma a Bagunça** e o **painel DEV**, a ferramenta da equipe para testar o jogo (pular etapas, liberar mundos, zerar o progresso de teste etc.). O painel **não** é para as crianças.
 
 > **Nunca coloque PIN, hash ou segredo neste documento, em mensagens, em issues ou em commits.** Os exemplos abaixo usam marcadores como `<hash gerado>`.
 
@@ -33,9 +33,11 @@ A sessão administrativa dura **60 minutos** e fica num cookie que o JavaScript 
 
 Sem elas, o login responde *"Acesso administrativo indisponível no momento (configuração do servidor)."* e o painel não abre no site publicado. No computador, `?dev=true` funciona mesmo sem elas.
 
+O login também precisa do **banco**: o limite de tentativas de PIN guarda os contadores no Supabase (`SUPABASE_URL`, `SUPABASE_SECRET_KEY` e a migração `supabase/migrations/20261021190000_sessoes_e_limites.sql` aplicada; ver [`seguranca.md`](seguranca.md)). Se o banco não responder, o login é **recusado** de propósito: sem o limite, ele ficaria aberto a tentativas sem fim.
+
 ### 1.3 Gerar o hash do PIN
 
-1. Escolha um PIN só com números, de **10 a 12 dígitos**. O sistema aceita de 6 a 12, mas, como ainda não há limite de tentativas (ver seção 5), um PIN longo é a principal proteção.
+1. Escolha um PIN só com números, de **10 a 12 dígitos**. O sistema aceita de 6 a 12, mas um PIN longo continua sendo a principal proteção, junto com o limite de tentativas (seção 5).
 2. Na pasta do projeto, num terminal **PowerShell, cmd ou Windows Terminal**, rode:
 
    ```text
@@ -111,10 +113,12 @@ Atalhos de teclado do painel:
 |---|---|
 | Shift + C | Completar a etapa atual (ou responder a conta) |
 | Shift + N | Ir para a próxima fase |
-| Shift + R | Resetar o progresso |
-| Shift + D | Desbloquear todas as fases e mundos |
+| Shift + R | Resetar o progresso **de teste** |
+| Shift + D | Desbloquear todas as fases e mundos (no progresso **de teste**) |
 
 No console do navegador (F12) também existem `dev.irPara(mundo, fase)`, `dev.completarFase()`, `dev.desbloquearTudo()`, `dev.resetarProgresso()`, `dev.desativar()` e outras; `dev.ajuda()` lista todas.
+
+> **Progresso de teste:** com o painel ligado, o jogo usa um progresso separado, só deste navegador. Desbloquear Tudo, Resetar e as fases jogadas no modo DEV mexem **só nele**: o progresso do jogador identificado (no navegador e no banco) não muda e nada do modo DEV é enviado ao servidor. Ao desligar o painel, o menu volta a mostrar o progresso real do jogador. Detalhes em [`progresso-supabase.md`](progresso-supabase.md).
 
 ### 2.2 No site publicado (com login)
 
@@ -140,8 +144,13 @@ O painel vale **na aba em que você fez o login**. Em outra aba, abra `/admin.ht
 | *Sessão iniciada.* / *Sessão ativa até HH:MM.* | Deu certo. A sessão dura 60 minutos. |
 | *Código ou PIN inválidos.* | Código ou PIN errado. A mensagem é a mesma nos dois casos, de propósito. |
 | *Abra esta página pelo endereço oficial do jogo.* | O endereço usado não está em `ADMIN_ALLOWED_ORIGINS`. |
-| *Acesso administrativo indisponível no momento (configuração do servidor).* | Falta alguma das três variáveis, ou alguma está inválida. |
+| *Acesso administrativo indisponível no momento (configuração do servidor).* | Falta alguma das três variáveis, alguma está inválida, ou o banco que guarda o limite de tentativas não respondeu (migração não aplicada, Supabase fora do ar). |
+| *Muitas tentativas. Espere alguns minutos e tente de novo.* | Passou do limite: 5 tentativas a cada 15 minutos na mesma rede, ou 30 por hora no total. Espere a janela acabar. |
 | *Não foi possível falar com o servidor. Tente de novo.* | O servidor não respondeu. |
+
+### Encerrar as sessões de um jogador
+
+Com a sessão administrativa ativa, `/admin.html` mostra o campo **"Encerrar as sessões de um jogador"**. Digite o apelido e clique em **Encerrar sessões**: todas as sessões abertas daquela criança deixam de valer na hora (em qualquer aparelho), sem afetar os outros jogadores e **sem apagar o progresso**. O jogo continua guardando as fases no navegador; quando a criança entrar de novo pelo JOGAR, o que ficou pendente é enviado. Para encerrar uma sessão específica pelo id, veja [`seguranca.md`](seguranca.md).
 
 ### Logout
 
@@ -167,6 +176,7 @@ Todos devem passar. Eles usam valores de mentira (não precisam de PIN, segredo 
 - sessão ausente, adulterada ou expirada;
 - logout;
 - login vindo de um endereço não autorizado;
+- tentativas repetidas de PIN (429), inclusive com o PIN certo, e o login recusado se o limite estiver indisponível;
 - variáveis faltando;
 - o próprio `js/dev.js`, simulando o site publicado: `?dev=true` sozinho e o `sessionStorage` editado à mão **não** abrem o painel.
 
@@ -202,8 +212,8 @@ O painel trata como "publicado" qualquer endereço que não seja `localhost`, `1
 
 ### 5.1 Limitações de segurança (existem hoje)
 
-- **Não há limite de tentativas de PIN.** Alguém pode tentar vários PINs seguidos. A proteção atual é o PIN longo; uma regra de limite de requisições na Vercel ainda falta.
-- **A sessão não pode ser cancelada no servidor.** O "Sair" apaga o cookie do navegador, mas uma cópia do cookie feita antes continua válida até completar os 60 minutos. Para derrubar todas as sessões, troque o `ADMIN_SESSION_SECRET` (passo 1.7).
+- **Limite de tentativas de PIN:** 5 por rede a cada 15 minutos e 30 por hora no total. O teto geral protege contra tentativas espalhadas por muitos endereços, mas também permite que alguém **bloqueie o login da equipe por até 1 hora** errando o PIN de propósito. Nesse caso, no computador o painel continua abrindo com `?dev=true`.
+- **A sessão administrativa não pode ser cancelada no servidor.** O "Sair" apaga o cookie do navegador, mas uma cópia do cookie feita antes continua válida até completar os 60 minutos. Para derrubar todas as sessões, troque o `ADMIN_SESSION_SECRET` (passo 1.7). (As sessões dos **jogadores** podem ser encerradas uma a uma; ver seção 3.)
 - **O painel DEV roda no navegador.** Ele só mexe em dados guardados no próprio navegador. A restrição tira o painel do alcance das crianças, mas quem souber usar as ferramentas do desenvolvedor (F12) ainda consegue mexer nos próprios dados locais. Operações importantes no servidor devem sempre exigir a sessão administrativa.
 - **O endereço `/admin.html` e o código `ADM01` não são segredo** (estão no código, que é público). A segurança depende só do PIN.
 - **Login administrativo dentro de um iframe** (por exemplo, na futura integração com o Cruzeiro HUB) não deve funcionar, porque o cookie é `SameSite=Strict`. Faça o login sempre no endereço do próprio jogo.
@@ -221,7 +231,7 @@ O painel trata como "publicado" qualquer endereço que não seja `localhost`, `1
 | **Vercel:** cookie com `Secure` em HTTPS num navegador real | ⏳ Pendente (só foi conferido no cabeçalho, em teste automático) |
 | **Vercel:** leitura dos dados do login pelo servidor da Vercel | ⏳ Pendente (testado só no servidor local) |
 | **Vercel:** endereços de *Preview* em `ADMIN_ALLOWED_ORIGINS` | ⏳ Pendente |
-| **Vercel:** regra de limite de tentativas para `/api/admin/login` | ⏳ Pendente (não existe ainda) |
+| Limite de tentativas de PIN (contadores no banco) | ✅ Testes automáticos com banco simulado e navegador Chrome no computador. ⏳ Pendente no Supabase real e na Vercel (roteiro em [`seguranca.md`](seguranca.md)) |
 
 ---
 
@@ -241,8 +251,8 @@ O painel trata como "publicado" qualquer endereço que não seja `localhost`, `1
 ## Referências no código
 
 - Tela de login: `admin.html` e `js/admin.js`.
-- Servidor: `api/admin/login.js`, `api/admin/logout.js`, `api/admin/sessao.js` e as regras em `api/_lib/admin.js`. Hash do PIN em `api/_lib/pin.js`; sessão e cookie em `api/_lib/sessao-admin.js`.
+- Servidor: `api/admin/login.js`, `api/admin/logout.js`, `api/admin/sessao.js`, `api/admin/revogar-sessao-jogador.js` e as regras em `api/_lib/admin.js`. Hash do PIN em `api/_lib/pin.js`; sessão e cookie em `api/_lib/sessao-admin.js`; limite de tentativas em `api/_lib/limite.js`.
 - Painel DEV e regra local/publicado: `js/dev.js`.
 - Script do hash: `scripts/gerar-hash-pin.js`.
-- Testes: `testes/admin.test.js` e `testes/dev-acesso.test.js`.
+- Testes: `testes/admin.test.js`, `testes/dev-acesso.test.js`, `testes/limite.test.js` e `testes/progresso-api.test.js` (revogação).
 - Visão geral do projeto: [`README.md`](../README.md).

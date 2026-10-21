@@ -75,6 +75,10 @@ async function supabaseFalso(entrada, opcoes = {}) {
   ) {
     return responderFalso(401, { message: "Invalid API key" });
   }
+  if (endereco.pathname === "/rest/v1/rpc/consumir_limite_requisicoes") {
+    // Limite de requisições (testado em progresso-api.test.js): aqui sempre libera.
+    return responderFalso(200, { permitido: true, espera_segundos: 0 });
+  }
   if (endereco.pathname !== "/rest/v1/players") {
     return responderFalso(404, { message: "tabela inexistente" });
   }
@@ -142,12 +146,17 @@ function nadaVazou(texto) {
   return !texto.includes(CHAVE_FALSA) && !texto.includes("projeto-falso");
 }
 
+// Só os pedidos à tabela players (fora a função do limite de requisições).
+function chamadasAPlayers() {
+  return chamadas.filter((c) => c.caminho === "/rest/v1/players");
+}
+
 test("jogador novo: consulta não grava; criação devolve 201 e grava no formato da tabela", async () => {
   const consulta = await postJson("/api/jogadores/verificar", { apelido: "  Leão   Azul " });
   assert.equal(consulta.status, 200);
   assert.deepEqual(await consulta.json(), { existe: false, apelido: "Leão Azul" });
   assert.equal(tabela.size, 0);
-  assert.deepEqual(chamadas.map((c) => c.metodo), ["GET"]);
+  assert.deepEqual(chamadasAPlayers().map((c) => c.metodo), ["GET"]);
 
   const criacao = await postJson("/api/jogadores", { apelido: "Leão Azul", avatar: "outro" });
   assert.equal(criacao.status, 201);
@@ -168,7 +177,7 @@ test("jogador novo: consulta não grava; criação devolve 201 e grava no format
 
 test("o pedido ao Supabase usa upsert que ignora duplicados e a chave só nos cabeçalhos", async () => {
   await postJson("/api/jogadores", { apelido: "Gato Feliz" });
-  const insercao = chamadas.find((c) => c.metodo === "POST");
+  const insercao = chamadasAPlayers().find((c) => c.metodo === "POST");
   assert.equal(insercao.caminho, "/rest/v1/players");
   assert.equal(insercao.consulta.get("on_conflict"), "normalized_nickname");
   assert.match(insercao.cabecalhos.get("prefer"), /resolution=ignore-duplicates/);
@@ -185,7 +194,8 @@ test("jogador existente é recuperado: mesmo id, mesma grafia, sem duplicata", a
   for (const variacao of ["leao azul", "LEÃO  AZUL", "leaoazul", "  Léao   Âzul "]) {
     const consulta = await (await postJson("/api/jogadores/verificar", { apelido: variacao })).json();
     assert.equal(consulta.existe, true, variacao);
-    assert.deepEqual(consulta.jogador, primeiro.jogador, variacao);
+    // A consulta mostra só o que a tela precisa: o id não é exposto aqui.
+    assert.deepEqual(consulta.jogador, { apelido: primeiro.jogador.apelido, avatar: primeiro.jogador.avatar }, variacao);
 
     const recuperacao = await postJson("/api/jogadores", { apelido: variacao });
     assert.equal(recuperacao.status, 200, variacao);
@@ -331,7 +341,7 @@ test("espaços de qualquer tipo no apelido recuperam o mesmo jogador e nunca che
   assert.equal(tabela.size, 1);
   assert.equal([...tabela.keys()][0], "anaclara");
   // Tudo que foi enviado ao banco como valor normalizado está no formato obrigatório.
-  const enviados = chamadas.filter((c) => c.corpo).map((c) => c.corpo.normalized_nickname);
+  const enviados = chamadasAPlayers().filter((c) => c.corpo).map((c) => c.corpo.normalized_nickname);
   assert.ok(enviados.length > 0 && enviados.every((v) => /^[a-z0-9]{3,20}$/.test(v)), JSON.stringify(enviados));
 });
 

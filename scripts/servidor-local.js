@@ -12,8 +12,9 @@
  * SUPABASE_URL e SUPABASE_SECRET_KEY. Elas ficam em .env.local (fora do git):
  *   node --env-file=.env.local scripts/servidor-local.js
  *
- * ⚠️ Com o .env.local configurado, os jogadores criados aqui são gravados no
- * banco REAL do Supabase configurado nele — não é um ambiente de teste.
+ * ⚠️ Com o .env.local configurado, os jogadores criados aqui (e, com
+ * PLAYER_SESSION_SECRET, as fases concluídas) são gravados no banco REAL do
+ * Supabase configurado nele — não é um ambiente de teste.
  *
  * Variáveis opcionais: PORTA (padrão 3000) e HOST (padrão 127.0.0.1 — só este
  * computador).
@@ -228,6 +229,11 @@ function iniciar() {
     } else {
       console.log("  ⚠ Supabase NÃO configurado: a identificação mostrará \"Não conseguimos conectar\".");
       console.log("    Rode: node --env-file=.env.local scripts/servidor-local.js");
+    }
+    if (process.env.PLAYER_SESSION_SECRET) {
+      console.log("  Sessão do jogador: configurada — o progresso é salvo no banco.");
+    } else {
+      console.log("  ⚠ PLAYER_SESSION_SECRET NÃO configurado: o progresso fica só no navegador.");
     }
     console.log("  Ctrl+C para parar.");
   });

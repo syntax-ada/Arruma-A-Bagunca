@@ -57,7 +57,10 @@ Principais responsabilidades:
 - `game.js` → mecânica de organização dos objetos, motor compartilhado por todos os mundos e fases orquestrado por `startGame()`;
 - `math.js` → motor do desafio matemático desacoplado, resolvendo a conta via `window.OPERACOES` e disparando a progressão;
 - `operacoes.js` → catálogo e regras das operações matemáticas (Soma, Subtração, Multiplicação, Divisão e contas compostas);
-- `progresso.js` → serviço de persistência de progresso (`localStorage`) multi-mundo e multi-fase;
+- `regras-progresso.js` → catálogo das 13 fases e regras da ordem; o mesmo arquivo é usado pelo navegador e pelo servidor (`api/progresso/*`);
+- `progresso.js` → serviço de progresso por jogador: guarda no `localStorage` (uma chave por jogador; o modo DEV usa um progresso de teste separado) e sincroniza com `api/progresso` usando a sessão do jogador;
+- `api/progresso/*` e `api/_lib/sessao-jogador.js` → leitura e gravação das fases concluídas (tabela `phase_completions`); use `await exigirSessaoJogador(req, "<regra>")` em todo endpoint de progresso (confere assinatura, limite e sessão ativa no banco);
+- `api/_lib/limite.js` → limite de requisições com contadores no Supabase (compartilhados entre instâncias); use `aplicarLimite(req, "<regra>")` em endpoint novo que acesse o banco ou confira segredo;
 - `dev.js` → ferramenta de desenvolvimento e painel de testes. Só ele decide se o modo DEV liga: em ambiente local (`localhost`, `127.0.0.1`, `file://`), por `?dev=true`; no site publicado, `?dev=true` ou o `sessionStorage` sozinhos **não** ligam — o painel só abre depois do login em `admin.html` e da conferência da sessão no servidor (`GET /api/admin/sessao`). O `menu.js` apenas lê o resultado (`window.modoDevLiberado`);
 - `admin.html` + `js/admin.js` → login administrativo da equipe; `api/admin/*` e `api/_lib/admin.js` → login, logout e sessão no servidor (use `exigirSessaoAdmin(req)` em todo endpoint administrativo);
 - `js/mundos/` → arquivos declarativos de configuração de cada mundo (`mundo1.js` a `mundo5.js`), auto-registrados em `window.MUNDOS`.
@@ -88,11 +91,11 @@ se o código mudar, atualize-a como parte da tarefa que a alterou.
 
 | O quê | Regra |
 |---|---|
-| `js/progresso.js` | Não alterar por iniciativa própria nem fora do escopo da tarefa. Alterações excepcionais só com autorização explícita da equipe e justificativa (por exemplo, a futura etapa de persistência do progresso no banco). Preservar as assinaturas `obterProgresso()` e `desbloquearProximaFase(faseAtual, mundoAtual, totalFases)`. |
+| `js/progresso.js` | Não alterar por iniciativa própria nem fora do escopo da tarefa. Alterações excepcionais só com autorização explícita da equipe e justificativa (por exemplo, mudanças na sincronização com o banco). Preservar as assinaturas `obterProgresso()` (síncrona) e `desbloquearProximaFase(faseAtual, mundoAtual, totalFases)`. |
 | `js/game.js` | É compartilhado por todos os mundos. Avaliar e sinalizar o impacto antes de alterar. |
-| Comportamento do botão JOGAR | Apagar o progresso local é intencional. Não alterar sem decisão da equipe. |
+| Comportamento do botão JOGAR | JOGAR **não** apaga progresso (nem no navegador, nem no banco). Não reintroduzir limpeza no JOGAR. Recomeçar o progresso para testes é ação separada (painel DEV, só o progresso de teste) e nunca apaga dados do banco. |
 | Estrutura oficial de fases | A faculdade exige 4 fases principais + 1 fase bônus. Não remover, reduzir nem descaracterizar a fase bônus (Mundo 5) sem decisão da equipe. |
-| Supabase | Nunca executar SQL, migrações, alterações de esquema, RLS ou exclusão de registros. Criar ou rodar migrações é tarefa futura da equipe: só com pedido explícito. Consultas somente de leitura, e só se pedidas. Não presuma que o projeto acessível por uma ferramenta é o do jogo: confirme antes. |
+| Supabase | Nunca executar SQL, migrações, alterações de esquema, RLS ou exclusão de registros. Arquivos de migração (`supabase/migrations/`) só são criados com pedido explícito, e quem os aplica é sempre a equipe, manualmente. Consultas somente de leitura, e só se pedidas. Não presuma que o projeto acessível por uma ferramenta é o do jogo: confirme antes. |
 | Vercel | Não fazer deploy nem alterar projetos, variáveis ou configurações. |
 | Dependências e build | Não adicionar `package.json`, bibliotecas ou ferramentas de build. |
 | Ações destrutivas | Apagar arquivos ou dados, reescrever histórico. |
@@ -106,8 +109,13 @@ Preserve estes acoplamentos. Para o mapa completo, veja a seção Arquitetura do
 - Os scripts são clássicos, com globais e sem módulos: **respeite a ordem de carregamento** nos HTML (por exemplo, `main.js` é o último script de `fase1.html`).
 - Cada mundo é um arquivo declarativo em `js/mundos/` que se registra em `window.MUNDOS`. Regras de jogo ficam no motor (`game.js`, `math.js`, `operacoes.js`), não nos mundos.
 - A fase roda em um iframe do menu e volta a ele por `postMessage` (`arruma-bagunca:navegacao`). Mantenha o contrato.
-- **JOGAR:** o `removeItem` do progresso acontece no clique, antes da identificação, e `dev.js` faz o backup do progresso num listener de captura no mesmo botão. Preserve a ordem. `?view=mundos` **não** apaga o progresso e pede o apelido se a aba não tem jogador.
+- **JOGAR:** abre a identificação sem mexer no progresso. Depois do apelido, `js/jogador.js` entrega a sessão recebida do servidor a `js/progresso.js`, que carrega o progresso daquele jogador antes de o menu aparecer. `?view=mundos` também não apaga nada e pede o apelido se a aba não tem jogador.
 - O jogador identificado fica em `sessionStorage` **só para exibição**. Nunca é prova de identidade nem de permissão.
+- **Progresso:** os endpoints de progresso usam só o id que está no token assinado (`exigirSessaoJogador`); nunca um id vindo do navegador. A sincronização só **soma** (união): nada apaga nem substitui conclusões, no banco ou no navegador, e o progresso de um jogador nunca é gravado na chave de outro. O progresso do modo DEV fica separado e nunca é enviado ao servidor.
+- A regra das fases (13 fases e a ordem) vive em `js/regras-progresso.js`, usada pelo navegador e pelo servidor. Mantenha-a igual ao `CHECK` da migração de `phase_completions`.
+- **Limite de requisições:** o contador fica no banco, nunca só em memória. Aplique o limite depois da validação barata e antes do trabalho caro (banco, PIN). Endpoints do jogo falham **abertos** se o limite estiver indisponível; os administrativos falham **fechados** (`falharFechado: true`). O IP vem só de `obterIpDoCliente` (`X-Forwarded-For` só é confiável na Vercel) e nunca é gravado cru: as chaves são HMAC.
+- **Sessões de jogador** têm registro em `player_sessions` e podem ser revogadas; a revogação nunca apaga progresso.
+- Funções SQL novas: `security invoker`, `set search_path = ''`, nomes com esquema, e `revoke ... from public, anon, authenticated` + `grant execute` só para `service_role`.
 - Backend (`api/`): CommonJS, só APIs nativas do Node, sem dependências. `api/_lib/` não vira rota. Erros no formato `{ erro, mensagem }`.
 - A validação, a normalização e o filtro do apelido vivem **só no servidor** (`api/_lib/apelido.js`), que é a fonte única da regra. O navegador apenas exibe a mensagem recebida.
 - O Supabase só é acessado por `api/_lib/supabase.js`, e só pelo servidor. O avatar gravado é sempre o padrão; o valor enviado pelo navegador é ignorado.

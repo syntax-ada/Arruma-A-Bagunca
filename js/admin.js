@@ -19,11 +19,15 @@
   const secaoSessao = document.querySelector("#secao-sessao");
   const textoSessao = document.querySelector("#texto-sessao");
   const btnSair = document.querySelector("#btn-sair");
+  const formRevogar = document.querySelector("#form-revogar");
+  const campoApelidoRevogar = document.querySelector("#campo-apelido-revogar");
+  const btnRevogar = document.querySelector("#btn-revogar");
   const mensagem = document.querySelector("#mensagem");
 
   const MENSAGENS = {
     401: "Código ou PIN inválidos.",
     403: "Abra esta página pelo endereço oficial do jogo.",
+    429: "Muitas tentativas. Espere alguns minutos e tente de novo.",
     503: "Acesso administrativo indisponível no momento (configuração do servidor).",
     rede: "Não foi possível falar com o servidor. Tente de novo.",
     outro: "Não foi possível entrar. Tente de novo.",
@@ -110,6 +114,59 @@
     }
     mostrarMensagem(MENSAGENS[resposta.status] || MENSAGENS.outro, "erro");
     campoPin.focus();
+  });
+
+  // Encerra no servidor as sessões de um jogador (ex.: apelido usado por
+  // outra pessoa). Não apaga o progresso: a criança só precisa entrar de novo.
+  formRevogar.addEventListener("submit", async function (evento) {
+    evento.preventDefault();
+    if (btnRevogar.disabled) {
+      return;
+    }
+    const apelido = campoApelidoRevogar.value.trim();
+    if (!apelido) {
+      mostrarMensagem("Escreva o apelido do jogador.", "erro");
+      return;
+    }
+    btnRevogar.disabled = true;
+    mostrarMensagem("Encerrando…");
+
+    let resposta;
+    try {
+      resposta = await fetch("/api/admin/revogar-sessao-jogador", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ apelido }),
+      });
+    } catch (erro) {
+      resposta = null;
+    } finally {
+      btnRevogar.disabled = false;
+    }
+
+    if (!resposta) {
+      mostrarMensagem(MENSAGENS.rede, "erro");
+      return;
+    }
+    if (resposta.status === 200) {
+      const { revogadas } = await resposta.json();
+      mostrarMensagem(`${revogadas} sessão(ões) encerrada(s).`, "ok");
+      campoApelidoRevogar.value = "";
+      return;
+    }
+    if (resposta.status === 401) {
+      mostrarLogin();
+      mostrarMensagem("A sessão administrativa expirou. Entre de novo.", "erro");
+      return;
+    }
+    const textos = {
+      400: "Apelido inválido.",
+      404: "Nenhum jogador com esse apelido.",
+      429: MENSAGENS[429],
+      403: MENSAGENS[403],
+    };
+    mostrarMensagem(textos[resposta.status] || "Não foi possível encerrar as sessões. Tente de novo.", "erro");
   });
 
   btnSair.addEventListener("click", async function () {

@@ -381,13 +381,8 @@ function abrirIdentificacaoDoJogador() {
 if (botaoJogar && telaInicial && menuFases && controlesIniciais) {
   botaoJogar.addEventListener("click", function () {
     tocarSomBotao();
-    // Intencional nesta versão: cada JOGAR recomeça o progresso local.
-    // Mantido no clique (antes da identificação) porque dev.js faz o backup
-    // do progresso num listener de captura deste mesmo clique.
-    try {
-      localStorage.removeItem("arruma_bagunca_progresso");
-    } catch (_) {}
-
+    // JOGAR não apaga progresso (nem no navegador, nem no banco): depois da
+    // identificação, js/progresso.js carrega o progresso DESTE jogador.
     abrirIdentificacaoDoJogador();
   });
 }
@@ -516,8 +511,8 @@ window.addEventListener("message", function (evento) {
 
 /**
  * Verifica se a URL contém o parâmetro ?view=mundos para exibir diretamente a seleção de mundos.
- * Se ainda não há jogador identificado nesta aba, pede o apelido antes —
- * sem apagar o progresso (diferente do botão JOGAR).
+ * Se ainda não há jogador identificado nesta aba, pede o apelido antes.
+ * Assim como o botão JOGAR, não apaga progresso.
  */
 function verificarParametroView() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -535,6 +530,12 @@ function verificarParametroView() {
     }
   }
 }
+
+// js/progresso.js avisa quando o progresso muda (ex.: o progresso do jogador
+// chegou do servidor depois da identificação) para o menu se redesenhar.
+window.addEventListener("arruma-bagunca:progresso-atualizado", function () {
+  atualizarInterfaceProgresso();
+});
 
 document.addEventListener("DOMContentLoaded", function () {
   atualizarInterfaceProgresso();

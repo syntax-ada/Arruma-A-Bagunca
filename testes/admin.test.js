@@ -9,8 +9,11 @@ const http = require("node:http");
 const { criarServidor } = require("../scripts/servidor-local");
 const { gerarHashPin } = require("../api/_lib/pin");
 const { criarTokenSessao } = require("../api/_lib/sessao-admin");
-const { exigirSessaoAdmin } = require("../api/_lib/admin");
+const admin = require("../api/_lib/admin");
+const { esquecerBloqueiosLocais } = require("../api/_lib/limite");
+const { CHAVE_FALSA, URL_FALSA, criarSupabaseFalso } = require("./apoio/supabase-falso");
 
+const { exigirSessaoAdmin } = admin;
 const PIN = "4829137056";
 const SEGREDO = "segredo-de-teste-com-mais-de-32-caracteres-abc";
 const OUTRO_SEGREDO = "outro-segredo-de-teste-com-mais-de-32-caracteres";
@@ -20,10 +23,14 @@ let servidor;
 let porta;
 let origemLocal;
 let logs;
+let desinstalar;
 const consoleErrorReal = console.error;
+// Os contadores do limite de tentativas ficam no Supabase (simulado aqui).
+const banco = criarSupabaseFalso();
 
 before(async () => {
   HASH = gerarHashPin(PIN);
+  desinstalar = banco.instalar();
   servidor = criarServidor();
   await new Promise((resolve) => servidor.listen(0, "127.0.0.1", resolve));
   porta = servidor.address().port;
@@ -33,11 +40,17 @@ before(async () => {
 
 after(() => {
   servidor.close();
+  desinstalar();
   console.error = consoleErrorReal;
 });
 
 beforeEach(() => {
   logs = [];
+  banco.zerar();
+  esquecerBloqueiosLocais();
+  delete process.env.VERCEL;
+  process.env.SUPABASE_URL = URL_FALSA;
+  process.env.SUPABASE_SECRET_KEY = CHAVE_FALSA;
   process.env.ADMIN_PIN_HASH = HASH;
   process.env.ADMIN_SESSION_SECRET = SEGREDO;
   process.env.ADMIN_ALLOWED_ORIGINS = `${origemLocal}, ${ORIGEM_HTTPS}`;
@@ -157,6 +170,102 @@ test("login: método, tipo de conteúdo e formato do corpo", async () => {
   assert.equal((await login({ codigo: "ADM01", pin: 4829137056 })).status, 400);
   assert.equal((await login({ codigo: "ADM01", pin: "1".repeat(40) })).status, 400);
   assert.equal((await login({ codigo: "ADM01", pin: "1".repeat(20000) })).status, 413);
+});
+
+// ---------------- Tentativas repetidas de PIN ----------------
+
+// Conta quantas vezes o PIN foi de fato conferido (o cálculo caro do hash).
+function espiarConferenciaDoPin() {
+  const original = admin.credenciaisCorretas;
+  const espia = { vezes: 0, restaurar: () => { admin.credenciaisCorretas = original; } };
+  admin.credenciaisCorretas = (...argumentos) => {
+    espia.vezes++;
+    return original(...argumentos);
+  };
+  return espia;
+}
+
+test("PIN: depois de 5 tentativas na mesma rede em 15 min, 429 — até com o PIN certo, e sem conferir o PIN", async () => {
+  const espia = espiarConferenciaDoPin();
+  try {
+    for (let i = 0; i < 5; i++) {
+      assert.equal((await login({ codigo: "ADM01", pin: `11111111${10 + i}` })).status, 401);
+    }
+    assert.equal(espia.vezes, 5);
+
+    const bloqueado = await login({ codigo: "ADM01", pin: PIN });
+    assert.equal(bloqueado.status, 429);
+    assert.equal(bloqueado.json.erro, "MUITAS_TENTATIVAS");
+    assert.equal(bloqueado.cabecalhos["set-cookie"], undefined);
+    const espera = Number(bloqueado.cabecalhos["retry-after"]);
+    assert.ok(espera >= 1 && espera <= 15 * 60, String(espera));
+    assert.equal(espia.vezes, 5, "tentativa além do limite nem calcula o hash");
+    assert.ok(nadaSensivel(bloqueado.texto));
+
+    // Passada a janela (relógio do banco adiantado; outra instância), o PIN certo entra.
+    banco.deslocamentoRelogioMs = 15 * 60 * 1000;
+    esquecerBloqueiosLocais();
+    assert.equal((await login({ codigo: "ADM01", pin: PIN })).status, 200);
+  } finally {
+    espia.restaurar();
+  }
+});
+
+test("PIN: pedidos malformados ou de outra origem não gastam tentativas", async () => {
+  for (let i = 0; i < 10; i++) {
+    assert.equal((await login({ codigo: "ADM01" })).status, 400);
+    assert.equal((await login({ codigo: "ADM01", pin: PIN }, { origem: "https://site-malicioso.exemplo" })).status, 403);
+  }
+  assert.equal(banco.chamadasDe("rpc/consumir_limite_requisicoes").length, 0);
+  assert.equal((await login({ codigo: "ADM01", pin: PIN })).status, 200);
+});
+
+test("PIN: X-Forwarded-For inventado não dá tentativas novas fora da Vercel", async () => {
+  for (let i = 0; i < 5; i++) {
+    await login({ codigo: "ADM01", pin: "0000000000" }, { extras: { "X-Forwarded-For": `198.51.100.${i}` } });
+  }
+  const resposta = await login({ codigo: "ADM01", pin: PIN }, { extras: { "X-Forwarded-For": "198.51.100.200" } });
+  assert.equal(resposta.status, 429);
+});
+
+test("PIN: na Vercel, cada rede tem as suas 5 tentativas, mas há um teto geral de 30 por hora", async () => {
+  process.env.VERCEL = "1";
+  const espia = espiarConferenciaDoPin();
+  try {
+    for (let rede = 0; rede < 6; rede++) {
+      for (let i = 0; i < 5; i++) {
+        const resposta = await login({ codigo: "ADM01", pin: "0000000000" }, { extras: { "X-Forwarded-For": `203.0.113.${rede}` } });
+        assert.equal(resposta.status, 401, `rede ${rede}, tentativa ${i + 1}`);
+      }
+    }
+    assert.equal(espia.vezes, 30);
+    // Uma rede nova, ainda sem nenhuma tentativa, já esbarra no teto geral.
+    const rede7 = await login({ codigo: "ADM01", pin: PIN }, { extras: { "X-Forwarded-For": "203.0.113.99" } });
+    assert.equal(rede7.status, 429);
+    assert.equal(espia.vezes, 30);
+  } finally {
+    espia.restaurar();
+  }
+});
+
+test("PIN: se o limite estiver indisponível, o login é recusado (falha fechada), sem conferir o PIN", async () => {
+  const espia = espiarConferenciaDoPin();
+  try {
+    for (const modo of ["sem-funcao-de-limite", "rede"]) {
+      banco.modo = modo;
+      logs = [];
+      const resposta = await login({ codigo: "ADM01", pin: PIN });
+      assert.equal(resposta.status, 503, modo);
+      assert.equal(resposta.cabecalhos["set-cookie"], undefined);
+      assert.ok(logs.some((l) => l.includes("[limite]") && l.includes("recusado")));
+      assert.ok(logs.every(nadaSensivel));
+    }
+    delete process.env.SUPABASE_URL;
+    assert.equal((await login({ codigo: "ADM01", pin: PIN })).status, 503, "sem Supabase configurado");
+    assert.equal(espia.vezes, 0);
+  } finally {
+    espia.restaurar();
+  }
 });
 
 // ---------------- Sessão ----------------

@@ -16,6 +16,15 @@ const AVATAR_PADRAO = "padrao";
 // recusar qualquer valor fora dele; esta verificação evita ao menos enviá-lo.
 const FORMATO_NORMALIZADO = /^[a-z0-9]{3,20}$/;
 
+const FORMATO_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+
+function exigirUuid(valor) {
+  if (typeof valor !== "string" || !FORMATO_UUID.test(valor)) {
+    console.error("[supabase] Identificador fora do formato esperado; nada foi enviado ao banco.");
+    throw new ErroHttp(500, "ERRO_INTERNO", "Algo deu errado. Tente de novo.");
+  }
+}
+
 function exigirFormatoNormalizado(valor) {
   if (typeof valor !== "string" || !FORMATO_NORMALIZADO.test(valor)) {
     console.error("[supabase] Apelido normalizado fora do formato esperado; nada foi enviado ao banco.");
@@ -120,11 +129,11 @@ async function requisitarSupabase(caminho, opcoes = {}) {
     // Nunca devolvemos URL, chave ou corpo do erro ao navegador.
     // Só o código curto do erro (ex.: 42501 permissão, 23505 duplicado); a
     // mensagem e os detalhes podem conter dados e não são registrados.
-    let codigo = "";
+    let codigoBanco = "";
     try {
       const corpoErro = await resposta.json();
       if (typeof corpoErro?.code === "string" && /^[A-Za-z0-9_]{1,20}$/.test(corpoErro.code)) {
-        codigo = ` (código ${corpoErro.code})`;
+        codigoBanco = corpoErro.code;
       }
     } catch {
       // Sem corpo JSON: fica só o status.
@@ -132,14 +141,18 @@ async function requisitarSupabase(caminho, opcoes = {}) {
     console.error(
       "[supabase] Requisição falhou:",
       resposta.status,
-      resposta.statusText + codigo
+      resposta.statusText + (codigoBanco ? ` (código ${codigoBanco})` : "")
     );
 
-    throw new ErroHttp(
+    const erro = new ErroHttp(
       503,
       "SERVICO_INDISPONIVEL",
       "Não conseguimos conectar agora. Tente de novo!"
     );
+    // Só para o servidor decidir o que fazer (ex.: 23503 = jogador inexistente).
+    // Não faz parte da resposta enviada ao navegador.
+    erro.codigoBanco = codigoBanco;
+    throw erro;
   }
 
   if (resposta.status === 204) {
@@ -236,8 +249,157 @@ async function criarOuRecuperar(apelido, apelidoNormalizado) {
   return { criado: false, jogador };
 }
 
+/**
+ * Lista as fases concluídas pelo jogador, como ids "mundo-fase" (ex.: "1-2").
+ * O id do jogador vem SEMPRE da sessão validada no servidor, nunca do navegador.
+ */
+async function listarFasesConcluidas(jogadorId) {
+  exigirUuid(jogadorId);
+  const consulta = new URLSearchParams({
+    select: "world,phase",
+    player_id: `eq.${jogadorId}`,
+    order: "world.asc,phase.asc",
+  });
+
+  const registros = await requisitarSupabase(`phase_completions?${consulta.toString()}`);
+  return registros.map((registro) => `${registro.world}-${registro.phase}`);
+}
+
+/**
+ * Grava conclusões já validadas por js/regras-progresso.js. Repetições são
+ * ignoradas pela chave primária (player_id, world, phase): dois pedidos
+ * simultâneos com a mesma fase gravam uma linha só. Devolve as fases que
+ * foram de fato inseridas agora.
+ *
+ * Jogador inexistente (removido do banco) → 401: a sessão deixou de valer.
+ */
+async function registrarFasesConcluidas(jogadorId, fases) {
+  exigirUuid(jogadorId);
+  if (!Array.isArray(fases) || fases.length === 0) {
+    return [];
+  }
+
+  const linhas = fases.map((id) => {
+    const [world, phase] = id.split("-").map(Number);
+    return { player_id: jogadorId, world, phase };
+  });
+  const consulta = new URLSearchParams({
+    on_conflict: "player_id,world,phase",
+    select: "world,phase",
+  });
+
+  let registros;
+  try {
+    registros = await requisitarSupabase(`phase_completions?${consulta.toString()}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Prefer: "resolution=ignore-duplicates,return=representation",
+      },
+      body: JSON.stringify(linhas),
+    });
+  } catch (erro) {
+    // 23503 = chave estrangeira: o jogador do token não existe mais no banco.
+    if (erro?.codigoBanco === "23503") {
+      throw new ErroHttp(401, "NAO_AUTENTICADO", "Entre de novo com o seu apelido para salvar o progresso.");
+    }
+    throw erro;
+  }
+
+  return registros.map((registro) => `${registro.world}-${registro.phase}`);
+}
+
+// ---------------------------------------------------------------------------
+// Sessões de jogador (tabela player_sessions): permitem revogar UMA sessão
+// sem derrubar as outras. O token assinado leva o id da sessão; cada pedido de
+// progresso confere aqui se ela continua ativa.
+// ---------------------------------------------------------------------------
+
+/** Cria a sessão no banco e devolve o id dela. */
+async function registrarSessaoJogador(jogadorId, expiraEm) {
+  exigirUuid(jogadorId);
+  const registros = await requisitarSupabase("player_sessions?select=id", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Prefer: "return=representation" },
+    body: JSON.stringify({ player_id: jogadorId, expires_at: new Date(expiraEm).toISOString() }),
+  });
+  const id = registros[0]?.id;
+  exigirUuid(id);
+  return id;
+}
+
+/**
+ * true só se a sessão existe, é do jogador indicado, não foi revogada e não
+ * expirou. Falha do banco → 503 (nunca libera sem conferir).
+ */
+async function sessaoJogadorEstaAtiva(sessaoId, jogadorId) {
+  exigirUuid(sessaoId);
+  exigirUuid(jogadorId);
+  const consulta = new URLSearchParams({
+    select: "player_id,expires_at,revoked_at",
+    id: `eq.${sessaoId}`,
+    limit: "1",
+  });
+  const [sessao] = await requisitarSupabase(`player_sessions?${consulta.toString()}`);
+  return !!sessao && sessao.player_id === jogadorId && !sessao.revoked_at && Date.parse(sessao.expires_at) > Date.now();
+}
+
+/**
+ * Revoga UMA sessão ({ sessaoId }) ou todas as sessões ativas de UM jogador
+ * ({ jogadorId }). Devolve quantas foram revogadas agora.
+ */
+async function revogarSessoesJogador({ sessaoId, jogadorId }) {
+  const filtro = new URLSearchParams({ select: "id", revoked_at: "is.null" });
+  if (sessaoId) {
+    exigirUuid(sessaoId);
+    filtro.set("id", `eq.${sessaoId}`);
+  } else {
+    exigirUuid(jogadorId);
+    filtro.set("player_id", `eq.${jogadorId}`);
+  }
+  const registros = await requisitarSupabase(`player_sessions?${filtro.toString()}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", Prefer: "return=representation" },
+    body: JSON.stringify({ revoked_at: new Date().toISOString() }),
+  });
+  return registros.length;
+}
+
+// ---------------------------------------------------------------------------
+// Limite de requisições: contadores compartilhados entre instâncias, na função
+// consumir_limite_requisicoes (migração em supabase/migrations/).
+// ---------------------------------------------------------------------------
+
+/**
+ * Conta mais um pedido em cada chave e diz se ele cabe nos limites.
+ * regras: [{ chave, limite, janelaSegundos }]
+ * Devolve { permitido, esperaSegundos }.
+ */
+async function consumirLimites(regras) {
+  const resposta = await requisitarSupabase("rpc/consumir_limite_requisicoes", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      p_chaves: regras.map((regra) => regra.chave),
+      p_limites: regras.map((regra) => regra.limite),
+      p_janelas: regras.map((regra) => regra.janelaSegundos),
+    }),
+  });
+  if (typeof resposta?.permitido !== "boolean") {
+    console.error("[supabase] Resposta inesperada da função de limite.");
+    throw new ErroHttp(503, "SERVICO_INDISPONIVEL", "Não conseguimos conectar agora. Tente de novo!");
+  }
+  return { permitido: resposta.permitido, esperaSegundos: Math.max(0, Number(resposta.espera_segundos) || 0) };
+}
+
 module.exports = {
   AVATAR_PADRAO,
   buscarPorApelidoNormalizado,
+  consumirLimites,
   criarOuRecuperar,
+  listarFasesConcluidas,
+  registrarFasesConcluidas,
+  registrarSessaoJogador,
+  revogarSessoesJogador,
+  sessaoJogadorEstaAtiva,
 };
