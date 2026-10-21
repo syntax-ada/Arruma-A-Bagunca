@@ -8,13 +8,15 @@
  *   node scripts/servidor-local.js
  *   → abra http://localhost:3000
  *
- * Variáveis opcionais:
- *   PORTA (padrão 3000) e HOST (padrão 127.0.0.1 — só este computador).
- *   Para ler um arquivo .env.local:
+ * Para a identificação do jogador funcionar, o servidor precisa das variáveis
+ * SUPABASE_URL e SUPABASE_SECRET_KEY. Elas ficam em .env.local (fora do git):
  *   node --env-file=.env.local scripts/servidor-local.js
  *
- * ⚠️ Os jogadores criados aqui ficam SÓ NA MEMÓRIA deste processo
- * (api/_lib/jogadores-temporario.js) e somem ao reiniciar o servidor.
+ * ⚠️ Com o .env.local configurado, os jogadores criados aqui são gravados no
+ * banco REAL do Supabase configurado nele — não é um ambiente de teste.
+ *
+ * Variáveis opcionais: PORTA (padrão 3000) e HOST (padrão 127.0.0.1 — só este
+ * computador).
  */
 
 const http = require("node:http");
@@ -23,9 +25,6 @@ const path = require("node:path");
 
 const RAIZ = path.resolve(__dirname, "..");
 const PASTA_API = path.join(RAIZ, "api");
-
-// Libera o armazenamento temporário de jogadores, que só funciona aqui.
-process.env.ARRUMA_SERVIDOR_LOCAL = "1";
 
 const TIPOS_DE_ARQUIVO = {
   ".html": "text/html; charset=utf-8",
@@ -223,8 +222,13 @@ function iniciar() {
     const endereco = host === "127.0.0.1" ? "localhost" : host;
     console.log("Arruma a Bagunça — servidor local");
     console.log(`  Jogo: http://${endereco}:${porta}`);
-    console.log("  ⚠ Jogadores ficam só na memória deste servidor (armazenamento temporário)");
-    console.log("    e somem ao reiniciar. Não é o cadastro definitivo.");
+    // Só informa se está configurado; nunca imprime os valores.
+    if (process.env.SUPABASE_URL && process.env.SUPABASE_SECRET_KEY) {
+      console.log("  Supabase: configurado — os jogadores criados são gravados no banco.");
+    } else {
+      console.log("  ⚠ Supabase NÃO configurado: a identificação mostrará \"Não conseguimos conectar\".");
+      console.log("    Rode: node --env-file=.env.local scripts/servidor-local.js");
+    }
     console.log("  Ctrl+C para parar.");
   });
 }

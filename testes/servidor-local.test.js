@@ -1,5 +1,7 @@
-// Testes do servidor local (scripts/servidor-local.js) e dos endpoints de
-// jogadores com o armazenamento TEMPORÁRIO. Sobe o servidor numa porta livre.
+// Testes do servidor local (scripts/servidor-local.js): arquivos estáticos,
+// rotas da API, erros HTTP e validação. Sobe o servidor numa porta livre.
+// Os testes que gravam/consultam jogadores (com Supabase simulado) ficam em
+// testes/jogadores-supabase.test.js.
 
 const { test, before, after } = require("node:test");
 const assert = require("node:assert/strict");
@@ -140,62 +142,4 @@ test("erros de validação respondem 422 com mensagem para a criança", async ()
 
   const reservado = await postJson("/api/jogadores", { apelido: "ADM01" });
   assert.equal(reservado.status, 422);
-});
-
-test("cadastro novo, recuperação e apelidos equivalentes", async () => {
-  const consulta = await postJson("/api/jogadores/verificar", { apelido: "  Leão   Azul " });
-  assert.equal(consulta.status, 200);
-  assert.deepEqual(await consulta.json(), { existe: false, apelido: "Leão Azul" });
-
-  // Consultar não grava nada
-  const consultaDeNovo = await postJson("/api/jogadores/verificar", { apelido: "Leão Azul" });
-  assert.equal((await consultaDeNovo.json()).existe, false);
-
-  const criacao = await postJson("/api/jogadores", { apelido: "Leão Azul", avatar: "outro" });
-  assert.equal(criacao.status, 201);
-  const criado = await criacao.json();
-  assert.equal(criado.criado, true);
-  assert.equal(criado.temporario, true);
-  assert.equal(criado.jogador.apelido, "Leão Azul");
-  assert.equal(criado.jogador.avatar, "padrao"); // avatar enviado é ignorado
-
-  for (const variacao of ["leao azul", "LEÃO  AZUL", "leaoazul"]) {
-    const encontrado = await (await postJson("/api/jogadores/verificar", { apelido: variacao })).json();
-    assert.equal(encontrado.existe, true, variacao);
-    assert.deepEqual(encontrado.jogador, criado.jogador, variacao);
-
-    const recuperacao = await postJson("/api/jogadores", { apelido: variacao });
-    assert.equal(recuperacao.status, 200, variacao);
-    const recuperado = await recuperacao.json();
-    assert.equal(recuperado.criado, false);
-    // A grafia exibida é a do primeiro cadastro
-    assert.deepEqual(recuperado.jogador, criado.jogador);
-  }
-});
-
-test("cadastros simultâneos do mesmo apelido criam um único jogador", async () => {
-  const variacoes = ["Teste Corrida", "teste corrida", "TESTE CORRIDA", " Tésté Córrida ", "testecorrida"];
-  const pedidos = Array.from({ length: 20 }, (_, i) => postJson("/api/jogadores", { apelido: variacoes[i % variacoes.length] }));
-  const respostas = await Promise.all(pedidos);
-  const corpos = await Promise.all(respostas.map((r) => r.json()));
-
-  assert.equal(respostas.filter((r) => r.status === 201).length, 1);
-  assert.equal(respostas.filter((r) => r.status === 200).length, 19);
-  assert.equal(new Set(corpos.map((c) => c.jogador.id)).size, 1);
-});
-
-test("fora do servidor local o armazenamento temporário se recusa (503)", async () => {
-  const valorAnterior = process.env.ARRUMA_SERVIDOR_LOCAL;
-  delete process.env.ARRUMA_SERVIDOR_LOCAL;
-  try {
-    const consulta = await postJson("/api/jogadores/verificar", { apelido: "Gato Feliz" });
-    assert.equal(consulta.status, 503);
-    assert.equal((await consulta.json()).erro, "SERVICO_INDISPONIVEL");
-
-    // A validação continua valendo antes de tudo
-    const invalido = await postJson("/api/jogadores", { apelido: "ab" });
-    assert.equal(invalido.status, 422);
-  } finally {
-    process.env.ARRUMA_SERVIDOR_LOCAL = valorAnterior;
-  }
 });

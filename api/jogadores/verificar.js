@@ -11,13 +11,13 @@
  * Erros:    400 REQUISICAO_INVALIDA · 415 TIPO_NAO_SUPORTADO · 422 APELIDO_INVALIDO
  *           422 APELIDO_NAO_PERMITIDO · 405 · 503 SERVICO_INDISPONIVEL
  *
- * ⚠️ Por enquanto usa o armazenamento TEMPORÁRIO do servidor local
- * (api/_lib/jogadores-temporario.js), não um banco de dados.
+ * Consulta o Supabase pelo apelido normalizado (api/_lib/supabase.js).
+ * Falha de configuração ou de conexão com o banco → 503 SERVICO_INDISPONIVEL.
  */
 
 const { aceitarMetodo, responderJson, tratarErro } = require("../_lib/http");
 const { lerApelidoValido } = require("../_lib/apelido");
-const armazenamento = require("../_lib/jogadores-temporario");
+const supabase = require("../_lib/supabase");
 
 module.exports = async function verificarJogador(req, res) {
   if (!aceitarMetodo(req, res, "POST")) {
@@ -26,7 +26,7 @@ module.exports = async function verificarJogador(req, res) {
 
   try {
     const { apelido, apelidoNormalizado } = await lerApelidoValido(req);
-    const jogador = armazenamento.buscarPorApelidoNormalizado(apelidoNormalizado);
+    const jogador = await supabase.buscarPorApelidoNormalizado(apelidoNormalizado);
 
     if (jogador) {
       responderJson(res, 200, { existe: true, jogador });
