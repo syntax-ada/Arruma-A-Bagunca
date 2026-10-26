@@ -40,6 +40,7 @@ function gerarItensFase(cotas) {
     itensEscolhidos.forEach((modelo) => {
       todosItens.push({
         id: `item-${modelo.baseId}-${contadorId++}`,
+        baseId: modelo.baseId,
         category: modelo.category,
         itemName: modelo.itemName,
         ariaLabel: modelo.ariaLabel,
@@ -50,6 +51,162 @@ function gerarItensFase(cotas) {
   });
 
   return embaralharArray(todosItens);
+}
+
+const CESTAS_PADRAO_ALTO_CONTRASTE = {
+  brinquedos: "assets/images/tela_fase1/Acessibilidade/sprites_cestas/brinquedo/cesta_brinquedo_padrão.png",
+  comidas: "assets/images/tela_fase1/Acessibilidade/sprites_cestas/comida/cesta_comida_padrão.png",
+  materiais: "assets/images/tela_fase1/Acessibilidade/sprites_cestas/material_escolar/cesta_material_escolar_padrao.png",
+};
+
+const CESTAS_PADRAO_ALTO_CONTRASTE_MUNDO2 = {
+  animais: "assets/images/mundo_2/Acessibilidade/cesta_animais_padrao.png",
+  brinquedos: "assets/images/mundo_2/Acessibilidade/cesta_brinquedos_padrao.png",
+  comidas: "assets/images/mundo_2/Acessibilidade/cesta_comida_padrao.png",
+  comida: "assets/images/mundo_2/Acessibilidade/cesta_comida_padrao.png",
+};
+
+const CESTAS_PADRAO_ALTO_CONTRASTE_MUNDO3 = {
+  bebidas: "assets/images/mundo_3/Acessibilidade/cesta_bebidas_padrao.png",
+  brinquedos: "assets/images/mundo_3/Acessibilidade/cesta_brinquedos_padrao.png",
+  comidas: "assets/images/mundo_3/Acessibilidade/cesta_comidas_padrao.png",
+};
+
+const CESTAS_PADRAO_ALTO_CONTRASTE_MUNDO4 = {
+  comida: "assets/images/mundo_4/Acessibilidade/cesta_comidas_padrao.png",
+  comidas: "assets/images/mundo_4/Acessibilidade/cesta_comidas_padrao.png",
+  mochila: "assets/images/mundo_4/Acessibilidade/cesta_mochila_padrao.png",
+};
+
+function normalizarNomeItemMundo1(identificador) {
+  if (!identificador) return "";
+  const s = String(identificador).toLowerCase().trim();
+  if (s.includes("urso") || s.includes("ursinho")) return "urso";
+  if (s.includes("trem") || s.includes("tren") || s.includes("trenzinho") || s.includes("comboio")) return "trem";
+  if (s.includes("robo") || s.includes("robô")) return "robo";
+  if (s.includes("banana")) return "banana";
+  if (s.includes("maca") || s.includes("maç") || s.includes("maça") || s.includes("maçã")) return "maca";
+  if (s.includes("pera") || s.includes("pêra")) return "pera";
+  if (s.includes("apontador")) return "apontador";
+  if (s.includes("borracha")) return "borracha";
+  if (s.includes("lapis") || s.includes("lápis")) return "lapis";
+  return "";
+}
+
+function isAltoContrasteAtivo() {
+  return Boolean(
+    typeof document !== "undefined" &&
+      (document.body.classList.contains("alto-contraste") ||
+        document.documentElement.classList.contains("alto-contraste"))
+  );
+}
+
+function obterMundoAtivoId() {
+  const mundoAtivo =
+    typeof window !== "undefined" && typeof window.obterMundoAtivo === "function"
+      ? window.obterMundoAtivo()
+      : null;
+  if (mundoAtivo) return mundoAtivo;
+  if (typeof document !== "undefined") {
+    if (document.body.classList.contains("mundo-2")) return 2;
+    if (document.body.classList.contains("mundo-1")) return 1;
+    if (document.body.classList.contains("mundo-3")) return 3;
+    if (document.body.classList.contains("mundo-4")) return 4;
+    if (document.body.classList.contains("mundo-5")) return 5;
+  }
+  return 1;
+}
+
+function isMundo1AltoContraste() {
+  return Boolean(isAltoContrasteAtivo() && obterMundoAtivoId() === 1);
+}
+
+function isMundo2AltoContraste() {
+  return Boolean(isAltoContrasteAtivo() && obterMundoAtivoId() === 2);
+}
+
+function isMundo3AltoContraste() {
+  return Boolean(isAltoContrasteAtivo() && obterMundoAtivoId() === 3);
+}
+
+function isMundo4AltoContraste() {
+  return Boolean(isAltoContrasteAtivo() && obterMundoAtivoId() === 4);
+}
+
+function isCestaAltoContrasteDisponivel() {
+  const mid = obterMundoAtivoId();
+  return Boolean(isAltoContrasteAtivo() && (mid === 1 || mid === 2 || mid === 3 || mid === 4));
+}
+
+function obterItensNaCesta(dropZone) {
+  if (!dropZone || typeof draggableItems === "undefined" || !draggableItems) return [];
+  const items = Array.from(draggableItems).filter(
+    (item) => item.dataset.dropZoneId === dropZone.id && item.classList.contains("is-correct")
+  );
+  return items
+    .map((item) => {
+      const imgItem = item.querySelector("img");
+      return normalizarNomeItemMundo1(
+        item.dataset.baseId ||
+        item.id ||
+        item.dataset.itemName ||
+        (imgItem && (imgItem.getAttribute("src") || imgItem.src)) ||
+        (imgItem && imgItem.alt) ||
+        ""
+      );
+    })
+    .filter(Boolean);
+}
+
+function obterTotalItensCategoria(categoria) {
+  if (typeof draggableItems === "undefined" || !draggableItems) return 3;
+  const count = Array.from(draggableItems).filter(
+    (item) => item.dataset.category === categoria
+  ).length;
+  return count > 0 ? count : 3;
+}
+
+function obterSpriteCestaAltoContraste(categoria, mundoId) {
+  const mid = mundoId || obterMundoAtivoId();
+  if (mid === 4) {
+    return CESTAS_PADRAO_ALTO_CONTRASTE_MUNDO4[categoria] || null;
+  }
+  if (mid === 3) {
+    return CESTAS_PADRAO_ALTO_CONTRASTE_MUNDO3[categoria] || null;
+  }
+  if (mid === 2) {
+    return CESTAS_PADRAO_ALTO_CONTRASTE_MUNDO2[categoria] || null;
+  }
+  return CESTAS_PADRAO_ALTO_CONTRASTE[categoria] || null;
+}
+
+function atualizarCestaAltoContraste(dropZone) {
+  if (!dropZone || !isCestaAltoContrasteDisponivel()) return;
+  const categoria = dropZone.dataset.accepts;
+  const novoSrc = obterSpriteCestaAltoContraste(categoria, obterMundoAtivoId());
+  const imgCesta = dropZone.querySelector(".cesta-img");
+  if (novoSrc && imgCesta) {
+    imgCesta.src = novoSrc;
+  }
+}
+
+function atualizarVisualCestasAltoContraste() {
+  if (typeof document === "undefined") return;
+  const altoContraste = isCestaAltoContrasteDisponivel();
+  const mid = obterMundoAtivoId();
+  document.querySelectorAll(".drop-zone").forEach((dropZone) => {
+    const imgCesta = dropZone.querySelector(".cesta-img");
+    if (!imgCesta) return;
+    if (altoContraste) {
+      const categoria = dropZone.dataset.accepts;
+      const spriteAltoContraste = obterSpriteCestaAltoContraste(categoria, mid);
+      if (spriteAltoContraste) {
+        imgCesta.src = spriteAltoContraste;
+      }
+    } else if (dropZone._spriteNormal) {
+      imgCesta.src = dropZone._spriteNormal;
+    }
+  });
 }
 
 let activeConfig = null;
@@ -266,17 +423,28 @@ function renderizarCestas(listaCategorias = []) {
 
     const imgCesta = document.createElement("img");
     imgCesta.className = `cesta cesta-img${cat.classeCesta ? ` ${cat.classeCesta}` : ""}`;
-    const cestaSrc = typeof cat.sprites === "string"
+    const cestaSrcNormal = typeof cat.sprites === "string"
       ? cat.sprites
       : (Array.isArray(cat.sprites) && cat.sprites.length > 0 ? cat.sprites[0] : (cat.imgSrc || ""));
-    imgCesta.src = cestaSrc;
+    dropZone._spriteNormal = cestaSrcNormal;
+    dropZone._itensAltoContraste = [];
+
+    if (isCestaAltoContrasteDisponivel()) {
+      const spriteInicial = obterSpriteCestaAltoContraste(cat.accepts, obterMundoAtivoId());
+      imgCesta.src = spriteInicial || cestaSrcNormal;
+    } else {
+      imgCesta.src = cestaSrcNormal;
+    }
     imgCesta.alt = `${cat.ariaLabel} com zero itens`;
     dropZone.appendChild(imgCesta);
 
     // Contador numérico dinâmico sobre a cesta (inicializado em 0)
-    const contadorItens = document.createElement("span");
-    contadorItens.className = "contador-itens";
-    contadorItens.textContent = "0";
+    const contadorItens = document.createElement("div");
+    contadorItens.className = "contador-itens contador-circulo";
+    const contadorNumero = document.createElement("span");
+    contadorNumero.className = "contador-numero";
+    contadorNumero.textContent = "0";
+    contadorItens.appendChild(contadorNumero);
     dropZone.appendChild(contadorItens);
 
     // Container para sobreposição dinâmica de itens dentro da cesta (inicia vazio)
@@ -292,6 +460,7 @@ function renderizarCestas(listaCategorias = []) {
       imgEtiqueta.alt = cat.etiquetaImgAlt || `Categoria ${cat.nome}`;
       dropZone.appendChild(imgEtiqueta);
     }
+
 
     containerCategorias.appendChild(dropZone);
   });
@@ -315,6 +484,9 @@ function renderizarGradeObjetos(listaObjetos = []) {
     button.type = "button";
     button.className = "draggable-item";
     button.id = dados.id;
+    if (dados.baseId) {
+      button.dataset.baseId = dados.baseId;
+    }
     button.dataset.category = dados.category;
     button.dataset.itemName = dados.itemName;
     button.setAttribute("aria-label", dados.ariaLabel);
@@ -491,6 +663,23 @@ function adicionarItemSobreposto(dropZone, item) {
     return;
   }
 
+  const imgItem = item.querySelector("img");
+  const chaveItemMundo1 = normalizarNomeItemMundo1(
+    item.dataset.baseId ||
+    item.id ||
+    item.dataset.itemName ||
+    (imgItem && (imgItem.getAttribute("src") || imgItem.src)) ||
+    (imgItem && imgItem.alt) ||
+    ""
+  );
+
+  if (!dropZone._itensAltoContraste) {
+    dropZone._itensAltoContraste = [];
+  }
+  if (chaveItemMundo1) {
+    dropZone._itensAltoContraste.push(chaveItemMundo1);
+  }
+
   const containerSobrepostos = dropZone.querySelector(".itens-sobrepostos");
   if (!containerSobrepostos) {
     return;
@@ -555,10 +744,12 @@ function finishDrag(event) {
     const contadorItens = targetDropZone.querySelector(".contador-itens");
     if (contadorItens) {
       const valorAtual = parseInt(contadorItens.textContent, 10) || 0;
-      contadorItens.textContent = String(valorAtual + 1);
+      const elNum = contadorItens.querySelector(".contador-numero") || contadorItens;
+      elNum.textContent = String(valorAtual + 1);
     }
 
     adicionarItemSobreposto(targetDropZone, item);
+    atualizarCestaAltoContraste(targetDropZone);
 
     updateDropZoneCounter(targetDropZone);
 
@@ -756,7 +947,8 @@ function updateDropZoneCounter(dropZone) {
 
   const contadorItens = dropZone.querySelector(".contador-itens");
   if (contadorItens) {
-    contadorItens.textContent = String(placedCount);
+    const elNum = contadorItens.querySelector(".contador-numero") || contadorItens;
+    elNum.textContent = String(placedCount);
   }
 }
 
@@ -846,10 +1038,12 @@ function handleDropZoneKeyboard(event) {
     const contadorItens = event.currentTarget.querySelector(".contador-itens");
     if (contadorItens) {
       const valorAtual = parseInt(contadorItens.textContent, 10) || 0;
-      contadorItens.textContent = String(valorAtual + 1);
+      const elNum = contadorItens.querySelector(".contador-numero") || contadorItens;
+      elNum.textContent = String(valorAtual + 1);
     }
 
     adicionarItemSobreposto(event.currentTarget, currentAvailableItem);
+    atualizarCestaAltoContraste(event.currentTarget);
 
     updateDropZoneCounter(event.currentTarget);
 
@@ -892,4 +1086,6 @@ if (typeof window !== "undefined") {
   window.gerarItensFase = gerarItensFase;
   window.embaralharArray = embaralharArray;
   window.findCorrectDropZone = findCorrectDropZone;
+  window.atualizarVisualCestasAltoContraste = atualizarVisualCestasAltoContraste;
+  window.obterSpriteCestaAltoContraste = obterSpriteCestaAltoContraste;
 }

@@ -214,6 +214,7 @@ function ocultarTutorialModalFases() {
   document.querySelector("#tutorial-modal-fase1")?.classList.add("escondido");
   document.querySelector("#tutorial-backdrop-modal")?.classList.add("escondido");
   btnIniciarFase1?.classList.remove("tutorial-destaque-btn-fase");
+  menuFases?.classList.remove("tutorial-menu-ativo");
 }
 
 function atualizarTutorialModalFases(mundoId, progresso, devAtivo) {
@@ -226,6 +227,7 @@ function atualizarTutorialModalFases(mundoId, progresso, devAtivo) {
   document.querySelector("#tutorial-modal-fase1")?.classList.toggle("escondido", !deveExibir);
   document.querySelector("#tutorial-backdrop-modal")?.classList.toggle("escondido", !deveExibir);
   btnIniciarFase1?.classList.toggle("tutorial-destaque-btn-fase", deveExibir);
+  menuFases?.classList.toggle("tutorial-menu-ativo", deveExibir);
 }
 
 function abrirModalFases(mundoId) {
@@ -324,6 +326,7 @@ function atualizarInterfaceProgresso() {
     const modalAberto = modalFases && !modalFases.classList.contains("escondido");
     const semProgresso = !devAtivo && !modalAberto && fasesConcluidas.length === 0 && faseMaximaMundo1 <= 1 && mundosLiberados.length <= 1;
     tutorialMenuMundo1.classList.toggle("escondido", !semProgresso);
+    menuFases?.classList.toggle("tutorial-menu-ativo", semProgresso);
   }
   if (false) {
   }
@@ -349,6 +352,7 @@ function atualizarInterfaceProgresso() {
  * caminho ?view=mundos.
  */
 function entrarNoMenuDeMundos() {
+  aplicarAvatarSelecionadoNaUI(indiceAvatarEscolhido);
   telaInicial?.classList.add("escondido");
   controlesIniciais?.classList.add("escondido");
   menuFases?.classList.remove("escondido");
@@ -463,6 +467,538 @@ if (botaoCreditos && modalCreditos) {
   });
 }
 
+// Controle do Modal de Configurações
+const modalConfiguracoes = document.querySelector("#modal-configuracoes");
+const btnConfigInicial = document.querySelector("#btn-config");
+const btnConfigMundos = document.querySelector("#btn-config-mundos");
+const btnFecharConfig = document.querySelector("#btn-fechar-config");
+const configNickname = document.querySelector("#config-nickname");
+const btnConfigSair = document.querySelector("#btn-config-sair");
+const btnConfigEditarAvatar = document.querySelector("#btn-config-editar-avatar");
+const configAvatarImg = document.querySelector("#config-avatar-img");
+const avatarJogadorTopo = document.querySelector("#avatar-jogador");
+const modalAvatares = document.querySelector("#modal-avatares");
+const btnFecharAvatares = document.querySelector("#btn-fechar-avatares");
+const carrosselAvataresViewport = document.querySelector("#carrossel-avatares-viewport");
+const carrosselAvataresTrilha = document.querySelector("#carrossel-avatares-trilha");
+const btnAvataresAnterior = document.querySelector("#btn-avatares-anterior");
+const btnAvataresProximo = document.querySelector("#btn-avatares-proximo");
+const nomeAvatarFoco = document.querySelector("#nome-avatar-foco");
+const btnConfirmarAvatar = document.querySelector("#btn-confirmar-avatar");
+
+const CHAVE_AVATAR_STORAGE = "arruma_bagunca_avatar_escolhido";
+const CATALOGO_AVATARES = [
+  { id: "cachorro", nome: "Cachorro", src: "assets/images/Settings/Avatares/Cachorro.png" },
+  { id: "gato", nome: "Gato", src: "assets/images/Settings/Avatares/Gato.png" },
+  { id: "coala", nome: "Coala", src: "assets/images/Settings/Avatares/Coala.png" },
+  { id: "coelho", nome: "Coelho", src: "assets/images/Settings/Avatares/Coelho.png" },
+  { id: "raposo", nome: "Raposo", src: "assets/images/Settings/Avatares/raposo.png" },
+  { id: "golfinho", nome: "Golfinho", src: "assets/images/Settings/Avatares/Golfinho.png" },
+  { id: "ave-maluca", nome: "Ave Maluca", src: "assets/images/Settings/Avatares/Ave maluca.png" },
+  { id: "galineo", nome: "Galineo", src: "assets/images/Settings/Avatares/galineo.png" },
+  { id: "chifrudo", nome: "Chifrudo", src: "assets/images/Settings/Avatares/chifrudo.png" },
+  { id: "monstro", nome: "Monstro!", src: "assets/images/Settings/Avatares/Monstro!.png" },
+];
+
+let indiceAvatarEscolhido = 0;
+let posicaoCarrosselAvatares = 0;
+let elementosOpcaoAvatar = [];
+let suprimirCliquePosArraste = false;
+
+function moduloPositivo(valor, total) {
+  return ((valor % total) + total) % total;
+}
+
+function aplicarAvatarSelecionadoNaUI(indice) {
+  const total = CATALOGO_AVATARES.length;
+  indiceAvatarEscolhido = moduloPositivo(indice, total);
+  const avatar = CATALOGO_AVATARES[indiceAvatarEscolhido];
+
+  if (configAvatarImg) {
+    configAvatarImg.src = avatar.src;
+    configAvatarImg.alt = "Avatar: " + avatar.nome;
+  }
+
+  if (avatarJogadorTopo) {
+    avatarJogadorTopo.textContent = "";
+    const imgTopo = document.createElement("img");
+    imgTopo.src = avatar.src;
+    imgTopo.alt = avatar.nome;
+    imgTopo.draggable = false;
+    avatarJogadorTopo.appendChild(imgTopo);
+  }
+}
+
+function carregarAvatarSalvo() {
+  try {
+    const idSalvo = localStorage.getItem(CHAVE_AVATAR_STORAGE);
+    const indiceEncontrado = CATALOGO_AVATARES.findIndex(function (item) {
+      return item.id === idSalvo;
+    });
+    aplicarAvatarSelecionadoNaUI(indiceEncontrado >= 0 ? indiceEncontrado : 0);
+  } catch (_erro) {
+    aplicarAvatarSelecionadoNaUI(0);
+  }
+}
+
+function salvarAvatarEscolhido(indice) {
+  aplicarAvatarSelecionadoNaUI(indice);
+  try {
+    localStorage.setItem(CHAVE_AVATAR_STORAGE, CATALOGO_AVATARES[indiceAvatarEscolhido].id);
+  } catch (_erro) {
+    // Ignora falha de armazenamento em modo restrito.
+  }
+}
+
+function calcularDeltaCircular(indiceItem, posicaoCentro, total) {
+  let delta = moduloPositivo(indiceItem - posicaoCentro, total);
+  if (delta >= total / 2) {
+    delta -= total;
+  }
+  return delta;
+}
+
+function renderizarPosicoesCarrosselAvatares() {
+  const total = CATALOGO_AVATARES.length;
+  if (!elementosOpcaoAvatar.length) {
+    return;
+  }
+
+  const indiceFoco = moduloPositivo(Math.round(posicaoCarrosselAvatares), total);
+  if (nomeAvatarFoco && CATALOGO_AVATARES[indiceFoco]) {
+    nomeAvatarFoco.textContent = CATALOGO_AVATARES[indiceFoco].nome;
+  }
+
+  elementosOpcaoAvatar.forEach(function (botao, indice) {
+    const delta = calcularDeltaCircular(indice, posicaoCarrosselAvatares, total);
+    const distancia = Math.abs(delta);
+
+    botao.classList.remove(
+      "avatar-slot-central",
+      "avatar-slot-foco",
+      "selecionado",
+      "avatar-slot-borda",
+      "avatar-slot-oculto"
+    );
+
+    let escala = 1;
+    if (distancia <= 0.45) {
+      botao.classList.add("avatar-slot-central", "avatar-slot-foco", "selecionado");
+      botao.setAttribute("aria-selected", "true");
+      escala = 1.06;
+    } else if (distancia <= 1.35) {
+      botao.classList.add("avatar-slot-central");
+      botao.setAttribute("aria-selected", "false");
+      escala = 1;
+    } else if (distancia <= 2.45) {
+      botao.classList.add("avatar-slot-borda");
+      botao.setAttribute("aria-selected", "false");
+      escala = 0.9;
+    } else {
+      botao.classList.add("avatar-slot-oculto");
+      botao.setAttribute("aria-selected", "false");
+      escala = 0.82;
+    }
+
+    botao.style.transform =
+      "translate(calc(-50% + " +
+      delta.toFixed(3) +
+      " * var(--avatar-step)), -50%) scale(" +
+      escala +
+      ")";
+  });
+}
+
+function centralizarAvatarNoCarrossel(indiceAlvo) {
+  const total = CATALOGO_AVATARES.length;
+  const delta = calcularDeltaCircular(indiceAlvo, posicaoCarrosselAvatares, total);
+  if (carrosselAvataresViewport) {
+    carrosselAvataresViewport.classList.remove("arrastando");
+  }
+  posicaoCarrosselAvatares = Math.round(posicaoCarrosselAvatares + delta);
+  renderizarPosicoesCarrosselAvatares();
+}
+
+function construirItensCarrosselAvatares() {
+  if (!carrosselAvataresTrilha || elementosOpcaoAvatar.length) {
+    return;
+  }
+
+  CATALOGO_AVATARES.forEach(function (avatar, indice) {
+    const botao = document.createElement("button");
+    botao.type = "button";
+    botao.className = "avatar-opcao-item";
+    botao.setAttribute("role", "option");
+    botao.setAttribute("aria-label", avatar.nome);
+    botao.dataset.indiceAvatar = String(indice);
+
+    const img = document.createElement("img");
+    img.src = avatar.src;
+    img.alt = avatar.nome;
+    img.draggable = false;
+    botao.appendChild(img);
+
+    carrosselAvataresTrilha.appendChild(botao);
+    botao.addEventListener("click", function () {
+      if (suprimirCliquePosArraste) {
+        return;
+      }
+      const delta = calcularDeltaCircular(
+        indice,
+        posicaoCarrosselAvatares,
+        CATALOGO_AVATARES.length
+      );
+      tocarSomBotao();
+      if (Math.abs(delta) > 0.1) {
+        centralizarAvatarNoCarrossel(indice);
+      }
+    });
+    elementosOpcaoAvatar.push(botao);
+  });
+}
+
+function obterPassoPxCarrossel() {
+  if (!elementosOpcaoAvatar.length) {
+    return 156;
+  }
+  const larguraItem = elementosOpcaoAvatar[0].getBoundingClientRect().width || 132;
+  return larguraItem + 24;
+}
+
+function abrirModalAvatares() {
+  if (!modalAvatares) {
+    return;
+  }
+  construirItensCarrosselAvatares();
+  posicaoCarrosselAvatares = indiceAvatarEscolhido;
+  renderizarPosicoesCarrosselAvatares();
+  modalAvatares.classList.remove("escondido");
+  if (carrosselAvataresViewport) {
+    carrosselAvataresViewport.focus();
+  }
+}
+
+function fecharModalAvatares() {
+  if (!modalAvatares) {
+    return;
+  }
+  modalAvatares.classList.add("escondido");
+}
+
+carregarAvatarSalvo();
+
+function abrirModalConfiguracoes() {
+  if (!modalConfiguracoes) {
+    return;
+  }
+  tocarSomBotao();
+  const jogadorAtual = typeof window.obterJogadorIdentificado === "function"
+    ? window.obterJogadorIdentificado()
+    : null;
+  if (configNickname) {
+    configNickname.textContent = jogadorAtual?.apelido || "Nickname";
+  }
+  modalConfiguracoes.classList.remove("escondido");
+}
+
+function fecharModalConfiguracoes() {
+  if (!modalConfiguracoes) {
+    return;
+  }
+  modalConfiguracoes.classList.add("escondido");
+}
+
+if (btnConfigInicial) {
+  btnConfigInicial.addEventListener("click", abrirModalConfiguracoes);
+}
+
+if (btnConfigMundos) {
+  btnConfigMundos.addEventListener("click", abrirModalConfiguracoes);
+}
+
+if (btnFecharConfig) {
+  btnFecharConfig.addEventListener("click", function () {
+    tocarSomBotao();
+    fecharModalConfiguracoes();
+  });
+}
+
+const CHAVE_ALTO_CONTRASTE_STORAGE = "arruma_bagunca_alto_contraste";
+const toggleAltoContraste = document.getElementById("toggle-alto-contraste");
+const labelAltoContraste = document.getElementById("label-alto-contraste");
+const imgCreditosModal = document.querySelector("#img-creditos, .img-creditos");
+
+function aplicarModoAltoContraste(ativo) {
+  const estadoAtivo = Boolean(ativo);
+  document.body.classList.toggle("alto-contraste", estadoAtivo);
+  document.documentElement.classList.toggle("alto-contraste", estadoAtivo);
+
+  if (toggleAltoContraste) {
+    toggleAltoContraste.classList.toggle("ativo", estadoAtivo);
+    toggleAltoContraste.classList.toggle("alto-contraste-ativo", estadoAtivo);
+    toggleAltoContraste.setAttribute("aria-checked", String(estadoAtivo));
+  }
+
+  if (imgCreditosModal) {
+    imgCreditosModal.src = estadoAtivo
+      ? "assets/images/tela_inicial/Acessibilidade/creditos.png"
+      : "assets/images/tela_inicial/creditos.png";
+  }
+
+  const botoesFechar = [
+    { seletor: "#btn-fechar-creditos img", padrao: "assets/images/tela_inicial/botão_fechar.png" },
+    { seletor: "#btn-fechar-config img", padrao: "assets/images/Settings/botton_fechar.png" },
+    { seletor: "#btn-fechar-avatares img", padrao: "assets/images/Settings/botton_fechar.png" },
+    { seletor: "#btn-fechar-modal img", padrao: "assets/images/mundo_1/botão_fechar.png" },
+    { seletor: "#btn-fechar-sidebar-boss img", padrao: "assets/images/mundo_1/botão_fechar.png" },
+  ];
+
+  botoesFechar.forEach(function (item) {
+    const img = document.querySelector(item.seletor);
+    if (img) {
+      img.src = estadoAtivo
+        ? "assets/images/tela_inicial/Acessibilidade/botão_fechar.png"
+        : item.padrao;
+    }
+  });
+
+  const iconesConfig = document.querySelectorAll("#btn-config img, #btn-config-mundos img");
+  iconesConfig.forEach(function (img) {
+    img.src = estadoAtivo
+      ? "assets/images/nova_tela_menu de_fases/Acessibilidade/botton_config.png"
+      : "assets/images/tela_inicial/engrenagem.png";
+  });
+
+  const imagensMundos = [
+    {
+      seletor: "#botao-fase1 > img",
+      padrao: "assets/images/nova_tela_menu de_fases/mundo_1.png",
+      altoContraste: "assets/images/nova_tela_menu de_fases/Acessibilidade/mundo1.png",
+    },
+    {
+      seletor: "#card-mundo-2 > img",
+      padrao: "assets/images/nova_tela_menu de_fases/mundo_2.png",
+      altoContraste: "assets/images/nova_tela_menu de_fases/Acessibilidade/mundo2.png",
+    },
+    {
+      seletor: "#card-mundo-3 > img",
+      padrao: "assets/images/nova_tela_menu de_fases/mundo_3.png",
+      altoContraste: "assets/images/nova_tela_menu de_fases/Acessibilidade/mundo3.png",
+    },
+    {
+      seletor: "#card-mundo-4 > img",
+      padrao: "assets/images/nova_tela_menu de_fases/mundo_4.png",
+      altoContraste: "assets/images/nova_tela_menu de_fases/Acessibilidade/mundo4.png",
+    },
+  ];
+
+  imagensMundos.forEach(function (mundo) {
+    const img = document.querySelector(mundo.seletor);
+    if (img) {
+      img.src = estadoAtivo ? mundo.altoContraste : mundo.padrao;
+    }
+  });
+}
+
+function alternarModoAltoContraste() {
+  const novoEstado = document.body.classList.toggle("alto-contraste");
+  aplicarModoAltoContraste(novoEstado);
+  try {
+    localStorage.setItem(CHAVE_ALTO_CONTRASTE_STORAGE, String(novoEstado));
+  } catch (_erro) {
+    // Ignora falha de armazenamento em modo restrito.
+  }
+  tocarSomBotao();
+}
+
+function carregarModoAltoContrasteSalvo() {
+  try {
+    const salvo = localStorage.getItem(CHAVE_ALTO_CONTRASTE_STORAGE);
+    aplicarModoAltoContraste(salvo === "true");
+  } catch (_erro) {
+    aplicarModoAltoContraste(false);
+  }
+}
+
+carregarModoAltoContrasteSalvo();
+
+if (toggleAltoContraste) {
+  toggleAltoContraste.addEventListener("click", function (evento) {
+    evento.stopPropagation();
+    alternarModoAltoContraste();
+  });
+}
+
+if (labelAltoContraste) {
+  labelAltoContraste.addEventListener("click", function () {
+    alternarModoAltoContraste();
+  });
+}
+
+if (modalConfiguracoes) {
+  modalConfiguracoes.addEventListener("click", function (evento) {
+    if (evento.target === modalConfiguracoes) {
+      fecharModalConfiguracoes();
+    }
+  });
+
+  modalConfiguracoes.querySelectorAll(".config-toggle").forEach(function (botaoToggle) {
+    if (botaoToggle.id === "toggle-alto-contraste") {
+      return;
+    }
+    botaoToggle.addEventListener("click", function () {
+      const novoEstado = !botaoToggle.classList.contains("ativo");
+      botaoToggle.classList.toggle("ativo", novoEstado);
+      botaoToggle.setAttribute("aria-checked", String(novoEstado));
+      tocarSomBotao();
+    });
+  });
+}
+
+if (btnConfigEditarAvatar) {
+  btnConfigEditarAvatar.addEventListener("click", function () {
+    tocarSomBotao();
+    abrirModalAvatares();
+  });
+}
+
+if (btnFecharAvatares) {
+  btnFecharAvatares.addEventListener("click", function () {
+    tocarSomBotao();
+    fecharModalAvatares();
+  });
+}
+
+if (modalAvatares) {
+  modalAvatares.addEventListener("click", function (evento) {
+    if (evento.target === modalAvatares) {
+      fecharModalAvatares();
+    }
+  });
+}
+
+if (btnAvataresAnterior) {
+  btnAvataresAnterior.addEventListener("click", function () {
+    tocarSomBotao();
+    posicaoCarrosselAvatares = Math.round(posicaoCarrosselAvatares) - 1;
+    renderizarPosicoesCarrosselAvatares();
+  });
+}
+
+if (btnAvataresProximo) {
+  btnAvataresProximo.addEventListener("click", function () {
+    tocarSomBotao();
+    posicaoCarrosselAvatares = Math.round(posicaoCarrosselAvatares) + 1;
+    renderizarPosicoesCarrosselAvatares();
+  });
+}
+
+if (btnConfirmarAvatar) {
+  btnConfirmarAvatar.addEventListener("click", function () {
+    tocarSomBotao();
+    const indiceFoco = moduloPositivo(
+      Math.round(posicaoCarrosselAvatares),
+      CATALOGO_AVATARES.length
+    );
+    salvarAvatarEscolhido(indiceFoco);
+    fecharModalAvatares();
+  });
+}
+
+if (carrosselAvataresViewport) {
+  let ponteiroAtivo = false;
+  let idPonteiroAtivo = null;
+  let inicioX = 0;
+  let posicaoInicialArraste = 0;
+  let moveuArraste = false;
+
+  carrosselAvataresViewport.addEventListener("pointerdown", function (evento) {
+    if (evento.button !== undefined && evento.button !== 0) {
+      return;
+    }
+    ponteiroAtivo = true;
+    idPonteiroAtivo = evento.pointerId;
+    inicioX = evento.clientX;
+    posicaoInicialArraste = posicaoCarrosselAvatares;
+    moveuArraste = false;
+    suprimirCliquePosArraste = false;
+  });
+
+  carrosselAvataresViewport.addEventListener("pointermove", function (evento) {
+    if (!ponteiroAtivo || evento.pointerId !== idPonteiroAtivo) {
+      return;
+    }
+    const deltaPx = evento.clientX - inicioX;
+    if (!moveuArraste && Math.abs(deltaPx) > 6) {
+      moveuArraste = true;
+      suprimirCliquePosArraste = true;
+      carrosselAvataresViewport.classList.add("arrastando");
+      if (typeof carrosselAvataresViewport.setPointerCapture === "function") {
+        try {
+          carrosselAvataresViewport.setPointerCapture(evento.pointerId);
+        } catch (_erro) {
+          // Ignora caso o ponteiro não suporte captura.
+        }
+      }
+    }
+    if (!moveuArraste) {
+      return;
+    }
+    const passoPx = obterPassoPxCarrossel();
+    posicaoCarrosselAvatares = posicaoInicialArraste - deltaPx / passoPx;
+    renderizarPosicoesCarrosselAvatares();
+  });
+
+  function finalizarArrasteAvatares(evento) {
+    if (!ponteiroAtivo || evento.pointerId !== idPonteiroAtivo) {
+      return;
+    }
+    ponteiroAtivo = false;
+    idPonteiroAtivo = null;
+    carrosselAvataresViewport.classList.remove("arrastando");
+
+    if (moveuArraste) {
+      posicaoCarrosselAvatares = Math.round(posicaoCarrosselAvatares);
+      renderizarPosicoesCarrosselAvatares();
+      setTimeout(function () {
+        suprimirCliquePosArraste = false;
+      }, 0);
+    }
+  }
+
+  carrosselAvataresViewport.addEventListener("pointerup", finalizarArrasteAvatares);
+  carrosselAvataresViewport.addEventListener("pointercancel", finalizarArrasteAvatares);
+
+  carrosselAvataresViewport.addEventListener("keydown", function (evento) {
+    if (evento.key === "ArrowLeft") {
+      evento.preventDefault();
+      tocarSomBotao();
+      posicaoCarrosselAvatares = Math.round(posicaoCarrosselAvatares) - 1;
+      renderizarPosicoesCarrosselAvatares();
+    } else if (evento.key === "ArrowRight") {
+      evento.preventDefault();
+      tocarSomBotao();
+      posicaoCarrosselAvatares = Math.round(posicaoCarrosselAvatares) + 1;
+      renderizarPosicoesCarrosselAvatares();
+    } else if (evento.key === "Enter" || evento.key === " ") {
+      evento.preventDefault();
+      if (btnConfirmarAvatar) {
+        btnConfirmarAvatar.click();
+      }
+    }
+  });
+}
+
+if (btnConfigSair) {
+  btnConfigSair.addEventListener("click", function () {
+    tocarSomBotao();
+    fecharModalConfiguracoes();
+    if (menuFases && !menuFases.classList.contains("escondido") && botaoVoltar) {
+      botaoVoltar.click();
+    }
+  });
+}
+
 if (btnFecharCreditos && modalCreditos) {
   btnFecharCreditos.addEventListener("click", function () {
     tocarSomBotao();
@@ -480,6 +1016,13 @@ if (modalCreditos) {
 
 document.addEventListener("keydown", function (evento) {
   if (evento.key === "Escape") {
+    if (modalAvatares && !modalAvatares.classList.contains("escondido")) {
+      fecharModalAvatares();
+      return;
+    }
+    if (modalConfiguracoes && !modalConfiguracoes.classList.contains("escondido")) {
+      fecharModalConfiguracoes();
+    }
     if (modalCreditos && !modalCreditos.classList.contains("escondido")) {
       modalCreditos.classList.add("escondido");
     }

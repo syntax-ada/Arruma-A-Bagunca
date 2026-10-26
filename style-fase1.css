@@ -17,13 +17,15 @@
     justify-content: center;
     background: transparent;
     border: none;
-    padding: 0;
+    padding: 12px;
+    min-width: 96px;
+    min-height: 96px;
     cursor: pointer;
     transition: transform 0.2s ease, filter 0.2s ease;
 }
 
 .btn-voltar-fase img {
-    width: 62px;
+    width: clamp(88px, 9vw, 112px);
     height: auto;
     display: block;
     filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.25));
@@ -538,21 +540,36 @@
    CALIBRAÇÃO ESPECÍFICA POR CATEGORIA E FORMATO DA CESTA
    ========================================================== */
 
-/* 1. Desativação da Sobreposição na Mochila (Mundo 4 e 5) */
+/* 1. Desativação da Sobreposição na Mochila (Mundo 5 por padrão) */
 .cesta-mochila .itens-sobrepostos,
 #cesta-mochila .itens-sobrepostos,
 [data-accepts="mochila"] .itens-sobrepostos {
-    display: none !important;
+    display: none;
 }
 
-/* 2. Cestas de Vime com Alça (Comidas do M4 e Brinquedos do M2) */
-.cesta-comida-mundo4 .itens-sobrepostos,
+/* 1.1. Mochila (Mundo 4) — ativa sobreposição física e efeito de profundidade */
+.mundo-4 .cesta-mochila .itens-sobrepostos,
+.mundo-4 #cesta-mochila .itens-sobrepostos,
+.mundo-4 [data-accepts="mochila"] .itens-sobrepostos {
+    display: flex;
+    top: 14%;
+    left: 14%;
+    width: 62%;
+    height: 25%;
+    overflow: hidden;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.mundo-4 .cesta-mochila .itens-sobrepostos img,
+.mundo-4 .cesta-mochila .itens-sobrepostos .item-sobreposto {
+    transform: translateY(15%) scale(1.05);
+    margin: 0 2px;
+}
+
+/* 2. Cestas de Vime com Alça (Brinquedos do M2) */
 .cesta-comidas .itens-sobrepostos,
 .cesta-comida .itens-sobrepostos,
-.mundo-4 .cesta-comida .itens-sobrepostos,
-.mundo-4 .cesta-comidas .itens-sobrepostos,
-.mundo-4 [data-accepts="comida"] .itens-sobrepostos,
-.mundo-4 [data-accepts="comidas"] .itens-sobrepostos,
 .cesta-brinquedos-mundo2 .itens-sobrepostos,
 .mundo-2 .cesta-brinquedos .itens-sobrepostos,
 .mundo-2 #cesta-brinquedos .itens-sobrepostos,
@@ -565,30 +582,52 @@
     align-items: flex-end;
 }
 
-.cesta-comida-mundo4 .itens-sobrepostos img,
 .cesta-comidas .itens-sobrepostos img,
 .cesta-comida .itens-sobrepostos img,
-.mundo-4 .cesta-comida .itens-sobrepostos img,
-.mundo-4 .cesta-comidas .itens-sobrepostos img,
-.mundo-4 [data-accepts="comida"] .itens-sobrepostos img,
-.mundo-4 [data-accepts="comidas"] .itens-sobrepostos img,
 .cesta-brinquedos-mundo2 .itens-sobrepostos img,
 .mundo-2 .cesta-brinquedos .itens-sobrepostos img,
 .mundo-2 #cesta-brinquedos .itens-sobrepostos img,
 .mundo-2 [data-accepts="brinquedos"] .itens-sobrepostos img,
-.cesta-comida-mundo4 .itens-sobrepostos .item-sobreposto,
 .cesta-comidas .itens-sobrepostos .item-sobreposto,
 .cesta-brinquedos-mundo2 .itens-sobrepostos .item-sobreposto,
 .mundo-2 .cesta-brinquedos .itens-sobrepostos .item-sobreposto {
     transform: translateY(5%) scale(1);
 }
 
+/* 2.1. Cesta de Comidas (Mundo 4) — alinhamento idêntico aos Mundos 2 e 3 */
+.mundo-4 .cesta-comida .itens-sobrepostos,
+.mundo-4 .cesta-comidas .itens-sobrepostos,
+.mundo-4 #cesta-comida .itens-sobrepostos,
+.mundo-4 #cesta-comidas .itens-sobrepostos,
+.mundo-4 [data-accepts="comida"] .itens-sobrepostos,
+.mundo-4 [data-accepts="comidas"] .itens-sobrepostos,
+.cesta-comida-mundo4 .itens-sobrepostos {
+    top: 15%;
+    left: 12%;
+    width: 64%;
+    height: 23%;
+    overflow: hidden;
+    align-items: flex-end;
+}
+
+.mundo-4 .cesta-comida .itens-sobrepostos img,
+.mundo-4 .cesta-comidas .itens-sobrepostos img,
+.mundo-4 [data-accepts="comida"] .itens-sobrepostos img,
+.mundo-4 [data-accepts="comidas"] .itens-sobrepostos img,
+.cesta-comida-mundo4 .itens-sobrepostos img,
+.mundo-4 .cesta-comida .itens-sobrepostos .item-sobreposto,
+.mundo-4 .cesta-comidas .itens-sobrepostos .item-sobreposto,
+.mundo-4 [data-accepts="comida"] .itens-sobrepostos .item-sobreposto,
+.mundo-4 [data-accepts="comidas"] .itens-sobrepostos .item-sobreposto,
+.cesta-comida-mundo4 .itens-sobrepostos .item-sobreposto {
+    transform: translateY(16%) scale(1.02);
+    margin: 0 1px;
+}
+
 /* 3. Cestas do Estilo Mundo 1 (Comida, Brinquedos, Materiais) */
 .mundo-1 .itens-sobrepostos,
 .mundo-2 .cesta-comida .itens-sobrepostos,
 .mundo-2 [data-accepts="comida"] .itens-sobrepostos,
-.mundo-3 .cesta-comidas .itens-sobrepostos,
-.mundo-3 [data-accepts="comidas"] .itens-sobrepostos,
 .mundo-5 .cesta-comidas .itens-sobrepostos,
 .mundo-5 .cesta-materiais .itens-sobrepostos,
 .cesta-materiais .itens-sobrepostos,
@@ -602,10 +641,23 @@
     align-items: flex-end;
 }
 
+/* 3.0. Cesta de Comidas / Piquenique (Mundo 3) — centralizada no vão da alça e assentada no tecido xadrez */
+.mundo-3 .cesta-comidas .itens-sobrepostos,
+.mundo-3 #cesta-comidas .itens-sobrepostos,
+.mundo-3 [data-accepts="comidas"] .itens-sobrepostos {
+    top: 15%;
+    left: 12%;
+    width: 64%;
+    height: 23%;
+    overflow: hidden;
+    align-items: flex-end;
+}
+
 .mundo-1 .itens-sobrepostos img,
 .mundo-1 .itens-sobrepostos .item-sobreposto,
 .mundo-2 .cesta-comida .itens-sobrepostos img,
 .mundo-3 .cesta-comidas .itens-sobrepostos img,
+.mundo-3 .cesta-comidas .itens-sobrepostos .item-sobreposto,
 .mundo-5 .cesta-comidas .itens-sobrepostos img,
 .mundo-5 .cesta-materiais .itens-sobrepostos img,
 .cesta-materiais .itens-sobrepostos img,
@@ -613,6 +665,12 @@
 #cesta-materiais .itens-sobrepostos img,
 [data-accepts="materiais"] .itens-sobrepostos img {
     transform: translateY(18%) scale(1);
+}
+
+.mundo-3 .cesta-comidas .itens-sobrepostos img,
+.mundo-3 .cesta-comidas .itens-sobrepostos .item-sobreposto {
+    transform: translateY(16%) scale(1.02);
+    margin: 0 1px;
 }
 
 /* 3.1. Cesta de Brinquedos (Mundo 1) — eleva sutilmente os brinquedos mantendo o recorte na borda frontal */
@@ -721,42 +779,54 @@
 /* 4. Gaiola de Animais (Mundo 2) */
 .cesta-animais .itens-sobrepostos,
 #cesta-animais .itens-sobrepostos,
-[data-accepts="animais"] .itens-sobrepostos {
-    top: 31%;
-    left: 14%;
-    width: 44%;
-    height: 42%;
+[data-accepts="animais"] .itens-sobrepostos,
+.mundo-2 .cesta-animais .itens-sobrepostos,
+.mundo-2 #cesta-animais .itens-sobrepostos,
+.mundo-2 [data-accepts="animais"] .itens-sobrepostos {
+    top: 20%;
+    left: 16%;
+    width: 34%;
+    height: 38%;
     overflow: hidden;
-    justify-content: flex-start;
+    justify-content: center;
     align-items: flex-end;
 }
 
 .cesta-animais .itens-sobrepostos img,
 .cesta-animais .itens-sobrepostos .item-sobreposto,
 #cesta-animais .itens-sobrepostos img,
-[data-accepts="animais"] .itens-sobrepostos img {
-    transform: scale(1.15) translateY(0);
-    margin-right: -2px;
+[data-accepts="animais"] .itens-sobrepostos img,
+.mundo-2 .cesta-animais .itens-sobrepostos img,
+.mundo-2 .cesta-animais .itens-sobrepostos .item-sobreposto {
+    transform: scale(1.05) translateY(0);
+    margin: 0 -3px;
 }
 
 /* 5. Cesta de Bebidas / Cooler (Mundo 3 e 5) */
 .cesta-bebidas .itens-sobrepostos,
 #cesta-bebidas .itens-sobrepostos,
-[data-accepts="bebidas"] .itens-sobrepostos {
-    top: 29%;
-    left: 16%;
-    width: 68%;
-    height: 21%;
+[data-accepts="bebidas"] .itens-sobrepostos,
+.mundo-3 .cesta-bebidas .itens-sobrepostos,
+.mundo-3 #cesta-bebidas .itens-sobrepostos,
+.mundo-3 [data-accepts="bebidas"] .itens-sobrepostos {
+    top: 10%;
+    left: 10%;
+    width: 80%;
+    height: 26%;
     overflow: hidden;
     align-items: flex-end;
+    justify-content: center;
 }
 
 .cesta-bebidas .itens-sobrepostos img,
 .cesta-bebidas .itens-sobrepostos .item-sobreposto,
 #cesta-bebidas .itens-sobrepostos img,
-[data-accepts="bebidas"] .itens-sobrepostos img {
-    transform: scale(1.22) translateY(3px);
-    margin: 0 -1px;
+[data-accepts="bebidas"] .itens-sobrepostos img,
+.mundo-3 .cesta-bebidas .itens-sobrepostos img,
+.mundo-3 .cesta-bebidas .itens-sobrepostos .item-sobreposto {
+    transform: translateY(16%) scale(1.12);
+    margin: 0 2px;
+    clip-path: none;
 }
 
 /* 6. Cesta de Brinquedos (Mundo 3 e 5) / Balde Vermelho */
@@ -768,12 +838,13 @@
 .mundo-5 #cesta-brinquedos .itens-sobrepostos,
 .mundo-3 [data-accepts="brinquedos"] .itens-sobrepostos,
 .mundo-5 [data-accepts="brinquedos"] .itens-sobrepostos {
-    top: 2%;
-    left: 21%;
-    width: 58%;
-    height: 26%;
+    top: -22%;
+    left: 14%;
+    width: 78%;
+    height: 27%;
     overflow: hidden;
     align-items: flex-end;
+    justify-content: center;
 }
 
 .cesta-brinquedos-mundo3 .itens-sobrepostos img,
@@ -784,7 +855,9 @@
 .cesta-brinquedos-mundo5 .itens-sobrepostos .item-sobreposto,
 .mundo-3 .cesta-brinquedos .itens-sobrepostos .item-sobreposto,
 .mundo-5 .cesta-brinquedos .itens-sobrepostos .item-sobreposto {
-    transform: translateY(8%) scale(1.05);
+    transform: translateY(12%) scale(1.08);
+    margin: 0 4px;
+    clip-path: none;
 }
 
 .drop-zone.is-over {
@@ -2136,4 +2209,707 @@
         padding: 1px 10px;
         font-size: clamp(0.68rem, 2.2vw, 0.82rem);
     }
+}
+
+
+/* ==========================================================
+   MODO DE ACESSIBILIDADE: ALTO CONTRASTE (.alto-contraste) — TUTORIAL E HUD DA FASE
+   ========================================================== */
+body.alto-contraste .tutorial-overlay-escuro {
+    background-color: rgba(18, 18, 18, 0.88) !important;
+    background-image:
+        url("assets/images/tela_inicial/Acessibilidade/background.png"),
+        url("assets/images/tela_inicial/Acessibilidade/KKK 1.jpg"),
+        url("assets/images/KKK 1.jpg") !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    opacity: 0.9 !important;
+    backdrop-filter: none !important;
+}
+
+body.alto-contraste .tutorial-balao-fase,
+body.alto-contraste .tutorial-balao-central,
+body.alto-contraste .tutorial-balao-matematica,
+body.alto-contraste .tutorial-balao-recompensa,
+body.alto-contraste .tutorial-banner-comemoracao,
+body.alto-contraste .tutorial-banner-incentivo {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 3px solid #000000 !important;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.65) !important;
+    text-shadow: none !important;
+}
+
+body.alto-contraste .tutorial-subtexto-incentivo {
+    color: #000000 !important;
+    opacity: 1 !important;
+}
+
+body.alto-contraste .tutorial-balao-fase::after {
+    border-color: #ffffff transparent transparent transparent !important;
+    filter: drop-shadow(0 3px 0 #000000) !important;
+}
+
+body.alto-contraste .tutorial-balao-matematica::after {
+    border-color: transparent transparent #ffffff transparent !important;
+    filter: drop-shadow(0 -3px 0 #000000) !important;
+}
+
+body.alto-contraste .draggable-item.tutorial-destaque-item {
+    background: #ffffff !important;
+    border: 3px solid #000000 !important;
+    box-shadow: 0 0 0 4px #ffffff, 0 0 0 7px #000000 !important;
+}
+
+body.alto-contraste .categoria.tutorial-destaque-cesta,
+body.alto-contraste .cesta-container.tutorial-destaque-cesta,
+body.alto-contraste .cesta-recompensa-tutorial,
+body.alto-contraste .tutorial-matematica-ativo #tela-organizacao .categoria,
+body.alto-contraste .tutorial-matematica-ativo #tela-organizacao .cesta-container {
+    filter: drop-shadow(0 0 4px #ffffff) drop-shadow(0 0 8px #000000) !important;
+}
+
+body.alto-contraste .tutorial-matematica-ativo #opcoes-matematica {
+    background: #ffffff !important;
+    border: 3px solid #000000 !important;
+    box-shadow: none !important;
+}
+
+body.alto-contraste .pagina-fase1 img.tutorial-maozinha-arraste,
+body.alto-contraste .tutorial-maozinha-arraste,
+body.alto-contraste .pagina-fase1 img.tutorial-maozinha-matematica,
+body.alto-contraste .tutorial-maozinha-matematica,
+body.alto-contraste .estrela-particula {
+    filter: grayscale(100%) contrast(1.25) drop-shadow(0 6px 12px rgba(0, 0, 0, 0.7)) !important;
+}
+
+body.alto-contraste .hud-instrucoes,
+body.alto-contraste.mundo-1 .hud-instrucoes {
+    background: #ffffff !important;
+    border: 6px solid #000000 !important;
+    box-shadow: none !important;
+}
+
+body.alto-contraste .hud-titulo,
+body.alto-contraste .hud-subtitulo,
+body.alto-contraste .hud-subtitulo.feedback-acerto,
+body.alto-contraste .hud-subtitulo.feedback-erro {
+    color: #000000 !important;
+    text-shadow: none !important;
+}
+
+/* ==========================================================
+   ALTO CONTRASTE: MUNDO 1 (HUD, OBJETOS, BALÕES, ETIQUETAS E CESTAS)
+   ========================================================== */
+body.alto-contraste .draggable-item,
+body.alto-contraste.mundo-1 .draggable-item {
+    background: #ffffff !important;
+    border: 6px solid #000000 !important;
+    border-radius: 18px !important;
+    box-shadow: none !important;
+}
+
+body.alto-contraste .slot-objeto,
+body.alto-contraste.mundo-1 .slot-objeto {
+    background: transparent !important;
+    border: none !important;
+}
+
+body.alto-contraste #tutorial-balao-arraste,
+body.alto-contraste .tutorial-balao-fase,
+body.alto-contraste.mundo-1 #tutorial-balao-arraste,
+body.alto-contraste.mundo-1 .tutorial-balao-fase {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 6px solid #000000 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+}
+
+body.alto-contraste .tutorial-balao-fase::after {
+    border-color: #000000 transparent transparent transparent !important;
+    filter: none !important;
+}
+
+/* ==========================================================
+   1. OCULTAÇÃO DE RÓTULOS E ETIQUETAS DE CATEGORIA (ALTO CONTRASTE)
+   ========================================================== */
+body.alto-contraste .etiqueta-texto-categoria,
+body.alto-contraste.mundo-1 .etiqueta-texto-categoria,
+body.alto-contraste .etiqueta-categoria,
+body.alto-contraste .categoria-img,
+body.alto-contraste.mundo-1 .etiqueta-categoria,
+body.alto-contraste.mundo-1 .categoria-img,
+body.alto-contraste [class*="etiqueta"],
+body.alto-contraste.mundo-1 [class*="etiqueta"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* ==========================================================
+   2. CENTRALIZAÇÃO DOS NÚMEROS NAS CESTAS (ALTO CONTRASTE)
+   Aplicado EXCLUSIVAMENTE sob o seletor body.alto-contraste.
+   O modo normal permanece 100% inalterado com seu visual padrão.
+   ========================================================== */
+body.alto-contraste .contador-itens,
+body.alto-contraste .contador-circulo,
+body.alto-contraste .cesta-container .contador-itens,
+body.alto-contraste .cesta-container .contador-circulo,
+body.alto-contraste.mundo-1 .contador-itens,
+body.alto-contraste.mundo-1 .contador-circulo,
+body.alto-contraste.mundo-2 .contador-itens,
+body.alto-contraste.mundo-2 .contador-circulo,
+body.alto-contraste.mundo-3 .contador-itens,
+body.alto-contraste.mundo-3 .contador-circulo {
+    position: absolute !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+    line-height: 1 !important;
+    color: #000000 !important;
+    font-family: Arial, Helvetica, sans-serif !important;
+    font-weight: 900 !important;
+    font-size: clamp(1.2rem, 2.4vw, 1.75rem) !important;
+    text-shadow: none !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    pointer-events: none !important;
+    user-select: none !important;
+    z-index: 10 !important;
+    transform: none !important;
+}
+
+/* Tag interna do número (.contador-numero): herda e preenche centralizada no flexbox */
+body.alto-contraste .contador-numero,
+body.alto-contraste .contador-circulo .contador-numero,
+body.alto-contraste .contador-itens .contador-numero,
+body.alto-contraste .cesta-container .contador-numero,
+body.alto-contraste .contador-circulo span,
+body.alto-contraste .contador-itens span,
+body.alto-contraste span.contador-numero,
+body.alto-contraste.mundo-1 .contador-numero,
+body.alto-contraste.mundo-2 .contador-numero,
+body.alto-contraste.mundo-3 .contador-numero {
+    position: static !important;
+    transform: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+    line-height: 1 !important;
+    font-family: Arial, Helvetica, sans-serif !important;
+    font-weight: 900 !important;
+    font-size: inherit !important;
+    color: #000000 !important;
+    text-shadow: none !important;
+    width: 100% !important;
+    height: 100% !important;
+    box-sizing: border-box !important;
+    pointer-events: none !important;
+}
+
+/* Coordenadas e dimensões precisas sobre o círculo branco das cestas do Mundo 1 */
+body.alto-contraste .cesta-brinquedos .contador-circulo,
+body.alto-contraste .cesta-brinquedos .contador-itens,
+body.alto-contraste #cesta-brinquedos .contador-circulo,
+body.alto-contraste #cesta-brinquedos .contador-itens,
+body.alto-contraste [data-accepts="brinquedos"] .contador-circulo,
+body.alto-contraste [data-accepts="brinquedos"] .contador-itens,
+body.alto-contraste.mundo-1 .cesta-brinquedos .contador-circulo,
+body.alto-contraste.mundo-1 .cesta-brinquedos .contador-itens,
+body.alto-contraste.mundo-1 #cesta-brinquedos .contador-circulo,
+body.alto-contraste.mundo-1 #cesta-brinquedos .contador-itens,
+body.alto-contraste.mundo-1 [data-accepts="brinquedos"] .contador-circulo,
+body.alto-contraste.mundo-1 [data-accepts="brinquedos"] .contador-itens {
+    top: 0% !important;
+    right: 1% !important;
+    left: auto !important;
+    bottom: auto !important;
+    width: 20% !important;
+    height: 26% !important;
+    transform: none !important;
+}
+
+body.alto-contraste .cesta-comidas .contador-circulo,
+body.alto-contraste .cesta-comidas .contador-itens,
+body.alto-contraste #cesta-comidas .contador-circulo,
+body.alto-contraste #cesta-comidas .contador-itens,
+body.alto-contraste [data-accepts="comidas"] .contador-circulo,
+body.alto-contraste [data-accepts="comidas"] .contador-itens,
+body.alto-contraste.mundo-1 .cesta-comidas .contador-circulo,
+body.alto-contraste.mundo-1 .cesta-comidas .contador-itens,
+body.alto-contraste.mundo-1 #cesta-comidas .contador-circulo,
+body.alto-contraste.mundo-1 #cesta-comidas .contador-itens,
+body.alto-contraste.mundo-1 [data-accepts="comidas"] .contador-circulo,
+body.alto-contraste.mundo-1 [data-accepts="comidas"] .contador-itens {
+    top: 0% !important;
+    right: 0% !important;
+    left: auto !important;
+    bottom: auto !important;
+    width: 22% !important;
+    height: 26% !important;
+    transform: none !important;
+}
+
+body.alto-contraste .cesta-materiais .contador-circulo,
+body.alto-contraste .cesta-materiais .contador-itens,
+body.alto-contraste #cesta-materiais .contador-circulo,
+body.alto-contraste #cesta-materiais .contador-itens,
+body.alto-contraste [data-accepts="materiais"] .contador-circulo,
+body.alto-contraste [data-accepts="materiais"] .contador-itens,
+body.alto-contraste.mundo-1 .cesta-materiais .contador-circulo,
+body.alto-contraste.mundo-1 .cesta-materiais .contador-itens,
+body.alto-contraste.mundo-1 #cesta-materiais .contador-circulo,
+body.alto-contraste.mundo-1 #cesta-materiais .contador-itens,
+body.alto-contraste.mundo-1 [data-accepts="materiais"] .contador-circulo,
+body.alto-contraste.mundo-1 [data-accepts="materiais"] .contador-itens {
+    top: 0% !important;
+    right: 15% !important;
+    left: auto !important;
+    bottom: auto !important;
+    width: 15.5% !important;
+    height: 26% !important;
+    transform: none !important;
+    font-size: clamp(1rem, 1.8vw, 1.45rem) !important;
+}
+
+/* Coordenadas e dimensões precisas sobre o círculo das cestas do Mundo 2 (Parque) */
+body.alto-contraste.mundo-2 .cesta-animais .contador-circulo,
+body.alto-contraste.mundo-2 .cesta-animais .contador-itens,
+body.alto-contraste.mundo-2 #cesta-animais .contador-circulo,
+body.alto-contraste.mundo-2 #cesta-animais .contador-itens,
+body.alto-contraste.mundo-2 [data-accepts="animais"] .contador-circulo,
+body.alto-contraste.mundo-2 [data-accepts="animais"] .contador-itens {
+    top: 1% !important;
+    right: 0.6% !important;
+    left: auto !important;
+    bottom: auto !important;
+    width: 23% !important;
+    height: 23% !important;
+    transform: none !important;
+}
+
+body.alto-contraste.mundo-2 .cesta-brinquedos .contador-circulo,
+body.alto-contraste.mundo-2 .cesta-brinquedos .contador-itens,
+body.alto-contraste.mundo-2 #cesta-brinquedos .contador-circulo,
+body.alto-contraste.mundo-2 #cesta-brinquedos .contador-itens,
+body.alto-contraste.mundo-2 [data-accepts="brinquedos"] .contador-circulo,
+body.alto-contraste.mundo-2 [data-accepts="brinquedos"] .contador-itens {
+    top: 20.9% !important;
+    right: 1.1% !important;
+    left: auto !important;
+    bottom: auto !important;
+    width: 21.5% !important;
+    height: 19.5% !important;
+    transform: none !important;
+}
+
+body.alto-contraste.mundo-2 .cesta-comidas .contador-circulo,
+body.alto-contraste.mundo-2 .cesta-comidas .contador-itens,
+body.alto-contraste.mundo-2 .cesta-comida .contador-circulo,
+body.alto-contraste.mundo-2 .cesta-comida .contador-itens,
+body.alto-contraste.mundo-2 #cesta-comidas .contador-circulo,
+body.alto-contraste.mundo-2 #cesta-comidas .contador-itens,
+body.alto-contraste.mundo-2 #cesta-comida .contador-circulo,
+body.alto-contraste.mundo-2 #cesta-comida .contador-itens,
+body.alto-contraste.mundo-2 [data-accepts="comidas"] .contador-circulo,
+body.alto-contraste.mundo-2 [data-accepts="comidas"] .contador-itens,
+body.alto-contraste.mundo-2 [data-accepts="comida"] .contador-circulo,
+body.alto-contraste.mundo-2 [data-accepts="comida"] .contador-itens {
+    top: 22% !important;
+    right: 0.6% !important;
+    left: auto !important;
+    bottom: auto !important;
+    width: 23.5% !important;
+    height: 19.5% !important;
+    transform: none !important;
+}
+
+/* Coordenadas e dimensões precisas sobre o círculo das cestas do Mundo 3 (Praia) */
+body.alto-contraste.mundo-3 .cesta-bebidas .contador-circulo,
+body.alto-contraste.mundo-3 .cesta-bebidas .contador-itens,
+body.alto-contraste.mundo-3 #cesta-bebidas .contador-circulo,
+body.alto-contraste.mundo-3 #cesta-bebidas .contador-itens,
+body.alto-contraste.mundo-3 [data-accepts="bebidas"] .contador-circulo,
+body.alto-contraste.mundo-3 [data-accepts="bebidas"] .contador-itens {
+    top: 10% !important;
+    right: 0.6% !important;
+    left: auto !important;
+    bottom: auto !important;
+    width: 23.5% !important;
+    height: 20.5% !important;
+    transform: none !important;
+}
+
+body.alto-contraste.mundo-3 .cesta-brinquedos .contador-circulo,
+body.alto-contraste.mundo-3 .cesta-brinquedos .contador-itens,
+body.alto-contraste.mundo-3 #cesta-brinquedos .contador-circulo,
+body.alto-contraste.mundo-3 #cesta-brinquedos .contador-itens,
+body.alto-contraste.mundo-3 [data-accepts="brinquedos"] .contador-circulo,
+body.alto-contraste.mundo-3 [data-accepts="brinquedos"] .contador-itens {
+    top: 2.7% !important;
+    right: 4.3% !important;
+    left: auto !important;
+    bottom: auto !important;
+    width: 23% !important;
+    height: 22.5% !important;
+    transform: none !important;
+}
+
+body.alto-contraste.mundo-3 .cesta-comidas .contador-circulo,
+body.alto-contraste.mundo-3 .cesta-comidas .contador-itens,
+body.alto-contraste.mundo-3 #cesta-comidas .contador-circulo,
+body.alto-contraste.mundo-3 #cesta-comidas .contador-itens,
+body.alto-contraste.mundo-3 [data-accepts="comidas"] .contador-circulo,
+body.alto-contraste.mundo-3 [data-accepts="comidas"] .contador-itens {
+    top: 20% !important;
+    right: 0.6% !important;
+    left: auto !important;
+    bottom: auto !important;
+    width: 24% !important;
+    height: 21% !important;
+    transform: none !important;
+}
+
+body.alto-contraste.mundo-1 .itens-sobrepostos,
+body.alto-contraste.mundo-2 .itens-sobrepostos,
+body.alto-contraste.mundo-3 .itens-sobrepostos,
+body.alto-contraste.mundo-4 .itens-sobrepostos {
+    display: flex !important;
+}
+
+body.alto-contraste.mundo-1 .itens-sobrepostos img,
+body.alto-contraste.mundo-1 .itens-sobrepostos .item-sobreposto,
+body.alto-contraste.mundo-2 .itens-sobrepostos img,
+body.alto-contraste.mundo-2 .itens-sobrepostos .item-sobreposto,
+body.alto-contraste.mundo-3 .itens-sobrepostos img,
+body.alto-contraste.mundo-3 .itens-sobrepostos .item-sobreposto,
+body.alto-contraste.mundo-4 .itens-sobrepostos img,
+body.alto-contraste.mundo-4 .itens-sobrepostos .item-sobreposto {
+    display: block !important;
+}
+
+/* Ajuste fino de elevação e profundidade dos itens no Mundo 3 (sensação de estarem guardados/dentro) */
+body.alto-contraste.mundo-3 .cesta-bebidas .itens-sobrepostos {
+    top: 10% !important;
+    left: 10% !important;
+    width: 80% !important;
+    height: 26% !important;
+    overflow: hidden !important;
+    align-items: flex-end !important;
+    justify-content: center !important;
+}
+
+body.alto-contraste.mundo-3 .cesta-bebidas .itens-sobrepostos img,
+body.alto-contraste.mundo-3 .cesta-bebidas .itens-sobrepostos .item-sobreposto {
+    transform: translateY(16%) scale(1.12) !important;
+    margin: 0 2px !important;
+    clip-path: none !important;
+}
+
+body.alto-contraste.mundo-3 .cesta-brinquedos .itens-sobrepostos {
+    top: -22% !important;
+    left: 14% !important;
+    width: 78% !important;
+    height: 27% !important;
+    overflow: hidden !important;
+    align-items: flex-end !important;
+    justify-content: center !important;
+}
+
+body.alto-contraste.mundo-3 .cesta-brinquedos .itens-sobrepostos img,
+body.alto-contraste.mundo-3 .cesta-brinquedos .itens-sobrepostos .item-sobreposto {
+    transform: translateY(12%) scale(1.08) !important;
+    margin: 0 4px !important;
+    clip-path: none !important;
+}
+
+body.alto-contraste.mundo-3 .cesta-comidas .itens-sobrepostos {
+    top: 15% !important;
+    left: 12% !important;
+    width: 64% !important;
+    height: 23% !important;
+    overflow: hidden !important;
+    align-items: flex-end !important;
+}
+
+body.alto-contraste.mundo-3 .cesta-comidas .itens-sobrepostos img,
+body.alto-contraste.mundo-3 .cesta-comidas .itens-sobrepostos .item-sobreposto {
+    transform: translateY(16%) scale(1.02) !important;
+    margin: 0 1px !important;
+}
+
+/* ==========================================================
+   2.4. MUNDO 4: ACAMPAMENTO (COMIDA E MOCHILA)
+   ========================================================== */
+
+/* 1. Alinhamento dos Contadores Numéricos nos Círculos Brancos */
+
+/* Cesta Comida / Comidas (Mundo 4) */
+body.alto-contraste.mundo-4 .cesta-comida .contador-circulo,
+body.alto-contraste.mundo-4 .cesta-comidas .contador-circulo,
+body.alto-contraste.mundo-4 .cesta-comida .contador-itens,
+body.alto-contraste.mundo-4 .cesta-comidas .contador-itens,
+body.alto-contraste.mundo-4 #cesta-comida .contador-circulo,
+body.alto-contraste.mundo-4 #cesta-comidas .contador-circulo,
+body.alto-contraste.mundo-4 #cesta-comida .contador-itens,
+body.alto-contraste.mundo-4 #cesta-comidas .contador-itens,
+body.alto-contraste.mundo-4 [data-accepts="comida"] .contador-circulo,
+body.alto-contraste.mundo-4 [data-accepts="comidas"] .contador-circulo,
+body.alto-contraste.mundo-4 [data-accepts="comida"] .contador-itens,
+body.alto-contraste.mundo-4 [data-accepts="comidas"] .contador-itens {
+    top: 22% !important;
+    right: 0.5% !important;
+    left: auto !important;
+    bottom: auto !important;
+    width: 24% !important;
+    height: 20% !important;
+    transform: none !important;
+}
+
+/* Mochila (Mundo 4) */
+body.alto-contraste.mundo-4 .cesta-mochila .contador-circulo,
+body.alto-contraste.mundo-4 .cesta-mochila .contador-itens,
+body.alto-contraste.mundo-4 #cesta-mochila .contador-circulo,
+body.alto-contraste.mundo-4 #cesta-mochila .contador-itens,
+body.alto-contraste.mundo-4 [data-accepts="mochila"] .contador-circulo,
+body.alto-contraste.mundo-4 [data-accepts="mochila"] .contador-itens {
+    top: 10% !important;
+    right: 1.5% !important;
+    left: auto !important;
+    bottom: auto !important;
+    width: 24% !important;
+    height: 21% !important;
+    transform: none !important;
+}
+
+/* 2. Sobreposição e Profundidade dos Itens */
+
+/* Cesta de Comida (Mundo 4) — alinhamento idêntico aos Mundos 2 e 3 */
+body.alto-contraste.mundo-4 .cesta-comida .itens-sobrepostos,
+body.alto-contraste.mundo-4 .cesta-comidas .itens-sobrepostos,
+body.alto-contraste.mundo-4 #cesta-comida .itens-sobrepostos,
+body.alto-contraste.mundo-4 #cesta-comidas .itens-sobrepostos,
+body.alto-contraste.mundo-4 [data-accepts="comida"] .itens-sobrepostos,
+body.alto-contraste.mundo-4 [data-accepts="comidas"] .itens-sobrepostos,
+body.alto-contraste.mundo-4 .cesta-comida-mundo4 .itens-sobrepostos {
+    top: 15% !important;
+    left: 12% !important;
+    width: 64% !important;
+    height: 23% !important;
+    overflow: hidden !important;
+    align-items: flex-end !important;
+}
+
+body.alto-contraste.mundo-4 .cesta-comida .itens-sobrepostos img,
+body.alto-contraste.mundo-4 .cesta-comidas .itens-sobrepostos img,
+body.alto-contraste.mundo-4 [data-accepts="comida"] .itens-sobrepostos img,
+body.alto-contraste.mundo-4 [data-accepts="comidas"] .itens-sobrepostos img,
+body.alto-contraste.mundo-4 .cesta-comida-mundo4 .itens-sobrepostos img,
+body.alto-contraste.mundo-4 .cesta-comida .itens-sobrepostos .item-sobreposto,
+body.alto-contraste.mundo-4 .cesta-comidas .itens-sobrepostos .item-sobreposto,
+body.alto-contraste.mundo-4 [data-accepts="comida"] .itens-sobrepostos .item-sobreposto,
+body.alto-contraste.mundo-4 [data-accepts="comidas"] .itens-sobrepostos .item-sobreposto,
+body.alto-contraste.mundo-4 .cesta-comida-mundo4 .itens-sobrepostos .item-sobreposto {
+    transform: translateY(16%) scale(1.02) !important;
+    margin: 0 1px !important;
+}
+
+/* Mochila (Mundo 4) — itens posicionados no compartimento com base oculta atrás do bolso/aba frontal */
+body.alto-contraste.mundo-4 .cesta-mochila .itens-sobrepostos,
+body.alto-contraste.mundo-4 #cesta-mochila .itens-sobrepostos,
+body.alto-contraste.mundo-4 [data-accepts="mochila"] .itens-sobrepostos {
+    top: 14% !important;
+    left: 14% !important;
+    width: 62% !important;
+    height: 25% !important;
+    overflow: hidden !important;
+    align-items: flex-end !important;
+    justify-content: center !important;
+}
+
+body.alto-contraste.mundo-4 .cesta-mochila .itens-sobrepostos img,
+body.alto-contraste.mundo-4 .cesta-mochila .itens-sobrepostos .item-sobreposto {
+    transform: translateY(15%) scale(1.05) !important;
+    margin: 0 2px !important;
+}
+
+/* ==========================================================
+   3. BOTÃO VOLTAR EM ALTO CONTRASTE (MAIOR ÁREA DE TOQUE)
+   ========================================================== */
+body.alto-contraste .btn-voltar-fase {
+    padding: 14px !important;
+    min-width: 104px !important;
+    min-height: 104px !important;
+}
+
+body.alto-contraste .btn-voltar-fase img {
+    width: clamp(96px, 10vw, 120px) !important;
+    height: auto !important;
+    filter: none !important;
+}
+
+/* ==========================================================
+   4. DESAFIO MATEMÁTICO E CONCLUSÃO EM ALTO CONTRASTE
+   Padrão preto e branco de alto contraste para o modal final,
+   alternativas, caixas de feedback e botões de navegação.
+   ========================================================== */
+body.alto-contraste .painel-matematica {
+    background: #ffffff !important;
+    border: 5px solid #000000 !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7) !important;
+    color: #000000 !important;
+}
+
+body.alto-contraste .pergunta-matematica {
+    color: #000000 !important;
+    font-weight: 900 !important;
+    text-shadow: none !important;
+}
+
+body.alto-contraste .item-resumo {
+    background: #ffffff !important;
+    border: 3px solid #000000 !important;
+    color: #000000 !important;
+}
+
+body.alto-contraste .valor-resumo,
+body.alto-contraste .operador-conta {
+    color: #000000 !important;
+    font-weight: 900 !important;
+}
+
+/* 4.1. Botões das alternativas de resposta */
+body.alto-contraste .botao-opcao-matematica {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 4px solid #000000 !important;
+    box-shadow: 0 5px 0 #000000 !important;
+    font-weight: 900 !important;
+    text-shadow: none !important;
+}
+
+body.alto-contraste .botao-opcao-matematica:hover:not(:disabled) {
+    background: #000000 !important;
+    color: #ffffff !important;
+    border-color: #000000 !important;
+    transform: scale(1.08) !important;
+    box-shadow: 0 6px 0 rgba(0, 0, 0, 0.6) !important;
+}
+
+body.alto-contraste .botao-opcao-matematica:active:not(:disabled) {
+    background: #000000 !important;
+    color: #ffffff !important;
+    border-color: #000000 !important;
+    transform: scale(0.96) !important;
+    box-shadow: 0 2px 0 #000000 !important;
+}
+
+body.alto-contraste .botao-opcao-matematica:focus-visible {
+    outline: 4px solid #000000 !important;
+    outline-offset: 4px !important;
+}
+
+body.alto-contraste .botao-opcao-matematica.is-correct {
+    background: #000000 !important;
+    color: #ffffff !important;
+    border: 5px solid #000000 !important;
+    box-shadow: 0 0 0 3px #ffffff, 0 0 0 7px #000000 !important;
+    transform: scale(1.08) !important;
+}
+
+body.alto-contraste .botao-opcao-matematica.is-wrong {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 4px dashed #000000 !important;
+    box-shadow: none !important;
+    opacity: 0.65 !important;
+    text-decoration: line-through !important;
+}
+
+/* 4.2. Caixa de feedback de acerto/erro */
+body.alto-contraste .feedback-matematica {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 3px solid #000000 !important;
+    font-weight: 800 !important;
+    text-shadow: none !important;
+}
+
+body.alto-contraste .feedback-matematica.is-success {
+    background: #000000 !important;
+    color: #ffffff !important;
+    border: 4px solid #000000 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35) !important;
+}
+
+body.alto-contraste .feedback-matematica.is-error {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 4px dashed #000000 !important;
+    box-shadow: none !important;
+}
+
+/* 4.3. Botões de navegação inferiores ("Voltar para o Menu" e "Próxima Fase") */
+body.alto-contraste .btn-conclusao,
+body.alto-contraste .btn-continuar-menu {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 4px solid #000000 !important;
+    border-radius: 50px !important;
+    font-weight: 900 !important;
+    box-shadow: 0 5px 0 #000000 !important;
+    text-shadow: none !important;
+}
+
+body.alto-contraste .btn-conclusao:hover:not(:disabled),
+body.alto-contraste .btn-continuar-menu:hover:not(:disabled) {
+    background: #000000 !important;
+    color: #ffffff !important;
+    border-color: #000000 !important;
+    transform: scale(1.06) !important;
+    box-shadow: 0 6px 0 rgba(0, 0, 0, 0.6) !important;
+}
+
+body.alto-contraste .btn-conclusao:active:not(:disabled),
+body.alto-contraste .btn-continuar-menu:active:not(:disabled) {
+    background: #000000 !important;
+    color: #ffffff !important;
+    border-color: #000000 !important;
+    transform: scale(0.96) !important;
+    box-shadow: 0 2px 0 #000000 !important;
+}
+
+body.alto-contraste .btn-conclusao:focus-visible,
+body.alto-contraste .btn-continuar-menu:focus-visible {
+    outline: 4px solid #000000 !important;
+    outline-offset: 4px !important;
+}
+
+/* 4.4. Painel de Vitória (Organização / Boss) */
+body.alto-contraste #painel-vitoria,
+body.alto-contraste .painel-vitoria {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 5px solid #000000 !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7) !important;
+}
+
+body.alto-contraste .titulo-vitoria,
+body.alto-contraste .subtitulo-vitoria {
+    color: #000000 !important;
+    text-shadow: none !important;
 }

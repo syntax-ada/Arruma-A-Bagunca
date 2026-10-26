@@ -130,3 +130,56 @@ img {
   border-radius: 999px;
   background: #ff5f95;
 }
+
+
+/* Alto Contraste: Controle de Volume Monocromático */
+body.alto-contraste .volume-container:focus-visible,
+body.alto-contraste .volume-icone:focus-visible {
+  outline: 3px solid #000000 !important;
+}
+
+body.alto-contraste .volume-slider {
+  accent-color: #000000;
+}
+
+body.alto-contraste .volume-slider::-webkit-slider-runnable-track {
+  background: linear-gradient(
+    to right,
+    #000000 0%,
+    #000000 var(--progresso, 100%),
+    #d4d4d4 var(--progresso, 100%),
+    #d4d4d4 100%
+  ) !important;
+  border: 1px solid #000000 !important;
+}
+
+body.alto-contraste .volume-slider::-webkit-slider-thumb {
+  background: #000000 !important;
+  border: 2px solid #ffffff !important;
+  box-shadow: 0 0 0 1.5px #000000 !important;
+}
+
+body.alto-contraste .volume-slider::-webkit-slider-thumb:hover,
+body.alto-contraste .volume-slider::-webkit-slider-thumb:active {
+  background: #333333 !important;
+}
+
+body.alto-contraste .volume-slider::-moz-range-track {
+  background: #d4d4d4 !important;
+  border: 1px solid #000000 !important;
+}
+
+body.alto-contraste .volume-slider::-moz-range-progress {
+  background: #000000 !important;
+}
+
+body.alto-contraste .volume-slider::-moz-range-thumb {
+  background: #000000 !important;
+  border: 2px solid #ffffff !important;
+  box-shadow: 0 0 0 1.5px #000000 !important;
+}
+
+body.alto-contraste .volume-slider::-moz-range-thumb:hover,
+body.alto-contraste .volume-slider::-moz-range-thumb:active {
+  background: #333333 !important;
+}
