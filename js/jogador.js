@@ -48,6 +48,9 @@
   const btnCorrigirApelido = document.querySelector("#btn-corrigir-apelido");
   const btnConfirmarApelido = document.querySelector("#btn-confirmar-apelido");
   const avisoConexao = document.querySelector("#aviso-conexao");
+  const textoAvisoConexao = document.querySelector("#texto-aviso-conexao");
+  // Texto padrão do aviso (o de index.html), usado quando o servidor não manda mensagem.
+  const MENSAGEM_AVISO_PADRAO = textoAvisoConexao ? textoAvisoConexao.textContent : "";
   const btnTentarNovamente = document.querySelector("#btn-tentar-novamente");
   const nomeJogadorMenu = document.querySelector("#nome-jogador");
   const avatarJogadorMenu = document.querySelector("#avatar-jogador");
@@ -103,6 +106,7 @@
    * Envia JSON para a API e classifica o resultado:
    *   "ok"          → resposta 2xx com JSON
    *   "validacao"   → 422 (apelido inválido ou não permitido), com a mensagem do servidor
+   *   "espera"      → 429 (muitas tentativas), com a mensagem do servidor
    *   "indisponivel"→ sem conexão, demora, 5xx, 404 ou resposta inesperada
    */
   async function chamarApi(url, corpo) {
@@ -126,6 +130,9 @@
 
       if (resposta.status === 422 && dados?.erro) {
         return { tipo: "validacao", mensagem: dados.mensagem || MENSAGEM_NAO_PERMITIDO };
+      }
+      if (resposta.status === 429 && dados?.mensagem) {
+        return { tipo: "espera", mensagem: dados.mensagem };
       }
       if (resposta.ok && dados) {
         return { tipo: "ok", dados };
@@ -167,8 +174,12 @@
     campoApelido.removeAttribute("aria-invalid");
   }
 
-  function mostrarAvisoConexao(acao) {
+  // "mensagem" vem do servidor (ex.: 429, "Espere um pouco"); sem ela, vale o texto padrão.
+  function mostrarAvisoConexao(acao, mensagem) {
     acaoParaRepetir = acao;
+    if (textoAvisoConexao) {
+      textoAvisoConexao.textContent = mensagem || MENSAGEM_AVISO_PADRAO;
+    }
     avisoConexao.classList.remove("escondido");
     btnTentarNovamente.focus();
   }
@@ -227,9 +238,9 @@
       mostrarErroApelido(resultado.mensagem);
       return;
     }
-    if (resultado.tipo === "indisponivel") {
+    if (resultado.tipo === "indisponivel" || resultado.tipo === "espera") {
       // O campo não é limpo: a criança só precisa tentar de novo.
-      mostrarAvisoConexao(consultarApelido);
+      mostrarAvisoConexao(consultarApelido, resultado.mensagem);
       return;
     }
 
@@ -280,7 +291,7 @@
       return;
     }
     if (!jogador) {
-      mostrarAvisoConexao(confirmarPerfil);
+      mostrarAvisoConexao(confirmarPerfil, resultado.mensagem);
       return;
     }
 

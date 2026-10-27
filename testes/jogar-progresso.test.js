@@ -310,3 +310,25 @@ test("falha ao criar ou recuperar o jogador continua mostrando o aviso de conex�
   assert.ok(!visivel(ambiente.$("#menu-fases")));
   assert.equal(ambiente.pedidos.filter((p) => p.rota.startsWith("/api/progresso")).length, 0);
 });
+
+test("limite de tentativas (429) mostra a mensagem do servidor no aviso, sem entrar", async () => {
+  const MENSAGEM_429 = "Muitas tentativas. Espere um pouco e tente de novo.";
+  const rotas = rotasDaAna();
+  rotas["POST /api/jogadores/verificar"] = { status: 429, corpo: { erro: "MUITAS_TENTATIVAS", mensagem: MENSAGEM_429, esperaSegundos: 60 } };
+  const ambiente = abrirIndex({ rotas });
+
+  await identificarComoAna(ambiente);
+  await esperar();
+
+  assert.ok(visivel(ambiente.$("#aviso-conexao")));
+  assert.equal(ambiente.$("#texto-aviso-conexao").textContent, MENSAGEM_429);
+  assert.ok(!visivel(ambiente.$("#menu-fases")));
+  assert.equal(ambiente.pedidos.filter((p) => p.rota === "/api/jogadores").length, 0);
+
+  // Sem conexão depois: volta o texto padrão do aviso, não a mensagem do 429.
+  rotas["POST /api/jogadores/verificar"] = "rede";
+  ambiente.$("#btn-tentar-novamente").disparar("click");
+  await esperar();
+  assert.ok(visivel(ambiente.$("#aviso-conexao")));
+  assert.notEqual(ambiente.$("#texto-aviso-conexao").textContent, MENSAGEM_429);
+});
