@@ -1168,6 +1168,23 @@
     padding: 8px 12px;
 }
 
+/* Em paisagem, a altura é o limite: com o tamanho dos objetos só pela largura
+   e a grade presa a 670px (regra de computador), 14 a 16 objetos viravam 3
+   linhas e a última ficava abaixo da tela (a área não rola). Aqui a grade usa
+   a largura toda (cabem 8 por linha, então até 16 objetos ficam em 2 linhas)
+   e o objeto também respeita a altura: 2 linhas sempre cabem abaixo do HUD
+   (os 140px descontam o HUD e os espaçamentos). 44px é o menor alvo de toque. */
+@media (orientation: landscape) {
+    [data-modo-cestas="celular"] .grid-objetos {
+        max-width: none;
+    }
+
+    [data-modo-cestas="celular"] .slot-objeto {
+        width: clamp(44px, min(10vw, (100vh - 140px) / 2), 86px);
+        height: clamp(44px, min(10vw, (100vh - 140px) / 2), 86px);
+    }
+}
+
 /* Escurece o cenário durante o arraste, sem esconder os objetos e sem
    receber toques. */
 [data-modo-cestas="celular"] .tela-organizacao:has(.draggable-item.is-dragging)::after {
