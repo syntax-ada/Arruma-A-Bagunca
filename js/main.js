@@ -22,7 +22,8 @@
  * Este arquivo NÃO contém lógica de fase nem regras de jogo — apenas resolve
  * qual configuração deve ser usada e entrega ao motor (game.js).
  *
- * ⚠️ ORDEM DE CARREGAMENTO: main.js deve ser o ÚLTIMO script do HTML.
+ * ⚠️ ORDEM DE CARREGAMENTO: main.js deve vir DEPOIS do motor e dos mundos
+ * (em fase1.html, só a ferramenta dev.js vem depois dele).
  * Ele depende de game.js (startGame) e dos arquivos de mundo (MUNDOS), que são
  * scripts clássicos com funções/variáveis globais — nada declara essa
  * dependência automaticamente.
