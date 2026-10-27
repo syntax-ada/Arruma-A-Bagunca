@@ -997,6 +997,133 @@
     }
 }
 
+/* ==========================================================
+   CESTAS TEMPORÁRIAS NO CELULAR
+   Só valem com [data-modo-cestas="celular"] no <html>, ligado por js/main.js
+   pelo critério O4 (ponteiro de toque + tela do aparelho e área do jogo com
+   até 500px no menor lado). Fora desse modo nada deste bloco se aplica.
+
+   As cestas ficam num painel fixo no rodapé, invisível até um objeto começar
+   a ser arrastado (.is-dragging, aplicado por game.js).
+   ⚠️ Nunca esconder o painel com display: none. game.js tira .is-dragging
+   ANTES de procurar a cesta sob o dedo (finishDrag): sem caixa na tela, a
+   soltura nunca seria reconhecida. Com opacidade, as cestas continuam no
+   lugar para a detecção e para o teclado.
+   O #area-categorias dá a estas regras prioridade sobre as do layout de
+   computador (posições laterais e o scale(1.45) da cesta de materiais).
+   ========================================================== */
+[data-modo-cestas="celular"] #area-categorias {
+    /* Cada cesta cabe numa caixa limitada pela altura da tela e pela largura
+       dividida entre até 3 cestas; a imagem mantém a proporção real. */
+    --espaco-cestas: clamp(8px, 3vw, 16px);
+    --altura-max-cesta: clamp(64px, 22vh, 140px);
+    --largura-max-cesta: calc((100vw - 24px - 2 * var(--espaco-cestas)) / 3);
+    position: fixed;
+    top: auto;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    /* Acima do escurecimento (80) e abaixo do objeto arrastado (100). */
+    z-index: 90;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-end;
+    gap: var(--espaco-cestas);
+    width: 100%;
+    margin: 0;
+    padding: 10px 12px calc(12px + env(safe-area-inset-bottom, 0px));
+    background: rgba(255, 255, 255, 0.94);
+    border-radius: 22px 22px 0 0;
+    box-shadow: 0 -6px 18px rgba(0, 0, 0, 0.25);
+    opacity: 0;
+    /* O painel e as cestas nunca recebem toque: quem está sendo arrastado já
+       capturou o ponteiro, e a detecção é pela posição. Assim, o painel
+       invisível não bloqueia os objetos que estão atrás dele. */
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+}
+
+/* Aparece durante o arraste, quando uma cesta recebe o foco pelo teclado e no
+   tutorial da conta, que mostra as cestas com as quantidades. */
+[data-modo-cestas="celular"] .tela-organizacao:has(.draggable-item.is-dragging) #area-categorias,
+[data-modo-cestas="celular"] #area-categorias:focus-within,
+[data-modo-cestas="celular"] .tutorial-matematica-ativo #area-categorias {
+    opacity: 1;
+}
+
+/* No tutorial da conta, só as cestas aparecem (como no layout de sempre),
+   sem a faixa branca do painel. */
+[data-modo-cestas="celular"] .tutorial-matematica-ativo #area-categorias {
+    background: transparent;
+    box-shadow: none;
+}
+
+[data-modo-cestas="celular"] #area-categorias .drop-zone {
+    position: relative;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    width: auto;
+    max-width: none;
+    transform: none;
+    transform-origin: center bottom;
+    pointer-events: none;
+}
+
+/* Destaque da cesta sob o dedo (como no computador, um pouco maior). */
+[data-modo-cestas="celular"] #area-categorias .drop-zone.is-over {
+    transform: scale(1.08);
+}
+
+[data-modo-cestas="celular"] #area-categorias .cesta-img {
+    width: auto;
+    height: auto;
+    max-width: var(--largura-max-cesta);
+    max-height: var(--altura-max-cesta);
+}
+
+/* As cestas não ficam mais nas laterais, então a área de objetos não precisa
+   da reserva lateral do layout de computador (min-width: 769px), que em
+   celulares em paisagem deixava objetos fora da tela. Mesmo espaçamento que
+   a área já usa em telas de até 768px. */
+[data-modo-cestas="celular"] .area-objetos {
+    padding: 8px 12px;
+}
+
+/* Escurece o cenário durante o arraste, sem esconder os objetos e sem
+   receber toques. */
+[data-modo-cestas="celular"] .tela-organizacao:has(.draggable-item.is-dragging)::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    background: rgba(10, 15, 28, 0.35);
+    pointer-events: none;
+    animation: escurecerCenarioCestas 0.15s ease-out;
+}
+
+@keyframes escurecerCenarioCestas {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    [data-modo-cestas="celular"] #area-categorias {
+        transition: none;
+    }
+
+    [data-modo-cestas="celular"] .tela-organizacao:has(.draggable-item.is-dragging)::after {
+        animation: none;
+    }
+}
+
 .pagina-fase1 img {
     pointer-events: none;
     display: block;
@@ -1032,6 +1159,9 @@
     overflow: hidden;
 }
 
+/* Os tamanhos do desafio acompanham a largura E a altura da tela (clamp com
+   vh/vmin), com mínimos legíveis para crianças. Em telas grandes os valores
+   chegam ao máximo e o visual é o de antes. */
 .tela-matematica {
     display: flex;
     flex-direction: column;
@@ -1039,8 +1169,15 @@
     justify-content: space-between;
     width: 100vw;
     height: 100vh;
-    padding: 10px 24px 30px;
-    overflow: hidden;
+    /* Altura realmente visível no celular (sem as barras do navegador). O 100vh
+       acima fica para navegadores que não conhecem dvh. */
+    height: 100dvh;
+    padding: clamp(6px, 1.5vh, 10px) clamp(12px, 4vw, 24px) clamp(12px, 3vh, 30px);
+    /* Rede de segurança: se o desafio não couber (tela muito baixa), a própria
+       tela rola e as alternativas e os botões finais continuam alcançáveis.
+       Quando cabe, nada rola. */
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 .hud-texto-matematica {
@@ -1053,23 +1190,26 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 20px;
+    gap: clamp(10px, 2.6vh, 20px);
     background: rgba(255, 255, 255, 0.95);
     border: 4px solid #24577a;
     border-radius: 24px;
-    padding: 28px 36px;
+    /* Margem lateral menor no celular deixa espaço para o resumo ficar em
+       menos linhas. */
+    padding: clamp(14px, 3.7vh, 28px) clamp(14px, 4.5vw, 36px);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
     max-width: min(90vw, 720px);
     width: 100%;
     margin-bottom: auto;
-    margin-top: 10px;
+    margin-top: clamp(6px, 1.5vh, 10px);
 }
 
 .pergunta-matematica {
     margin: 0;
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 1.6rem;
+    font-size: clamp(1.25rem, 4.2vmin, 1.6rem);
     font-weight: 800;
+    line-height: 1.2;
     color: #1f2933;
     text-align: center;
 }
@@ -1078,7 +1218,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 14px;
+    gap: clamp(6px, 1.5vh, 10px) clamp(8px, 2.5vw, 14px);
     flex-wrap: wrap;
 }
 
@@ -1088,45 +1228,55 @@
     gap: 6px;
     background: #f0f7fb;
     border: 2px solid #24577a;
-    padding: 6px 14px;
+    padding: clamp(4px, 1vh, 6px) clamp(10px, 2.5vw, 14px);
     border-radius: 12px;
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 1.15rem;
+    font-size: clamp(1.05rem, 3.4vmin, 1.15rem);
     font-weight: 700;
     color: #1f2933;
 }
 
 .icone-resumo {
-    font-size: 1.4rem;
+    font-size: clamp(1.2rem, 4vmin, 1.4rem);
 }
 
 .valor-resumo {
     color: #24577a;
-    font-size: 1.3rem;
+    font-size: clamp(1.15rem, 3.8vmin, 1.3rem);
 }
 
 .operador-conta {
-    font-size: 1.6rem;
+    font-size: clamp(1.35rem, 4.4vmin, 1.6rem);
     font-weight: 900;
     color: #24577a;
 }
 
 .opcoes-matematica {
+    /* Tamanho de cada alternativa e distância entre os centros de duas
+       vizinhas. A mãozinha do tutorial (tutorialPairarOpcoes) usa o mesmo
+       passo, para continuar apontando para elas em qualquer tela. */
+    --tamanho-opcao: clamp(64px, 14vmin, 88px);
+    --espaco-opcoes: clamp(14px, 4vw, 24px);
+    --passo-opcao: calc(var(--tamanho-opcao) + var(--espaco-opcoes));
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
-    gap: 24px;
+    gap: var(--espaco-opcoes);
     width: 100%;
-    margin-top: 6px;
+    margin-top: clamp(2px, 1vh, 6px);
 }
 
+/* Alvo de toque grande para crianças: nunca abaixo de 64px. Em vez de
+   encolher além disso, as alternativas quebram de linha. */
 .botao-opcao-matematica {
-    width: 88px;
-    height: 88px;
+    width: var(--tamanho-opcao);
+    height: var(--tamanho-opcao);
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 2.2rem;
+    font-size: clamp(1.75rem, 6vmin, 2.2rem);
     font-weight: 900;
     color: #ffffff;
     background: #24577a;
@@ -1159,11 +1309,11 @@
 }
 
 .feedback-matematica {
-    min-height: 48px;
+    min-height: clamp(40px, 7vh, 48px);
     margin: 0;
-    padding: 10px 20px;
+    padding: clamp(6px, 1.4vh, 10px) clamp(12px, 3vw, 20px);
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 1.2rem;
+    font-size: clamp(1.05rem, 3.4vmin, 1.2rem);
     font-weight: 700;
     text-align: center;
     border-radius: 10px;
@@ -1211,7 +1361,7 @@
     gap: 16px;
     flex-wrap: wrap;
     justify-content: center;
-    margin-top: 20px;
+    margin-top: clamp(8px, 2vh, 20px);
 }
 
 .btn-conclusao {
@@ -1870,10 +2020,12 @@
     filter: drop-shadow(0 0 18px rgba(255, 255, 255, 0.85)) drop-shadow(0 0 28px rgba(242, 83, 138, 0.75));
 }
 
+/* 90vw e o respiro lateral menor em #opcoes-matematica (abaixo) mantêm as
+   três alternativas numa linha a partir de 320px de largura. */
 .tutorial-matematica-ativo .painel-matematica {
     position: relative;
     z-index: 52;
-    max-width: min(82vw, 600px);
+    max-width: min(90vw, 600px);
 }
 
 .tutorial-matematica-ativo #resumo-quantidades {
@@ -1884,7 +2036,10 @@
 .tutorial-matematica-ativo #opcoes-matematica {
     position: relative;
     z-index: 56;
-    padding: 10px 16px;
+    /* Permite à mãozinha saber, pela largura, se as alternativas quebraram
+       em duas linhas (@container mais abaixo). */
+    container-type: inline-size;
+    padding: 10px clamp(8px, 2.5vw, 16px);
     border-radius: 22px;
     background: rgba(255, 255, 255, 0.25);
     box-shadow: 0 0 24px rgba(242, 83, 138, 0.45);
@@ -1918,18 +2073,47 @@
     animation: tutorialPairarOpcoes 2.4s infinite ease-in-out;
 }
 
+/* Percorre as três alternativas: esquerda, centro e direita. O deslocamento
+   segue o passo das alternativas; os ajustes de -23px, -15px e -7px são os
+   da animação original (no computador, com passo de 112px, os valores são
+   exatamente os de antes: -135px, -15px e 105px). */
 @keyframes tutorialPairarOpcoes {
     0%, 100% {
-        transform: translate(-135px, 0) rotate(-6deg) scale(1);
+        transform: translate(calc(-1 * var(--passo-opcao) - 23px), 0) rotate(-6deg) scale(1);
     }
     25% {
-        transform: translate(-135px, -8px) rotate(-10deg) scale(0.92);
+        transform: translate(calc(-1 * var(--passo-opcao) - 23px), -8px) rotate(-10deg) scale(0.92);
     }
     50% {
         transform: translate(-15px, 0) rotate(0deg) scale(1);
     }
     75% {
-        transform: translate(105px, -8px) rotate(8deg) scale(0.92);
+        transform: translate(calc(var(--passo-opcao) - 7px), -8px) rotate(8deg) scale(0.92);
+    }
+}
+
+/* Telas muito estreitas: as alternativas quebram em duas linhas (duas em
+   cima, uma embaixo, no centro) e a mãozinha segue esse desenho. 220px é a
+   largura mínima de uma linha: 3 × 64px + 2 × 14px. Mesma especificidade da
+   regra da mãozinha acima, que fica antes e por isso é substituída aqui. */
+@container (width < 220px) {
+    .pagina-fase1 img.tutorial-maozinha-matematica {
+        animation-name: tutorialPairarOpcoesDuasLinhas;
+    }
+}
+
+@keyframes tutorialPairarOpcoesDuasLinhas {
+    0%, 100% {
+        transform: translate(calc(-0.5 * var(--passo-opcao) - 23px), 0) rotate(-6deg) scale(1);
+    }
+    25% {
+        transform: translate(calc(-0.5 * var(--passo-opcao) - 23px), -8px) rotate(-10deg) scale(0.92);
+    }
+    50% {
+        transform: translate(calc(0.5 * var(--passo-opcao) - 15px), 0) rotate(0deg) scale(1);
+    }
+    75% {
+        transform: translate(-7px, calc(var(--passo-opcao) - 8px)) rotate(8deg) scale(0.92);
     }
 }
 

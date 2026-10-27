@@ -9,3 +9,6 @@
 
 # Dependências (o projeto não usa hoje; evita commit acidental)
 node_modules/
+
+# Anotações pessoais locais (checklists, rascunhos) — nunca versionar.
+pessoal/

@@ -42,7 +42,7 @@ A origem dos demais itens da tabela não está documentada neste repositório.
 | Instruções com suporte a áudio | Não implementado |
 | Configurações de acessibilidade | Não implementado. O botão "Configurações" do menu é um espaço reservado, sem função |
 | Suporte a teclado | Parcial (ver seção 3) |
-| Dispositivos móveis | Parcial: layouts responsivos, sem teste registrado em aparelhos reais |
+| Dispositivos móveis | Parcial: cestas temporárias no celular (critério O4, ver seção 3) e desafio matemático ajustado a telas pequenas e baixas. Verificado só em teste local, com emulação de tela e toque no Chrome; **sem teste em aparelhos reais** |
 | Pontuação e conquistas | Não implementado |
 | Login administrativo e restrição do painel DEV | Implementado no código: login em `admin.html` com sessão conferida no servidor e limite de tentativas de PIN; `?dev=true` só vale em ambiente local. Validado em teste simulado e local; **sem deploy verificado** |
 | Limite de requisições e revogação de sessões de jogador | Implementado no código, com contadores e sessões no Supabase (migração `20261021190000_sessoes_e_limites.sql`, aplicada no Supabase real pela equipe em 21/10/2026). Validado em teste simulado, no navegador com banco simulado e, no banco real, nas permissões e na execução das funções como `service_role`; ⚠️ **o fluxo pela API ainda não foi validado** e não há deploy verificado (ver [`docs/seguranca.md`](docs/seguranca.md)) |
@@ -67,8 +67,16 @@ Os Mundos 1 a 4 são as etapas principais; o Mundo 5 é a fase bônus (organiza�
 - **Progressão:** concluir uma fase libera a próxima; concluir a última libera o próximo mundo. O Mundo 5 aparece como um painel lateral do Boss no menu de mundos, depois de concluir o Mundo 4. A ordem é obrigatória: uma fase aberta pela URL sem as anteriores concluídas pode ser jogada, mas não é registrada nem libera nada. Depois da fase bônus não há mais nada a liberar. As regras (13 fases e a ordem) ficam em `js/regras-progresso.js`, usado pelo navegador e pelo servidor.
 - **Progresso salvo:** cada conclusão é guardada no navegador, na chave do jogador identificado, e enviada ao servidor. Sem internet, fica pendente e é reenviada depois. Ao entrar com o apelido, o progresso do banco é somado ao do navegador; nada é apagado ou substituído. **JOGAR não apaga progresso.**
 - **Organização:** arrastar e soltar com mouse ou toque. Um objeto na cesta errada volta ao lugar, sem penalidade. Cada cesta mostra um contador (número e ícone).
-- **Teclado (parcial):** Enter ou Espaço sobre uma cesta posiciona nela o próximo objeto disponível. Não é possível arrastar objetos pelo teclado.
-- **Desafio matemático:** usa as quantidades que a criança realmente organizou, com a operação declarada pela fase. As alternativas são geradas e embaralhadas. Resposta errada mostra um feedback gentil e permite tentar de novo.
+- **Cestas no celular (modo O4):** o modo liga só quando as três condições valem ao mesmo tempo: o ponteiro principal é toque (`pointer: coarse`), o menor lado da tela do aparelho tem até 500 px e o menor lado da área do jogo (o iframe da fase) tem até 500 px. Quem decide é `js/main.js`, que reavalia ao girar ou redimensionar. Nesse modo:
+  - as cestas ficam ocultas enquanto nenhum objeto está sendo arrastado;
+  - ao começar o arraste, aparece um painel temporário no rodapé com as cestas, os nomes e os contadores, e o cenário escurece levemente, sem esconder os objetos;
+  - ao soltar, o painel fecha e valem as mesmas regras de sempre (acerto, erro, retorno do objeto, contadores e objetos guardados);
+  - a área de objetos não reserva mais espaço nas laterais para as cestas;
+  - o tutorial de arraste da Fase 1 do Mundo 1 não é exibido; o tutorial da conta continua.
+
+  Fora do modo O4 (tablets, inclusive em tela dividida, computadores com qualquer tamanho de janela, celular usando mouse), as cestas e os tutoriais funcionam como antes. Se a detecção falhar ou o navegador não entender `:has()` no CSS, o modo fica desligado.
+- **Teclado (parcial):** Enter ou Espaço sobre uma cesta posiciona nela o próximo objeto disponível. Não é possível arrastar objetos pelo teclado. No modo O4, o painel aparece quando uma cesta recebe o foco.
+- **Desafio matemático:** usa as quantidades que a criança realmente organizou, com a operação declarada pela fase. As alternativas são geradas e embaralhadas. Resposta errada mostra um feedback gentil e permite tentar de novo. Em telas pequenas ou baixas, o painel do desafio se ajusta à largura e à altura (fora da batalha do Mundo 5, as alternativas têm pelo menos 64 px); se ainda não couber, a tela do desafio rola.
 - **Mundo 5:** cinco contas compostas (× e ÷ antes de + e −), com o Monstro da Bagunça e cinco corações. Ao acertar as cinco, a cena passa para a organização final da sala.
 
 ---
@@ -96,7 +104,7 @@ Supabase / PostgreSQL (tabelas players e phase_completions)
 - `index.html`: tela inicial, identificação, menu de mundos e o iframe onde a fase roda. `fase1.html`: tela de jogo genérica, usada por todos os mundos.
 - `js/mundos/`: um arquivo declarativo por mundo, que se registra em `window.MUNDOS`.
 - `js/game.js` (organização), `js/math.js` (desafio) e `js/operacoes.js` (regras das operações): o motor compartilhado.
-- `js/main.js`: resolve `?mundo=X&fase=Y` e inicia a fase.
+- `js/main.js`: resolve `?mundo=X&fase=Y`, decide o modo das cestas no celular (critério O4, atributo `data-modo-cestas` no `<html>`) e inicia a fase.
 - `js/regras-progresso.js`: catálogo das 13 fases e regras da ordem, compartilhado com o servidor. `js/progresso.js`: progresso por jogador e sincronização com o servidor. `js/audio.js`: trilha e volume. `js/jogador.js`: tela de identificação. `js/menu.js`: navegação do menu. `js/dev.js`: ferramentas de desenvolvimento.
 - `api/jogadores/`, `api/progresso/` e `api/admin/`: endpoints. `api/_lib/`: funções compartilhadas (não viram rotas), entre elas `limite.js` (limite de requisições) e `sessao-jogador.js` (sessão do jogador).
 - `supabase/migrations/`: migrações SQL versionadas, aplicadas **manualmente** pela equipe.
@@ -223,6 +231,16 @@ A migração `supabase/migrations/20261021190000_sessoes_e_limites.sql` (aplicad
 - O filtro de palavras não é moderação perfeita.
 - Outros pontos pendentes da auditoria (publicação de pastas internas, `admin.html` em iframe de outro site) estão em [`docs/seguranca.md`](docs/seguranca.md).
 - O progresso feito sem jogador identificado (ex.: `fase1.html` aberta direto, sem passar pelo JOGAR) vale só enquanto a página estiver aberta.
+- **Cestas no celular (modo O4):**
+  - verificado só em teste local, com emulação no Chrome, e **não em aparelhos reais**;
+  - o critério é uma aproximação: o navegador não informa "isto é um celular". Um celular usando mouse e um tablet em tela dividida ficam fora do modo, com as cestas sempre visíveis, como antes;
+  - as cestas só aparecem no primeiro arraste, e o texto do HUD não avisa isso;
+  - durante o arraste, o painel cobre a parte de baixo da área de objetos (que fica escurecida);
+  - em 844×390, com 14 a 16 objetos, a terceira linha fica cerca de 10% cortada na base, mas continua visível e pode ser arrastada;
+  - as cestas mantêm a proporção das imagens, por isso a de materiais escolares parece menor.
+- **Observados em emulação, fora do modo O4 (já existiam antes dele):**
+  - no tutorial de arraste da Fase 1 do Mundo 1, deslizar o dedo para a direita sobre a camada escura fez o navegador voltar a página;
+  - em janelas baixas de computador (ex.: 1024×450), cestas laterais se sobrepõem e um objeto solto na cesta certa pode ser recusado, porque vale a primeira cesta da página.
 
 ### Acessibilidade
 
@@ -294,6 +312,8 @@ Ao relatar uma verificação, diga qual destes níveis foi feito. Um nível não
 
 Configuração informada pela equipe (esquema do banco, variáveis na Vercel) não substitui a validação da integração nem do deploy.
 
+**Responsividade e modo O4:** verificados em **teste local** com o Chrome sem interface e emulação de tela e toque (celulares de 320×568 a 956×440, tablets em tela cheia e dividida, computadores), com scripts avulsos que não estão no repositório. Foram cobertos: as 13 fases concluídas por arraste, acerto, erro, soltura fora da cesta, arraste interrompido, contadores, tutoriais, giro de tela, teclado e o jogo dentro do iframe do menu. **Não houve teste em aparelhos reais**, que continua pendente.
+
 `scratch/` guarda duas páginas de teste manual. `test_menu_boss.html` funciona. ⚠️ `test_boss_fluxo.html` entra em loop por estar desatualizado: o Mundo 5 funciona pelo fluxo real do jogo.
 
 ---
@@ -334,6 +354,8 @@ Não são obrigações imediatas; cada incremento deve ser avaliado antes de com
 - Versionar o esquema de `players` numa migração revisada pela equipe. Criar `.vercelignore` e limitar requisições à API.
 - Confirmar se a arte do Mundo 5 é a definitiva (o comentário no topo de `js/mundos/mundo5.js` ainda diz "provisório" e está desatualizado).
 - Teclado completo, configurações de acessibilidade, instruções por áudio e testes em dispositivos reais.
+- Testar o modo O4 em aparelhos reais (iPhone com Safari, Android com Chrome, tablets, inclusive em tela dividida) e decidir se o tutorial de arraste ganha uma versão para o celular.
+- Responsividade fora do modo O4: sobreposição das cestas laterais em janelas baixas de computador e o deslize que volta a página no tutorial de arraste (ver seção 5, limitações).
 - Corrigir ou remover `scratch/test_boss_fluxo.html`.
 
 ---

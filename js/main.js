@@ -136,5 +136,79 @@
     });
   }
 
+  // ==========================================================================
+  // MODO DAS CESTAS NO CELULAR (critério O4)
+  // ==========================================================================
+  // O painel temporário de cestas (style-fase1.css, [data-modo-cestas="celular"])
+  // só vale quando as TRÊS condições são verdadeiras:
+  //   1. o ponteiro principal é toque: (pointer: coarse);
+  //   2. o menor lado da tela do aparelho (screen) tem até 500 px;
+  //   3. o menor lado da área do jogo tem até 500 px. A área do jogo é esta
+  //      janela: dentro do iframe do menu, innerWidth/innerHeight medem o iframe.
+  // Assim, tablets (em tela cheia ou dividida) e computadores, com qualquer
+  // tamanho de janela, ficam com o comportamento de sempre.
+  // O painel depende de :has() no CSS para saber quando aparecer; sem esse
+  // suporte o modo não liga. Qualquer erro aqui também deixa o modo desligado:
+  // as cestas continuam como sempre e a fase pode ser concluída.
+  const LIMITE_MODO_CELULAR_PX = 500;
+
+  function deveUsarCestasDeCelular() {
+    try {
+      const toque = window.matchMedia("(pointer: coarse)").matches;
+      const menorLadoTela = Math.min(window.screen.width, window.screen.height);
+      const menorLadoJogo = Math.min(window.innerWidth, window.innerHeight);
+      const cssEntendeHas = typeof CSS !== "undefined" && typeof CSS.supports === "function"
+        && CSS.supports("selector(:has(*))");
+
+      return toque && cssEntendeHas
+        && menorLadoTela > 0 && menorLadoTela <= LIMITE_MODO_CELULAR_PX
+        && menorLadoJogo > 0 && menorLadoJogo <= LIMITE_MODO_CELULAR_PX;
+    } catch (erro) {
+      return false;
+    }
+  }
+
+  // O tutorial de arraste da fase 1-1 aponta para as cestas na posição de
+  // sempre, que no celular só aparecem durante o arraste. Por enquanto ele não
+  // roda nesse modo. removerElementosTutorialArraste (game.js) só desfaz o
+  // tutorial: não mexe em objetos, cestas, contadores nem progresso.
+  function encerrarTutorialDeArrasteNoCelular() {
+    if (document.querySelector("#tutorial-overlay") && typeof removerElementosTutorialArraste === "function") {
+      removerElementosTutorialArraste();
+    }
+  }
+
+  function aplicarModoDasCestas() {
+    const raiz = document.documentElement;
+    if (deveUsarCestasDeCelular()) {
+      raiz.dataset.modoCestas = "celular";
+      encerrarTutorialDeArrasteNoCelular();
+    } else {
+      delete raiz.dataset.modoCestas;
+    }
+  }
+
+  // Antes de startGame, para o primeiro desenho já sair no modo certo.
+  aplicarModoDasCestas();
+
+  // Reavalia ao girar, redimensionar ou trocar o tipo de ponteiro (ex.: mouse
+  // conectado ao celular).
+  window.addEventListener("resize", aplicarModoDasCestas);
+  window.addEventListener("orientationchange", aplicarModoDasCestas);
+  try {
+    const consultaPonteiro = window.matchMedia("(pointer: coarse)");
+    if (typeof consultaPonteiro.addEventListener === "function") {
+      consultaPonteiro.addEventListener("change", aplicarModoDasCestas);
+    } else if (typeof consultaPonteiro.addListener === "function") {
+      consultaPonteiro.addListener(aplicarModoDasCestas);
+    }
+  } catch (erro) {
+    // Sem matchMedia: o modo já ficou desligado acima.
+  }
+
   startGame(config);
+
+  // startGame pode ter aberto o tutorial de arraste (fase 1-1). No modo celular
+  // ele é encerrado aqui mesmo, antes de a tela ser desenhada.
+  aplicarModoDasCestas();
 })();

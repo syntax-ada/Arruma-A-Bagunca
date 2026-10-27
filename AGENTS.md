@@ -53,7 +53,7 @@ Principais responsabilidades:
 - `index.html` → menu inicial (jogar, créditos) e seleção de mundos/fases;
 - `fase1.html` → tela de jogo genérica (organização de objetos + desafio matemático);
 - `menu.js` → navegação do menu, carrossel de mundos e modais de fases e créditos;
-- `main.js` → ponto de entrada (bootstrap) da fase: lê os parâmetros da URL (`?mundo=X&fase=Y`), resolve o mundo e a fase via `window.MUNDOS` e inicializa o motor com `startGame(config)`;
+- `main.js` → ponto de entrada (bootstrap) da fase: lê os parâmetros da URL (`?mundo=X&fase=Y`), resolve o mundo e a fase via `window.MUNDOS` e inicializa o motor com `startGame(config)`. Também é o único que decide o modo das cestas no celular (critério O4) e grava `data-modo-cestas="celular"` no `<html>`; o CSS só lê esse atributo;
 - `game.js` → mecânica de organização dos objetos, motor compartilhado por todos os mundos e fases orquestrado por `startGame()`;
 - `math.js` → motor do desafio matemático desacoplado, resolvendo a conta via `window.OPERACOES` e disparando a progressão;
 - `operacoes.js` → catálogo e regras das operações matemáticas (Soma, Subtração, Multiplicação, Divisão e contas compostas);
@@ -109,6 +109,7 @@ Preserve estes acoplamentos. Para o mapa completo, veja a seção Arquitetura do
 - Os scripts são clássicos, com globais e sem módulos: **respeite a ordem de carregamento** nos HTML (por exemplo, `main.js` é o último script de `fase1.html`).
 - Cada mundo é um arquivo declarativo em `js/mundos/` que se registra em `window.MUNDOS`. Regras de jogo ficam no motor (`game.js`, `math.js`, `operacoes.js`), não nos mundos.
 - A fase roda em um iframe do menu e volta a ele por `postMessage` (`arruma-bagunca:navegacao`). Mantenha o contrato.
+- **Cestas no celular (modo O4):** o modo liga só com as três condições juntas: ponteiro principal de toque (`pointer: coarse`), menor lado da tela até 500 px e menor lado da área do jogo (o iframe) até 500 px. Em erro, ou sem suporte a `:has()`, fica desligado. Não troque o critério por largura, toque ou user-agent isolados. Todo o CSS do modo fica sob `[data-modo-cestas="celular"]` e não pode mudar nada fora dele (tablets e computadores mantêm o comportamento de sempre). **Nunca esconda as cestas com `display: none`:** o `game.js` tira `.is-dragging` antes de procurar a cesta sob o dedo, e uma cesta sem caixa na tela nunca recebe a soltura. O escurecimento não recebe toque. No modo, o tutorial de arraste da Fase 1 do Mundo 1 não roda.
 - **JOGAR:** abre a identificação sem mexer no progresso. Depois do apelido, `js/jogador.js` entrega a sessão recebida do servidor a `js/progresso.js`, que carrega o progresso daquele jogador antes de o menu aparecer. `?view=mundos` também não apaga nada e pede o apelido se a aba não tem jogador.
 - O jogador identificado fica em `sessionStorage` **só para exibição**. Nunca é prova de identidade nem de permissão.
 - **Progresso:** os endpoints de progresso usam só o id que está no token assinado (`exigirSessaoJogador`); nunca um id vindo do navegador. A sincronização só **soma** (união): nada apaga nem substitui conclusões, no banco ou no navegador, e o progresso de um jogador nunca é gravado na chave de outro. O progresso do modo DEV fica separado e nunca é enviado ao servidor.
