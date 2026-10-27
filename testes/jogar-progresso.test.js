@@ -113,6 +113,7 @@ function abrirIndex({ url = "http://localhost:3000/", localStorage = criarArmaze
   const pedidos = [];
   const document = {
     readyState: "complete",
+    documentElement: criarElemento("html"),
     head: criarElemento("head"),
     body: criarElemento("body"),
     querySelector(seletor) {
@@ -120,6 +121,10 @@ function abrirIndex({ url = "http://localhost:3000/", localStorage = criarArmaze
         elementos.set(seletor, criarElemento(seletor));
       }
       return elementos.get(seletor);
+    },
+    // Como no navegador: o mesmo elemento de querySelector("#id").
+    getElementById(id) {
+      return this.querySelector(`#${id}`);
     },
     querySelectorAll: () => [],
     createElement: (tag) => criarElemento(tag),
