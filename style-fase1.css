@@ -1087,9 +1087,11 @@
    ========================================================== */
 [data-modo-cestas="celular"] #area-categorias {
     /* Cada cesta cabe numa caixa limitada pela altura da tela e pela largura
-       dividida entre até 3 cestas; a imagem mantém a proporção real. */
+       dividida entre até 3 cestas; a imagem mantém a proporção real. O nome
+       da categoria faz parte da imagem (faixa na base), então a cesta inteira
+       precisa caber na tela. */
     --espaco-cestas: clamp(8px, 3vw, 16px);
-    --altura-max-cesta: clamp(64px, 22vh, 140px);
+    --altura-max-cesta: clamp(64px, 25vh, 140px);
     --largura-max-cesta: calc((100vw - 24px - 2 * var(--espaco-cestas)) / 3);
     position: fixed;
     top: auto;
@@ -1105,7 +1107,8 @@
     gap: var(--espaco-cestas);
     width: 100%;
     margin: 0;
-    padding: 10px 12px calc(12px + env(safe-area-inset-bottom, 0px));
+    /* Margens curtas: a altura do painel fica quase toda para as cestas. */
+    padding: 6px 12px calc(8px + env(safe-area-inset-bottom, 0px));
     background: rgba(255, 255, 255, 0.94);
     border-radius: 22px 22px 0 0;
     box-shadow: 0 -6px 18px rgba(0, 0, 0, 0.25);
