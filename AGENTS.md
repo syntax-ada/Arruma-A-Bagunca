@@ -52,9 +52,9 @@ Principais responsabilidades:
 
 - `index.html` → menu inicial (jogar, créditos) e seleção de mundos/fases;
 - `fase1.html` → tela de jogo genérica (organização de objetos + desafio matemático);
-- `menu.js` → navegação do menu, carrossel de mundos e modais de fases e créditos;
-- `main.js` → ponto de entrada (bootstrap) da fase: lê os parâmetros da URL (`?mundo=X&fase=Y`), resolve o mundo e a fase via `window.MUNDOS` e inicializa o motor com `startGame(config)`. Também é o único que decide o modo das cestas no celular (critério O4) e grava `data-modo-cestas="celular"` no `<html>`; o CSS só lê esse atributo;
-- `game.js` → mecânica de organização dos objetos, motor compartilhado por todos os mundos e fases orquestrado por `startGame()`;
+- `menu.js` → navegação do menu, carrossel de mundos, modais de fases e créditos e modal de Configurações (liga o alto contraste, guardado em `localStorage`, e a escolha local do avatar);
+- `main.js` → ponto de entrada (bootstrap) da fase: lê os parâmetros da URL (`?mundo=X&fase=Y`), resolve o mundo e a fase via `window.MUNDOS` e inicializa o motor com `startGame(config)`. Também aplica o alto contraste na fase e é o único que decide o modo das cestas no celular (critério O4), gravando `data-modo-cestas="celular"` no `<html>`; o CSS só lê esse atributo;
+- `game.js` → mecânica de organização dos objetos, motor compartilhado por todos os mundos e fases orquestrado por `startGame()`. Também guarda os caminhos dos sprites de cesta de alto contraste de cada mundo;
 - `math.js` → motor do desafio matemático desacoplado, resolvendo a conta via `window.OPERACOES` e disparando a progressão;
 - `operacoes.js` → catálogo e regras das operações matemáticas (Soma, Subtração, Multiplicação, Divisão e contas compostas);
 - `regras-progresso.js` → catálogo das 13 fases e regras da ordem; o mesmo arquivo é usado pelo navegador e pelo servidor (`api/progresso/*`);
@@ -69,22 +69,12 @@ Não altere responsabilidades arquiteturais importantes sem sinalizar o impacto 
 
 ---
 
-## Estado atual dos mundos e fases
+## Mundos e fases
 
-| Mundo | Tema | Operação | Fases | Acessível pela UI? |
-|---|---|---|---|---|
-| 1 | A Casa | Soma (`+`) | 3 fases (5, 9 e 14 objetos) | Sim (Fases 1, 2 e 3 acessíveis pela UI via modal e progressão) |
-| 2 | Parque | Subtração (`−`) | 3 fases (Comidas, Animais, Brinquedos) | Sim (desbloqueado após concluir Mundo 1) |
-| 3 | Praia | Multiplicação (`×`) | 3 fases (Bebidas, Comidas, Brinquedos) | Sim (desbloqueado após concluir Mundo 2) |
-| 4 | Acampamento | Divisão (`÷`) | 3 fases (Comida, Mochila) | Sim (desbloqueado após concluir Mundo 3) |
-| 5 | Desafio Final (Boss) | Expressões Compostas | 1 fase (Batalha contra o Boss + Organização Noturna) | Sim (Sidebar lateral do Boss desbloqueada após Mundo 4 / Dev Mode) |
+O estado dos mundos e das fases (o que existe, o que é parcial e como cada mundo é liberado) fica no [`README.md`](README.md), seções 2 e 3. A fonte de verdade das fases (categorias, quantidades e operação) é `js/mundos/`. Quem mudar um mundo ou uma fase atualiza o README na mesma tarefa.
 
-As Fases 1, 2 e 3 do Mundo 1 estão totalmente acessíveis pela UI (a Fase 1 liberada por padrão e as Fases 2 e 3 desbloqueadas progressivamente). Os Mundos 2, 3 e 4 estão implementados no engine com suas respectivas operações matemáticas e mecânicas completas, e são desbloqueados em sequência pelo carrossel.
+---
 
-O Mundo 5 (`mundo5.js`) é o desafio final contra o Monstro da Bagunça: reúne cinco desafios de expressões compostas com precedência de operadores e uma etapa final de organização na sala à noite (`sala_noite_bagunçada.jpeg` durante a batalha e arrumação, mudando para `sala_noite.png` ao concluir a organização). É acessível na tela de seleção de mundos por meio de uma sidebar vertical azul dedicada à direita, que é liberada após a conclusão do Mundo 4 (ou com `?dev=true`) e conta com botão de fechar e ícone flutuante minimizado para reabertura. Na batalha, o monstro fica centralizado com balão de risada, acompanhado de 5 corações dinâmicos de vida no HUD, balões de instrução personalizados (`hud_branco.png` e `hud_branco2.png`) e transição suave para a organização dos itens após derrotar o adversário.
-
-Esta tabela reflete o estado no momento da última revisão deste documento —
-se o código mudar, atualize-a como parte da tarefa que a alterou.
 ## 4. Limites de atuação
 
 **Exigem autorização explícita** (e sinalização do impacto antes):
@@ -106,9 +96,9 @@ se o código mudar, atualize-a como parte da tarefa que a alterou.
 
 Preserve estes acoplamentos. Para o mapa completo, veja a seção Arquitetura do `README.md`.
 
-- Os scripts são clássicos, com globais e sem módulos: **respeite a ordem de carregamento** nos HTML (por exemplo, `main.js` é o último script de `fase1.html`).
+- Os scripts são clássicos, com globais e sem módulos: **respeite a ordem de carregamento** nos HTML (por exemplo, em `fase1.html`, `main.js` vem depois do motor e dos mundos; só a ferramenta `dev.js` vem depois dele).
 - Cada mundo é um arquivo declarativo em `js/mundos/` que se registra em `window.MUNDOS`. Regras de jogo ficam no motor (`game.js`, `math.js`, `operacoes.js`), não nos mundos.
-- A fase roda em um iframe do menu e volta a ele por `postMessage` (`arruma-bagunca:navegacao`). Mantenha o contrato.
+- A fase roda em um iframe do menu e volta a ele por `postMessage` (`arruma-bagunca:navegacao`). Mantenha o contrato. O iframe (`.conteudo-fase`, em `global.css`) usa a altura visível (`100dvh`, com `100vh` de reserva): não volte só para `100vh`, porque no celular a base da fase fica atrás da barra do navegador.
 - **Cestas no celular (modo O4):** o modo liga só com as três condições juntas: ponteiro principal de toque (`pointer: coarse`), menor lado da tela até 500 px e menor lado da área do jogo (o iframe) até 500 px. Em erro, ou sem suporte a `:has()`, fica desligado. Não troque o critério por largura, toque ou user-agent isolados. Todo o CSS do modo fica sob `[data-modo-cestas="celular"]` e não pode mudar nada fora dele (tablets e computadores mantêm o comportamento de sempre). **Nunca esconda as cestas com `display: none`:** o `game.js` tira `.is-dragging` antes de procurar a cesta sob o dedo, e uma cesta sem caixa na tela nunca recebe a soltura. O escurecimento não recebe toque. No modo, o tutorial de arraste da Fase 1 do Mundo 1 não roda.
 - **JOGAR:** abre a identificação sem mexer no progresso. Depois do apelido, `js/jogador.js` entrega a sessão recebida do servidor a `js/progresso.js`, que carrega o progresso daquele jogador antes de o menu aparecer. `?view=mundos` também não apaga nada e pede o apelido se a aba não tem jogador.
 - O jogador identificado fica em `sessionStorage` **só para exibição**. Nunca é prova de identidade nem de permissão.

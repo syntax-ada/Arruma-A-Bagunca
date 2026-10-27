@@ -1087,9 +1087,11 @@
    ========================================================== */
 [data-modo-cestas="celular"] #area-categorias {
     /* Cada cesta cabe numa caixa limitada pela altura da tela e pela largura
-       dividida entre até 3 cestas; a imagem mantém a proporção real. */
+       dividida entre até 3 cestas; a imagem mantém a proporção real. O nome
+       da categoria faz parte da imagem (faixa na base), então a cesta inteira
+       precisa caber na tela. */
     --espaco-cestas: clamp(8px, 3vw, 16px);
-    --altura-max-cesta: clamp(64px, 22vh, 140px);
+    --altura-max-cesta: clamp(64px, 25vh, 140px);
     --largura-max-cesta: calc((100vw - 24px - 2 * var(--espaco-cestas)) / 3);
     position: fixed;
     top: auto;
@@ -1105,7 +1107,8 @@
     gap: var(--espaco-cestas);
     width: 100%;
     margin: 0;
-    padding: 10px 12px calc(12px + env(safe-area-inset-bottom, 0px));
+    /* Margens curtas: a altura do painel fica quase toda para as cestas. */
+    padding: 6px 12px calc(8px + env(safe-area-inset-bottom, 0px));
     background: rgba(255, 255, 255, 0.94);
     border-radius: 22px 22px 0 0;
     box-shadow: 0 -6px 18px rgba(0, 0, 0, 0.25);
@@ -1163,6 +1166,23 @@
    a área já usa em telas de até 768px. */
 [data-modo-cestas="celular"] .area-objetos {
     padding: 8px 12px;
+}
+
+/* Em paisagem, a altura é o limite: com o tamanho dos objetos só pela largura
+   e a grade presa a 670px (regra de computador), 14 a 16 objetos viravam 3
+   linhas e a última ficava abaixo da tela (a área não rola). Aqui a grade usa
+   a largura toda (cabem 8 por linha, então até 16 objetos ficam em 2 linhas)
+   e o objeto também respeita a altura: 2 linhas sempre cabem abaixo do HUD
+   (os 140px descontam o HUD e os espaçamentos). 44px é o menor alvo de toque. */
+@media (orientation: landscape) {
+    [data-modo-cestas="celular"] .grid-objetos {
+        max-width: none;
+    }
+
+    [data-modo-cestas="celular"] .slot-objeto {
+        width: clamp(44px, min(10vw, (100vh - 140px) / 2), 86px);
+        height: clamp(44px, min(10vw, (100vh - 140px) / 2), 86px);
+    }
 }
 
 /* Escurece o cenário durante o arraste, sem esconder os objetos e sem
@@ -1821,6 +1841,9 @@
     backdrop-filter: blur(2px);
     z-index: 40;
     pointer-events: auto;
+    /* Os objetos bloqueados deixam o toque cair nesta camada; sem isto, um
+       deslize para o lado vira o "voltar" do navegador e a criança sai da fase. */
+    touch-action: none;
     animation: surgirOverlayTutorial 0.3s ease-out;
 }
 

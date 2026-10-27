@@ -36,13 +36,13 @@ A origem dos demais itens da tabela não está documentada neste repositório.
 | Menu inicial e créditos | Implementado |
 | 4 fases principais + 1 fase bônus ([Requisito oficial]) | Implementado na organização da equipe ([Decisão da equipe]): 4 mundos principais com 3 fases cada (Mundos 1 a 4) + Mundo 5 como fase bônus do Boss, todos jogáveis. Arte do Mundo 5: a confirmar |
 | Identificação por apelido | Implementado: apelido gravado no Supabase, sem senha ([Decisão da equipe]) |
-| Avatar | Parcial: único avatar 👤 nesta versão ([Decisão da equipe]) |
+| Avatar | Parcial: o banco grava sempre o avatar padrão (👤). No modal de Configurações, a criança pode escolher 1 de 10 avatares ilustrados, mas a escolha fica só neste navegador (uma chave para todos os jogadores dele) e não vai ao servidor. ⚠️ A decisão registrada era "único avatar 👤" ([Decisão da equipe]): a equipe precisa confirmar se a escolha local vale |
 | Progresso e fases concluídas | Implementado: guardado no navegador **separado por jogador** e enviado ao servidor; o JOGAR não apaga progresso |
 | Progresso por jogador no banco | Implementado no código (tabela `phase_completions`, sessão do jogador assinada no servidor). Validado em teste simulado e local. Migração aplicada no Supabase real pela equipe em 21/10/2026, com as permissões conferidas; ⚠️ **o fluxo pelo jogo ainda não foi validado no banco real** e não há deploy verificado (passo a passo em [`docs/progresso-supabase.md`](docs/progresso-supabase.md)) |
-| Instruções com suporte a áudio | Não implementado |
-| Configurações de acessibilidade | Não implementado. O botão "Configurações" do menu é um espaço reservado, sem função |
+| Instruções com suporte a áudio | Não implementado. Há 17 áudios de narração em `assets/audio/narração/`, ainda sem uso no código |
+| Configurações de acessibilidade | Parcial: o botão "Configurações" do menu abre um modal. O **alto contraste** funciona e foi validado visualmente pela equipe (ver seção 3). Os interruptores "Som do jogo", "Música" e "Áudio-descrição" só mudam de aparência: não têm efeito nem são guardados. O botão "Sair" do modal só fecha o modal e volta à tela anterior (não encerra a identificação). Tamanho de fonte: não implementado |
 | Suporte a teclado | Parcial (ver seção 3) |
-| Dispositivos móveis | Parcial: cestas temporárias no celular (critério O4, ver seção 3) e desafio matemático ajustado a telas pequenas e baixas. Verificado só em teste local, com emulação de tela e toque no Chrome; **sem teste em aparelhos reais** |
+| Dispositivos móveis | Parcial: cestas temporárias no celular (critério O4, ver seção 3), desafio matemático ajustado a telas pequenas e baixas e a fase ocupando só a área visível da tela (sem a parte coberta pela barra do navegador). Verificado em teste local, com emulação de tela e toque no Chrome. Em aparelhos reais, há só o relato da equipe que encontrou o corte do painel das cestas (27/10/2026); a correção ainda **não foi testada em aparelho** |
 | Pontuação e conquistas | Não implementado |
 | Login administrativo e restrição do painel DEV | Implementado no código: login em `admin.html` com sessão conferida no servidor e limite de tentativas de PIN; `?dev=true` só vale em ambiente local. Validado em teste simulado e local; **sem deploy verificado** |
 | Limite de requisições e revogação de sessões de jogador | Implementado no código, com contadores e sessões no Supabase (migração `20261021190000_sessoes_e_limites.sql`, aplicada no Supabase real pela equipe em 21/10/2026). Validado em teste simulado, no navegador com banco simulado e, no banco real, nas permissões e na execução das funções como `service_role`; ⚠️ **o fluxo pela API ainda não foi validado** e não há deploy verificado (ver [`docs/seguranca.md`](docs/seguranca.md)) |
@@ -64,7 +64,7 @@ A origem dos demais itens da tabela não está documentada neste repositório.
 
 Os Mundos 1 a 4 são as etapas principais; o Mundo 5 é a fase bônus (organização definida pela equipe, ver seção 2). A fonte de verdade das fases (categorias, quantidades, operação) é a pasta `js/mundos/`.
 
-- **Progressão:** concluir uma fase libera a próxima; concluir a última libera o próximo mundo. O Mundo 5 aparece como um painel lateral do Boss no menu de mundos, depois de concluir o Mundo 4. A ordem é obrigatória: uma fase aberta pela URL sem as anteriores concluídas pode ser jogada, mas não é registrada nem libera nada. Depois da fase bônus não há mais nada a liberar. As regras (13 fases e a ordem) ficam em `js/regras-progresso.js`, usado pelo navegador e pelo servidor.
+- **Progressão:** concluir uma fase libera a próxima; concluir a última libera o próximo mundo. O Mundo 5 aparece como um painel lateral do Boss no menu de mundos, depois de concluir o Mundo 4 (ou com o modo DEV liberado), com botão de fechar e um ícone flutuante do Monstro para reabrir. A ordem é obrigatória: uma fase aberta pela URL sem as anteriores concluídas pode ser jogada, mas não é registrada nem libera nada. Depois da fase bônus não há mais nada a liberar. As regras (13 fases e a ordem) ficam em `js/regras-progresso.js`, usado pelo navegador e pelo servidor.
 - **Progresso salvo:** cada conclusão é guardada no navegador, na chave do jogador identificado, e enviada ao servidor. Sem internet, fica pendente e é reenviada depois. Ao entrar com o apelido, o progresso do banco é somado ao do navegador; nada é apagado ou substituído. **JOGAR não apaga progresso.**
 - **Organização:** arrastar e soltar com mouse ou toque. Um objeto na cesta errada volta ao lugar, sem penalidade. Cada cesta mostra um contador (número e ícone).
 - **Cestas no celular (modo O4):** o modo liga só quando as três condições valem ao mesmo tempo: o ponteiro principal é toque (`pointer: coarse`), o menor lado da tela do aparelho tem até 500 px e o menor lado da área do jogo (o iframe da fase) tem até 500 px. Quem decide é `js/main.js`, que reavalia ao girar ou redimensionar. Nesse modo:
@@ -72,12 +72,14 @@ Os Mundos 1 a 4 são as etapas principais; o Mundo 5 é a fase bônus (organiza�
   - ao começar o arraste, aparece um painel temporário no rodapé com as cestas, os nomes e os contadores, e o cenário escurece levemente, sem esconder os objetos;
   - ao soltar, o painel fecha e valem as mesmas regras de sempre (acerto, erro, retorno do objeto, contadores e objetos guardados);
   - a área de objetos não reserva mais espaço nas laterais para as cestas;
+  - em paisagem, a grade de objetos usa a largura toda (até 8 por linha, então até 16 objetos ficam em 2 linhas) e o tamanho de cada objeto também respeita a altura da tela, com mínimo de 44 px;
   - o tutorial de arraste da Fase 1 do Mundo 1 não é exibido; o tutorial da conta continua.
 
   Fora do modo O4 (tablets, inclusive em tela dividida, computadores com qualquer tamanho de janela, celular usando mouse), as cestas e os tutoriais funcionam como antes. Se a detecção falhar ou o navegador não entender `:has()` no CSS, o modo fica desligado.
 - **Teclado (parcial):** Enter ou Espaço sobre uma cesta posiciona nela o próximo objeto disponível. Não é possível arrastar objetos pelo teclado. No modo O4, o painel aparece quando uma cesta recebe o foco.
 - **Desafio matemático:** usa as quantidades que a criança realmente organizou, com a operação declarada pela fase. As alternativas são geradas e embaralhadas. Resposta errada mostra um feedback gentil e permite tentar de novo. Em telas pequenas ou baixas, o painel do desafio se ajusta à largura e à altura (fora da batalha do Mundo 5, as alternativas têm pelo menos 64 px); se ainda não couber, a tela do desafio rola.
-- **Mundo 5:** cinco contas compostas (× e ÷ antes de + e −), com o Monstro da Bagunça e cinco corações. Ao acertar as cinco, a cena passa para a organização final da sala.
+- **Mundo 5:** cinco contas compostas (× e ÷ antes de + e −), com o Monstro da Bagunça (com balão de risada) e cinco corações. Ao acertar as cinco, a cena passa para a organização final da sala à noite: o cenário `sala_noite_bagunçada.jpeg` vira `sala_noite.png` quando a organização termina.
+- **Alto contraste:** ligado e desligado no modal de Configurações do menu. Vale para o navegador inteiro (todos os jogadores dele) e também para a fase aberta no iframe. No menu, troca fundos, cards e botões por versões em preto e branco. **Recurso de acessibilidade validado visualmente pela equipe (27/10/2026).** Na fase, os Mundos 1 a 4 usam cestas próprias de alto contraste (o nome da categoria vem desenhado na imagem) e as etiquetas separadas ficam escondidas; o Mundo 5 ainda não tem cestas de alto contraste.
 
 ---
 
@@ -101,11 +103,12 @@ Supabase / PostgreSQL (tabelas players e phase_completions)
 
 **Principais peças** (o código é a referência; aqui só as responsabilidades):
 
-- `index.html`: tela inicial, identificação, menu de mundos e o iframe onde a fase roda. `fase1.html`: tela de jogo genérica, usada por todos os mundos.
+- `index.html`: tela inicial, identificação, menu de mundos e o iframe onde a fase roda (ocupa a altura visível da tela, `100dvh`, para a base da fase não ficar atrás da barra do navegador no celular). `fase1.html`: tela de jogo genérica, usada por todos os mundos.
 - `js/mundos/`: um arquivo declarativo por mundo, que se registra em `window.MUNDOS`.
 - `js/game.js` (organização), `js/math.js` (desafio) e `js/operacoes.js` (regras das operações): o motor compartilhado.
 - `js/main.js`: resolve `?mundo=X&fase=Y`, decide o modo das cestas no celular (critério O4, atributo `data-modo-cestas` no `<html>`) e inicia a fase.
-- `js/regras-progresso.js`: catálogo das 13 fases e regras da ordem, compartilhado com o servidor. `js/progresso.js`: progresso por jogador e sincronização com o servidor. `js/audio.js`: trilha e volume. `js/jogador.js`: tela de identificação. `js/menu.js`: navegação do menu. `js/dev.js`: ferramentas de desenvolvimento.
+- `js/regras-progresso.js`: catálogo das 13 fases e regras da ordem, compartilhado com o servidor. `js/progresso.js`: progresso por jogador e sincronização com o servidor. `js/audio.js`: trilha e volume. `js/jogador.js`: tela de identificação. `js/menu.js`: navegação do menu, créditos e modal de Configurações (alto contraste e escolha local do avatar). `js/dev.js`: ferramentas de desenvolvimento.
+- Alto contraste na fase: `js/main.js` aplica a classe `alto-contraste` e `js/game.js` troca os sprites das cestas (os caminhos de cada mundo ficam no próprio `game.js`).
 - `api/jogadores/`, `api/progresso/` e `api/admin/`: endpoints. `api/_lib/`: funções compartilhadas (não viram rotas), entre elas `limite.js` (limite de requisições) e `sessao-jogador.js` (sessão do jogador).
 - `supabase/migrations/`: migrações SQL versionadas, aplicadas **manualmente** pela equipe.
 - `admin.html` e `js/admin.js`: login administrativo da equipe (sem link na interface das crianças).
@@ -120,6 +123,8 @@ Supabase / PostgreSQL (tabelas players e phase_completions)
 | Progresso de cada jogador (fases concluídas e as já confirmadas pelo servidor) | `localStorage`, chave `arruma_bagunca_progresso_jogador:<id>` | Até limpar o navegador. O JOGAR não apaga |
 | Progresso de teste do modo DEV | `localStorage`, chave `arruma_bagunca_progresso_dev` | Até "Resetar Progresso" no painel DEV. Nunca vai ao servidor |
 | Volume | `localStorage`, chave `arruma_bagunca_volume` | Até limpar o navegador |
+| Alto contraste ligado ou não | `localStorage`, chave `arruma_bagunca_alto_contraste` | Até limpar o navegador. Vale para todos os jogadores do navegador |
+| Avatar escolhido no modal de Configurações | `localStorage`, chave `arruma_bagunca_avatar_escolhido` (só o nome do avatar, ex.: `gato`) | Até limpar o navegador. Vale para todos os jogadores do navegador e não vai ao servidor |
 | Jogador identificado (só para exibição) | `sessionStorage`, chave `arruma_bagunca_jogador` | A aba |
 | Sessão do jogador (token assinado pelo servidor) | `sessionStorage`, chave `arruma_bagunca_sessao_jogador`; registro da sessão no Supabase, tabela `player_sessions` | A aba; a sessão vale 12 horas ou até ser encerrada pela equipe |
 | Contadores do limite de requisições | Supabase, tabela `rate_limit_counters` (chaves são resumos: sem IP nem id) | Apagados 1 dia depois de vencidos |
@@ -171,7 +176,7 @@ O servidor local também responde `404 NAO_ENCONTRADO` para rotas inexistentes.
 
 Login, logout e revogação só são aceitos se o cabeçalho `Origin` for exatamente uma das origens de `ADMIN_ALLOWED_ORIGINS` (e, se o navegador informar `Sec-Fetch-Site`, ele precisa ser `same-origin`). Todo endpoint administrativo novo deve começar com `exigirSessaoAdmin(req)`.
 
-**Limite de requisições** (regras em `api/_lib/limite.js`; detalhes, custos e motivos em [`docs/seguranca.md`](docs/seguranca.md)): login administrativo com 5 tentativas por rede a cada 15 min e 30 por hora no total; identificação de jogadores com 120 por rede a cada 10 min; progresso com 600 por rede e 60 por jogador a cada 10 min. Os contadores ficam no Supabase, compartilhados entre instâncias. Se o banco não responder, o jogo segue funcionando sem o limite, e o login administrativo é recusado.
+**Limite de requisições** (regras em `api/_lib/limite.js`; detalhes, custos e motivos em [`docs/seguranca.md`](docs/seguranca.md)): login administrativo com 5 tentativas por rede a cada 15 min e 30 por hora no total; identificação de jogadores com 120 por rede a cada 10 min; progresso com 600 por rede e 60 por jogador a cada 10 min. Os contadores ficam no Supabase, compartilhados entre instâncias. Se o banco não responder, o jogo segue funcionando sem o limite, e o login administrativo é recusado. Na identificação, um 429 mostra no aviso a mensagem enviada pelo servidor ("Muitas tentativas…"), e não "Não conseguimos conectar".
 
 **Regras do apelido** (em `api/_lib/apelido.js`, única fonte):
 
@@ -212,10 +217,10 @@ A migração `supabase/migrations/20261021190000_sessoes_e_limites.sql` (aplicad
 ### Dados e privacidade
 
 - **Dado de perfil solicitado à criança:** apenas o apelido, na grafia digitada. A tela orienta a não usar o nome completo e o servidor recusa sequências de 5 ou mais números.
-- **Gerado pelo sistema a partir do apelido:** o apelido normalizado (sem acentos, em minúsculas e sem espaços), usado só para reconhecer apelidos equivalentes, e o avatar padrão, fixo (a criança não escolhe).
+- **Gerado pelo sistema a partir do apelido:** o apelido normalizado (sem acentos, em minúsculas e sem espaços), usado só para reconhecer apelidos equivalentes, e o avatar padrão, o único gravado no banco. O avatar ilustrado escolhido no modal de Configurações (imagens prontas, sem foto) fica só no navegador.
 - **Identificação técnica e datas mantidas no banco:** um identificador aleatório (`id`) e as datas de criação e de atualização do registro.
 - **Progresso no banco:** quais fases o jogador concluiu e quando (data e hora de cada conclusão).
-- Não se coleta nome real, e-mail, documentos, fotos nem localização, e as tabelas não têm campo para IP. No navegador, o apelido, o avatar, o identificador e o token da sessão ficam só no `sessionStorage` da aba. O progresso de cada jogador fica no `localStorage`, identificado só pelo `id` aleatório, até a limpeza dos dados do site.
+- Não se coleta nome real, e-mail, documentos, fotos nem localização, e as tabelas não têm campo para IP. No navegador, o apelido, o avatar padrão, o identificador e o token da sessão ficam só no `sessionStorage` da aba. O progresso de cada jogador fica no `localStorage`, identificado só pelo `id` aleatório, até a limpeza dos dados do site; o avatar ilustrado escolhido e a preferência de alto contraste também ficam no `localStorage`, sem dono (valem para o navegador).
 - Os logs do backend registram status e códigos de erro, não apelidos nem chaves.
 - A chave secreta do Supabase existe só como variável de ambiente do servidor e da Vercel. O servidor recusa a chave publicável. `.env.local` é ignorado pelo git.
 - O PIN administrativo nunca é guardado: só o hash (`ADMIN_PIN_HASH`), em variável de ambiente do servidor, junto com o segredo que assina a sessão.
@@ -236,16 +241,17 @@ A migração `supabase/migrations/20261021190000_sessoes_e_limites.sql` (aplicad
   - o critério é uma aproximação: o navegador não informa "isto é um celular". Um celular usando mouse e um tablet em tela dividida ficam fora do modo, com as cestas sempre visíveis, como antes;
   - as cestas só aparecem no primeiro arraste, e o texto do HUD não avisa isso;
   - durante o arraste, o painel cobre a parte de baixo da área de objetos (que fica escurecida);
-  - em 844×390, com 14 a 16 objetos, a terceira linha fica cerca de 10% cortada na base, mas continua visível e pode ser arrastada;
-  - as cestas mantêm a proporção das imagens, por isso a de materiais escolares parece menor.
-- **Observados em emulação, fora do modo O4 (já existiam antes dele):**
-  - no tutorial de arraste da Fase 1 do Mundo 1, deslizar o dedo para a direita sobre a camada escura fez o navegador voltar a página;
-  - em janelas baixas de computador (ex.: 1024×450), cestas laterais se sobrepõem e um objeto solto na cesta certa pode ser recusado, porque vale a primeira cesta da página.
+  - em paisagem, as fases com 14 a 16 objetos (1-3, 2-3 e 4-3) deixavam a terceira linha em parte abaixo da tela, e a área de objetos não rola. Com a grade em 2 linhas e o tamanho pela altura, nenhum objeto fica cortado nas 12 fases de organização, de 568×264 a 956×440, inclusive simulando a barra do navegador (teste local em emulação; **não testado em aparelho**). Consequências visuais: com 9 a 16 objetos, a grade tem até 8 por linha (antes, 6 ou 7), e com 568 px de largura os objetos ficam com 57 px (antes, 60);
+  - as cestas mantêm a proporção das imagens, por isso a de materiais escolares parece menor;
+  - o nome de cada categoria faz parte da imagem da cesta (faixa na base), então ele só aparece com a cesta inteira na tela;
+  - a altura do iframe usa `100dvh`; navegadores sem suporte a `dvh` (anteriores a 2022) ficam com `100vh`, e a base da fase pode voltar a ficar atrás da barra do navegador.
+- **Observado em emulação, fora do modo O4 (já existia antes dele):** em janelas baixas de computador (ex.: 1024×450), cestas laterais se sobrepõem e um objeto solto na cesta certa pode ser recusado, porque vale a primeira cesta da página.
+- No tutorial de arraste da Fase 1 do Mundo 1, deslizar o dedo para o lado sobre a camada escura fazia o navegador voltar a página. A camada agora bloqueia esse gesto (`touch-action: none`); verificado em emulação de tablet, ainda não em aparelho.
 
 ### Acessibilidade
 
-- **Implementado:** feedback imediato de acerto e erro; informação nunca só por cor (ícone e número); tela de identificação com rótulo, foco visível e mensagens anunciadas; layouts responsivos; teclado parcial.
-- **Não implementado:** instruções por áudio, configurações de contraste e tamanho de fonte, teclado completo, testes em dispositivos reais e com leitor de tela.
+- **Implementado:** feedback imediato de acerto e erro; informação nunca só por cor (ícone e número); tela de identificação com rótulo, foco visível e mensagens anunciadas; layouts responsivos; teclado parcial; alto contraste, com versões em preto e branco **validadas visualmente pela equipe** (27/10/2026). Ainda falta: o Mundo 5 não tem cestas de alto contraste, e três imagens de fundo citadas no CSS do alto contraste (fundo do tutorial do menu e do modal) não existem no repositório, então nessas telas vale só a cor de fundo.
+- **Não implementado:** instruções por áudio (os áudios de narração existem, mas não são tocados; o interruptor "Áudio-descrição" não tem função), tamanho de fonte, teclado completo, testes com leitor de tela. Em aparelhos reais, só o relato do corte do painel das cestas (seção 2).
 
 ---
 
@@ -275,7 +281,7 @@ node --env-file=.env.local scripts/servidor-local.js    → http://localhost:300
 - Sem as variáveis, a identificação mostra "Não conseguimos conectar agora". Abrir o `index.html` direto no navegador também não passa dessa tela: é preciso o servidor.
 - **JOGAR** leva à identificação e **não apaga progresso**: depois do apelido, o menu mostra o progresso daquele jogador (navegador + banco). `index.html?view=mundos` abre o menu direto; se a aba ainda não tem jogador identificado, pede o apelido antes.
 - **Recomeçar um teste:** use um apelido novo ou o painel DEV (o "Resetar Progresso" zera só o progresso de teste). Nada no jogo apaga dados do banco; ver [`docs/progresso-supabase.md`](docs/progresso-supabase.md), seção 5.
-- **Modo DEV:** em ambiente local, `?dev=true` abre um painel flutuante, com atalhos Shift+C (completar etapa), Shift+N (próxima fase), Shift+R (resetar o progresso de teste) e Shift+D (desbloquear tudo no progresso de teste); `?dev=false` desliga. No site publicado, entre por `/admin.html` com o código e o PIN; depois disso o painel aparece no jogo, e "Sair" (ou `dev.desativar()`) encerra a sessão.
+- **Modo DEV:** em ambiente local, `?dev=true` abre um painel flutuante, com atalhos Shift+C (completar etapa), Shift+N (próxima fase), Shift+R (resetar o progresso de teste) e Shift+D (desbloquear tudo no progresso de teste); `?dev=false` desliga. No site publicado, entre por `/admin.html` com o código e o PIN; depois disso o painel aparece no jogo, e "Sair" (ou `dev.desativar()`) encerra a sessão. Passo a passo em [`docs/tutorial-acesso-admin.md`](docs/tutorial-acesso-admin.md).
 
 ---
 
@@ -286,6 +292,13 @@ node --test        → testes automatizados (pasta testes/)
 ```
 
 Cobrem as regras do apelido, o PIN e a sessão administrativa, o login administrativo (`api/admin/*`), quem pode ligar o painel DEV (o `js/dev.js` real numa sandbox), o servidor local, os endpoints de jogadores e de progresso **com um Supabase simulado** (sessão do jogador, sessões revogadas ou vencidas, ordem das fases, duplicidade, jogadores separados, limite de requisições, tentativas repetidas de PIN, CORS, falhas do banco), as regras das 13 fases, as regras de segurança no texto das migrações SQL (RLS, permissões, funções) e, numa sandbox com os scripts reais do navegador, a sincronização do progresso (troca de jogador, falta de conexão, dados locais inválidos, modo DEV, iframe) e o botão JOGAR. Não usam credenciais nem rede. Não há testes de interface versionados no repositório; o comportamento visual e de interação é verificado à parte (manualmente ou com scripts avulsos).
+
+**Resultado em 27/10/2026:** 153 testes, todos passando. Antes dessa correção, no commit `70d688d`, eram 152 testes com 6 falhas (7 em cópias no Windows com `core.autocrlf`, onde o teste das migrações também falhava), todas dos próprios testes e não do jogo:
+- o navegador simulado do teste do JOGAR não tinha `document.getElementById` nem `document.documentElement`, que o `js/menu.js` passou a usar com o alto contraste (`795f730`);
+- o teste do servidor local não aceitava o `?v=7` de `menu.js` (agora aceita e busca o endereço com a versão);
+- o teste das migrações não tratava quebras de linha CRLF (cópias no Windows com `core.autocrlf`).
+
+Nenhuma verificação foi retirada. Foi acrescentado um teste para o limite de tentativas (429) na identificação.
 
 ### O que cada nível de verificação garante
 
@@ -312,7 +325,7 @@ Ao relatar uma verificação, diga qual destes níveis foi feito. Um nível não
 
 Configuração informada pela equipe (esquema do banco, variáveis na Vercel) não substitui a validação da integração nem do deploy.
 
-**Responsividade e modo O4:** verificados em **teste local** com o Chrome sem interface e emulação de tela e toque (celulares de 320×568 a 956×440, tablets em tela cheia e dividida, computadores), com scripts avulsos que não estão no repositório. Foram cobertos: as 13 fases concluídas por arraste, acerto, erro, soltura fora da cesta, arraste interrompido, contadores, tutoriais, giro de tela, teclado e o jogo dentro do iframe do menu. **Não houve teste em aparelhos reais**, que continua pendente.
+**Responsividade e modo O4:** verificados em **teste local** com o Chrome sem interface e emulação de tela e toque (celulares de 320×568 a 956×440, tablets em tela cheia e dividida, computadores), com scripts avulsos que não estão no repositório. Foram cobertos: as 13 fases concluídas por arraste, acerto, erro, soltura fora da cesta, arraste interrompido, contadores, tutoriais, giro de tela, teclado e o jogo dentro do iframe do menu. A emulação **não reproduz a barra do navegador** do celular: o corte da base do painel das cestas só apareceu no teste da equipe em dois celulares e dois navegadores (27/10/2026). A correção (altura visível do iframe) foi verificada em emulação, simulando a área que sobra com a barra à mostra; o reteste em aparelho continua pendente.
 
 `scratch/` guarda duas páginas de teste manual. `test_menu_boss.html` funciona. ⚠️ `test_boss_fluxo.html` entra em loop por estar desatualizado: o Mundo 5 funciona pelo fluxo real do jogo.
 
@@ -337,7 +350,7 @@ O projeto está pensado para a **Vercel**: a raiz como site estático e `api/` c
 - **Commit e push são feitos por pessoas da equipe**, depois de revisão. Essa é uma regra operacional do projeto, não uma exigência da faculdade. Agentes de IA seguem o [`AGENTS.md`](AGENTS.md).
 - Antes de commitar: `node --check` nos JS alterados, `node --test`, `git diff --check` e conferir que nenhum valor secreto entrou, inclusive em `.env.example`.
 - Tipos de tarefa: Correção, Melhoria, Feature, UX/UI e Arquitetura.
-- **Pontos acoplados ao acrescentar um mundo ou fase:** além do arquivo em `js/mundos/` e das tags `<script>` em `index.html` e `fase1.html`, hoje o card do carrossel está escrito à mão no `index.html`, a lista de classes `mundo-N` está em `js/main.js`, a escala da barra de progresso está fixa em `js/menu.js`, o catálogo de fases está em `js/regras-progresso.js` (um teste confere se bate com `js/mundos/`) e a restrição `CHECK` de `phase_completions` exige uma nova migração.
+- **Pontos acoplados ao acrescentar um mundo ou fase:** além do arquivo em `js/mundos/` e das tags `<script>` em `index.html` e `fase1.html`, hoje o card do carrossel está escrito à mão no `index.html`, a lista de classes `mundo-N` está em `js/main.js`, a escala da barra de progresso e as imagens de alto contraste dos cards estão fixas em `js/menu.js`, os sprites de alto contraste das cestas de cada mundo estão em `js/game.js`, o catálogo de fases está em `js/regras-progresso.js` (um teste confere se bate com `js/mundos/`) e a restrição `CHECK` de `phase_completions` exige uma nova migração.
 
 ---
 
@@ -352,11 +365,13 @@ Não são obrigações imediatas; cada incremento deve ser avaliado antes de com
 - Definir o Cruzeiro HUB: como será a integração via iframe (e se a identidade do jogador virá do HUB).
 - Configurar as variáveis administrativas na Vercel e validar o login e o painel DEV no site publicado; decidir se a sessão administrativa precisa de revogação no servidor; avaliar uma regra opcional no firewall da Vercel e o cabeçalho `frame-ancestors` para `admin.html`.
 - Versionar o esquema de `players` numa migração revisada pela equipe. Criar `.vercelignore` e limitar requisições à API.
-- Confirmar se a arte do Mundo 5 é a definitiva (o comentário no topo de `js/mundos/mundo5.js` ainda diz "provisório" e está desatualizado).
+- Confirmar se a arte do Mundo 5 é a definitiva (o comentário no topo de `js/mundos/mundo5.js` ainda diz "provisório" e está desatualizado). Os comentários de `js/math.js` também citam os balões `hud_branco.png` e `hud_branco2.png`, mas o código não os aplica (o elemento `.caixa-instrucoes` não existe mais em `fase1.html`).
 - Teclado completo, configurações de acessibilidade, instruções por áudio e testes em dispositivos reais.
 - Testar o modo O4 em aparelhos reais (iPhone com Safari, Android com Chrome, tablets, inclusive em tela dividida) e decidir se o tutorial de arraste ganha uma versão para o celular.
-- Responsividade fora do modo O4: sobreposição das cestas laterais em janelas baixas de computador e o deslize que volta a página no tutorial de arraste (ver seção 5, limitações).
+- Responsividade fora do modo O4: sobreposição das cestas laterais em janelas baixas de computador (ver seção 5, limitações). No modo O4, testar em aparelho real a grade de objetos em paisagem.
 - Corrigir ou remover `scratch/test_boss_fluxo.html`.
+- Decidir o que fazer com o que chegou junto do alto contraste e ainda não funciona: os interruptores de som, música e áudio-descrição; o "Sair" do modal; a escolha local de avatar (fica ou volta ao avatar único?); os 17 áudios de narração sem uso; as cestas de alto contraste do Mundo 5; as três imagens de fundo ausentes.
+- Retestar em aparelho real o painel das cestas depois da correção da altura do iframe (nomes e contadores visíveis em retrato e paisagem).
 
 ---
 

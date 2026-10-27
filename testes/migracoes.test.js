@@ -15,10 +15,11 @@ const PASTA = path.join(__dirname, "..", "supabase", "migrations");
 const ARQUIVOS = fs.readdirSync(PASTA).filter((f) => f.endsWith(".sql")).sort();
 
 // SQL em minúsculas, sem comentários de linha e com espaços normalizados.
+// Aceita quebras de linha LF e CRLF (cópias no Windows com core.autocrlf).
 function lerSql(arquivo) {
   return fs
     .readFileSync(path.join(PASTA, arquivo), "utf8")
-    .split("\n")
+    .split(/\r?\n/)
     .map((linha) => linha.replace(/--.*$/, ""))
     .join("\n")
     .toLowerCase()

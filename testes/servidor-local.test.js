@@ -48,9 +48,12 @@ test("serve a página inicial e os scripts do jogo", async () => {
   assert.match(pagina.headers.get("content-type"), /text\/html/);
   const html = await pagina.text();
   assert.match(html, /id="tela-identificacao"/);
-  assert.match(html, /<script src="js\/jogador.js"><\/script>\s*<script src="js\/menu.js">/);
+  // menu.js logo depois de jogador.js; o "?v=N" (versão para o cache) é opcional.
+  const ordem = html.match(/<script src="js\/jogador.js"><\/script>\s*<script src="(js\/menu.js(?:\?v=\d+)?)">/);
+  assert.ok(ordem, "menu.js deve vir logo depois de jogador.js");
 
-  const script = await fetch(`${base}/js/menu.js`);
+  // O endereço usado pela página (com a versão, se houver) precisa ser servido.
+  const script = await fetch(`${base}/${ordem[1]}`);
   assert.equal(script.status, 200);
   assert.match(script.headers.get("content-type"), /javascript/);
 

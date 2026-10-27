@@ -17,6 +17,11 @@ img {
   z-index: 1000;
   width: 100vw;
   height: 100vh;
+  /* Altura realmente visível. No celular, 100vh é a altura com a barra do
+     navegador recolhida; como o menu não rola, a barra fica sempre à mostra e
+     a base da fase (as cestas, por exemplo) ficava escondida abaixo da tela.
+     O 100vh acima fica para navegadores que não conhecem dvh. */
+  height: 100dvh;
   border: 0;
   background: #ffffff;
 }
