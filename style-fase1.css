@@ -1824,6 +1824,9 @@
     backdrop-filter: blur(2px);
     z-index: 40;
     pointer-events: auto;
+    /* Os objetos bloqueados deixam o toque cair nesta camada; sem isto, um
+       deslize para o lado vira o "voltar" do navegador e a criança sai da fase. */
+    touch-action: none;
     animation: surgirOverlayTutorial 0.3s ease-out;
 }
 
