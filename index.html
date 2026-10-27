@@ -4,8 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Arruma a Bagunça</title>
-    <link rel="stylesheet" href="global.css" />
-    <link rel="stylesheet" href="style-menu.css" />
+
+    <link rel="stylesheet" href="global.css?v=4" />
+    <link rel="stylesheet" href="style-menu.css?v=8" />
 
   </head>
 
@@ -50,12 +51,98 @@
         <button class="btn-jogar btn-creditos" id="botao-creditos" type="button"><span>CRÉDITOS</span></button>
       </section>
 
+      <div id="modal-configuracoes" class="modal-overlay escondido" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-config">
+        <div class="modal-config-conteudo">
+          <button class="btn-fechar-modal btn-fechar-config" id="btn-fechar-config" type="button" aria-label="Fechar configurações">
+            <img src="assets/images/Settings/botton_fechar.png" alt="Fechar" />
+          </button>
+          <h2 id="titulo-modal-config" class="sr-only">Configurações</h2>
+          <div class="config-grid">
+            <section class="config-coluna config-coluna-perfil" aria-labelledby="config-titulo-perfil">
+              <h3 id="config-titulo-perfil" class="config-cabecalho config-cabecalho-rosa">Perfil</h3>
+              <div class="config-perfil-corpo">
+                <div class="config-avatar-circulo" id="config-avatar">
+                  <img id="config-avatar-img" src="assets/images/Settings/Avatares/Cachorro.png" alt="Avatar atual" draggable="false" />
+                </div>
+                <p class="config-nickname" id="config-nickname">Nickname</p>
+                <div class="config-acoes-perfil">
+                  <button class="btn-config-acao btn-config-azul" id="btn-config-editar-avatar" type="button">Editar avatar</button>
+                  <button class="btn-config-acao btn-config-vermelho" id="btn-config-sair" type="button">Sair</button>
+                </div>
+              </div>
+            </section>
+
+            <div class="config-coluna config-coluna-opcoes">
+              <section class="config-secao" aria-labelledby="config-titulo-audio">
+                <h3 id="config-titulo-audio" class="config-cabecalho config-cabecalho-salmao">Áudio do jogo</h3>
+                <div class="config-lista-opcoes">
+                  <div class="config-item-opcao">
+                    <span class="config-rotulo-opcao" id="label-som-jogo">Som do jogo</span>
+                    <button class="config-toggle ativo" id="toggle-som-jogo" type="button" role="switch" aria-checked="true" aria-labelledby="label-som-jogo">
+                      <span class="config-toggle-knob" aria-hidden="true"></span>
+                    </button>
+                  </div>
+                  <div class="config-item-opcao">
+                    <span class="config-rotulo-opcao" id="label-musica">Música</span>
+                    <button class="config-toggle ativo" id="toggle-musica" type="button" role="switch" aria-checked="true" aria-labelledby="label-musica">
+                      <span class="config-toggle-knob" aria-hidden="true"></span>
+                    </button>
+                  </div>
+                </div>
+              </section>
+
+              <section class="config-secao" aria-labelledby="config-titulo-acessibilidade">
+                <h3 id="config-titulo-acessibilidade" class="config-cabecalho config-cabecalho-amarelo">Acessibilidade</h3>
+                <div class="config-lista-opcoes">
+                  <div class="config-item-opcao">
+                    <span class="config-rotulo-opcao" id="label-alto-contraste">Alto contraste</span>
+                    <button class="config-toggle" id="toggle-alto-contraste" type="button" role="switch" aria-checked="false" aria-labelledby="label-alto-contraste">
+                      <span class="config-toggle-knob" aria-hidden="true"></span>
+                    </button>
+                  </div>
+                  <div class="config-item-opcao">
+                    <span class="config-rotulo-opcao" id="label-audio-descricao">Áudio-descrição</span>
+                    <button class="config-toggle" id="toggle-audio-descricao" type="button" role="switch" aria-checked="false" aria-labelledby="label-audio-descricao">
+                      <span class="config-toggle-knob" aria-hidden="true"></span>
+                    </button>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="modal-avatares" class="modal-overlay escondido" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-avatares">
+        <div class="modal-avatares-conteudo">
+          <button class="btn-fechar-modal btn-fechar-avatares" id="btn-fechar-avatares" type="button" aria-label="Fechar seleção de avatar">
+            <img src="assets/images/Settings/botton_fechar.png" alt="Fechar" />
+          </button>
+          <div class="modal-avatares-cabecalho">
+            <h2 id="titulo-modal-avatares" class="titulo-modal-avatares">Escolha um avatar</h2>
+            <p class="subtitulo-modal-avatares">Arraste para os lados ou clique no seu favorito!</p>
+          </div>
+          <div class="carrossel-avatares-area">
+            <button class="btn-seta-avatares btn-seta-avatares-esq" id="btn-avatares-anterior" type="button" aria-label="Avatar anterior">&#10094;</button>
+            <div class="carrossel-avatares-viewport" id="carrossel-avatares-viewport" tabindex="0" aria-label="Carrossel de avatares">
+              <div class="carrossel-avatares-trilha" id="carrossel-avatares-trilha" role="listbox" aria-label="Opções de avatar"></div>
+            </div>
+            <button class="btn-seta-avatares btn-seta-avatares-dir" id="btn-avatares-proximo" type="button" aria-label="Próximo avatar">&#10095;</button>
+          </div>
+          <p class="nome-avatar-foco" id="nome-avatar-foco" aria-live="polite">Cachorro</p>
+          <div class="modal-avatares-rodape">
+            <button class="btn-config-acao btn-config-azul btn-confirmar-avatar" id="btn-confirmar-avatar" type="button">Escolher este avatar</button>
+          </div>
+        </div>
+      </div>
+
       <div id="modal-creditos" class="modal-overlay escondido" role="dialog" aria-modal="true" aria-label="Créditos do jogo">
         <div class="modal-creditos-conteudo">
           <button class="btn-fechar-modal" id="btn-fechar-creditos" type="button" aria-label="Fechar créditos">
             <img src="assets/images/tela_inicial/botão_fechar.png" alt="Fechar" />
           </button>
-          <img class="img-creditos" src="assets/images/tela_inicial/creditos.png" alt="Créditos do jogo Arruma a Bagunça" />
+          <h2 class="titulo-modal-creditos">Créditos</h2>
+          <img class="img-creditos" id="img-creditos" src="assets/images/tela_inicial/creditos.png" alt="Créditos do jogo Arruma a Bagunça" />
         </div>
       </div>
 
@@ -134,7 +221,7 @@
                 aria-label="Ajustar volume"
               />
             </div>
-            <button class="controle-mundo" type="button" aria-label="Configurações">
+            <button class="controle-mundo" id="btn-config-mundos" type="button" aria-label="Configurações">
               <img src="assets/images/tela_inicial/engrenagem.png" alt="" />
               <span>Configurações</span>
             </button>
@@ -236,7 +323,7 @@
     <script src="js/mundos/mundo5.js"></script>
     <script src="js/audio.js"></script>
     <script src="js/jogador.js"></script>
-    <script src="js/menu.js"></script>
+    <script src="js/menu.js?v=7"></script>
     <script src="js/dev.js"></script>
   </body>
 </html>

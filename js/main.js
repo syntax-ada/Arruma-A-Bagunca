@@ -81,6 +81,38 @@
   document.body.classList.remove("mundo-1", "mundo-2", "mundo-3", "mundo-4", "mundo-5");
   document.body.classList.add(`mundo-${mundo.id}`);
 
+  function sincronizarAltoContrasteFase() {
+    let ativo = false;
+    try {
+      ativo = localStorage.getItem("arruma_bagunca_alto_contraste") === "true";
+      if (!ativo && window.parent && window.parent !== window && window.parent.document) {
+        ativo = window.parent.document.body.classList.contains("alto-contraste");
+      }
+    } catch (_erro) {
+      ativo = false;
+    }
+    document.body.classList.toggle("alto-contraste", ativo);
+    document.documentElement.classList.toggle("alto-contraste", ativo);
+
+    const btnVoltarImg = document.querySelector("#btn-voltar-fase img");
+    if (btnVoltarImg) {
+      btnVoltarImg.src = ativo
+        ? "assets/images/nova_tela_menu de_fases/Acessibilidade/botton_voltar.png"
+        : "assets/images/mundo_4/botton_voltar.png";
+    }
+
+    if (typeof window.atualizarVisualCestasAltoContraste === "function") {
+      window.atualizarVisualCestasAltoContraste();
+    }
+  }
+
+  sincronizarAltoContrasteFase();
+  window.addEventListener("storage", function (evento) {
+    if (evento.key === "arruma_bagunca_alto_contraste") {
+      sincronizarAltoContrasteFase();
+    }
+  });
+
   window.obterMundoAtivo = function () {
     return mundo.id;
   };

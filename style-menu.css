@@ -274,6 +274,9 @@ button {
   height: 34px;
   place-items: center;
   background: #ff5f95;
+  border: 2px solid #161616;
+  flex-shrink: 0;
+  overflow: hidden;
   border-radius: 50%;
 }
 
@@ -745,6 +748,7 @@ button {
   width: clamp(230px, 20vw, 280px);
   background: linear-gradient(180deg, #1d63d6 0%, #0d388e 100%);
   border: 4px solid #ffffff;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.16);
   border-radius: 28px;
   box-shadow: 0 14px 35px rgba(0, 0, 0, 0.45), inset 0 2px 6px rgba(255, 255, 255, 0.3);
   z-index: 70;
@@ -1287,4 +1291,977 @@ button {
     font-size: 0.9rem;
     padding: 8px 12px;
   }
+}
+
+
+/* ==========================================================
+   MODAL DE CONFIGURAÇÕES
+   ========================================================== */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.modal-config-conteudo {
+  position: relative;
+  width: min(92vw, 760px);
+  background: #ffffff;
+  border-radius: 36px;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.38);
+  padding: 32px;
+  box-sizing: border-box;
+}
+
+.modal-config-conteudo .btn-fechar-config {
+  position: absolute;
+  top: -18px;
+  right: -18px;
+  width: 54px;
+  height: 54px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  z-index: 96;
+  transition: transform 0.2s ease;
+}
+
+.modal-config-conteudo .btn-fechar-config:hover {
+  transform: scale(1.12);
+}
+
+.modal-config-conteudo .btn-fechar-config img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.config-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.25fr;
+  gap: 24px;
+  align-items: stretch;
+}
+
+.config-coluna-perfil,
+.config-secao {
+  background: #f4f5f9;
+  border-radius: 26px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.config-coluna-opcoes {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 22px;
+}
+
+.config-cabecalho {
+  margin: 0;
+  padding: 14px 20px;
+  font-family: "Trebuchet MS", "Comic Sans MS", Arial, Helvetica, sans-serif;
+  font-size: clamp(1.15rem, 2vw, 1.4rem);
+  font-weight: 900;
+  text-align: center;
+  letter-spacing: 0.3px;
+}
+
+.config-cabecalho-rosa {
+  background: #f2538a;
+  color: #ffffff;
+}
+
+.config-cabecalho-salmao {
+  background: #ff8577;
+  color: #ffffff;
+}
+
+.config-cabecalho-amarelo {
+  background: #ffd15c;
+  color: #1f2933;
+}
+
+.config-perfil-corpo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 34px 22px 22px;
+  gap: 16px;
+}
+
+.config-avatar-circulo {
+  width: 146px;
+  height: 146px;
+  margin-top: 8px;
+  border: 4px solid #161616;
+  overflow: hidden;
+  border-radius: 50%;
+  background: #e2e7f1;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.16);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3.4rem;
+  user-select: none;
+}
+
+.config-nickname {
+  margin: 0;
+  font-family: "Trebuchet MS", "Comic Sans MS", Arial, Helvetica, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #1f2933;
+  text-align: center;
+  word-break: break-word;
+}
+
+.config-acoes-perfil {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.btn-config-acao {
+  width: 100%;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 999px;
+  font-family: "Trebuchet MS", "Comic Sans MS", Arial, Helvetica, sans-serif;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #ffffff;
+  cursor: pointer;
+  transition: transform 0.18s ease, filter 0.18s ease;
+}
+
+.btn-config-acao:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+}
+
+.btn-config-acao:active {
+  transform: translateY(1px);
+}
+
+.btn-config-azul {
+  background: #2b7de9;
+  box-shadow: 0 4px 0 #1b56a8;
+}
+
+.btn-config-vermelho {
+  background: #e53935;
+  box-shadow: 0 4px 0 #a3201d;
+}
+
+.config-lista-opcoes {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px 24px 22px;
+}
+
+.config-item-opcao {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: #ffffff;
+  padding: 12px 18px;
+  border-radius: 18px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.config-rotulo-opcao {
+  font-family: "Trebuchet MS", "Comic Sans MS", Arial, Helvetica, sans-serif;
+  font-size: 1.08rem;
+  font-weight: 800;
+  color: #1f2933;
+}
+
+.config-toggle {
+  position: relative;
+  width: 60px;
+  height: 32px;
+  border-radius: 999px;
+  background: #cbd2e1;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  transition: background-color 0.25s ease;
+  flex-shrink: 0;
+}
+
+.config-toggle.ativo {
+  background: #2ecc71;
+}
+
+.config-toggle-knob {
+  display: block;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
+  transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.config-toggle.ativo .config-toggle-knob {
+  transform: translateX(28px);
+}
+
+.config-toggle:focus-visible,
+.btn-config-acao:focus-visible,
+.modal-config-conteudo .btn-fechar-config:focus-visible {
+  outline: 3px solid #1f2933;
+  outline-offset: 3px;
+}
+
+@media (max-width: 680px) {
+  .modal-config-conteudo {
+    padding: 22px 18px;
+    border-radius: 26px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .config-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .config-avatar-circulo {
+    width: 88px;
+    height: 88px;
+    font-size: 2.7rem;
+  }
+}
+
+
+.config-avatar-circulo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+}
+
+#avatar-jogador,
+.avatar-usuario:not(.avatar-confirmacao) {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  max-width: 36px;
+  max-height: 36px;
+  overflow: hidden;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+#avatar-jogador img,
+.avatar-usuario img,
+.avatar-jogador img {
+  max-width: 100%;
+  max-height: 100%;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
+
+/* =========================================
+   MODAL DE SELEÇÃO DE AVATARES (#modal-avatares)
+   ========================================= */
+.modal-avatares-conteudo {
+  --avatar-size: 132px;
+  --avatar-gap: 24px;
+  --avatar-step: calc(var(--avatar-size) + var(--avatar-gap));
+  position: relative;
+  width: min(94vw, 820px);
+  background: linear-gradient(180deg, #ffffff 0%, #f5f7fc 100%);
+  border-radius: 36px;
+  padding: 32px 28px 28px;
+  box-shadow: 0 24px 56px rgba(0, 0, 0, 0.42), 0 0 0 5px rgba(255, 255, 255, 0.9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  animation: surgirModal 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.modal-avatares-conteudo .btn-fechar-avatares {
+  position: absolute;
+  top: -16px;
+  right: -16px;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  z-index: 5;
+  transition: transform 0.2s ease;
+}
+
+.modal-avatares-conteudo .btn-fechar-avatares:hover {
+  transform: scale(1.08);
+}
+
+.modal-avatares-conteudo .btn-fechar-avatares img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.modal-avatares-cabecalho {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.titulo-modal-avatares {
+  margin: 0;
+  font-family: "Trebuchet MS", "Comic Sans MS", Arial, Helvetica, sans-serif;
+  font-size: clamp(1.65rem, 3vw, 2.2rem);
+  font-weight: 900;
+  color: #1f2933;
+  letter-spacing: 0.4px;
+}
+
+.subtitulo-modal-avatares {
+  margin: 0;
+  font-family: "Trebuchet MS", "Comic Sans MS", Arial, Helvetica, sans-serif;
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: #5c6b7d;
+}
+
+.carrossel-avatares-area {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+/* Viewport dimensionado para exibir 3 avatares inteiros ao centro + 1 parcial em cada ponta */
+.carrossel-avatares-viewport {
+  position: relative;
+  width: calc(4 * var(--avatar-step));
+  max-width: 100%;
+  height: calc(var(--avatar-size) + 34px);
+  overflow: hidden;
+  cursor: grab;
+  user-select: none;
+  touch-action: pan-y;
+  border-radius: 24px;
+  background: #eef2f9;
+  box-shadow: inset 0 3px 10px rgba(0, 0, 0, 0.06);
+}
+
+.carrossel-avatares-viewport.arrastando {
+  cursor: grabbing;
+}
+
+.carrossel-avatares-viewport:focus-visible {
+  outline: 3px solid #2b7de9;
+  outline-offset: 3px;
+}
+
+.carrossel-avatares-trilha {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.avatar-opcao-item {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--avatar-size);
+  height: var(--avatar-size);
+  border-radius: 50%;
+  border: 4px solid #111111;
+  background: #ffffff;
+  padding: 0;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.16);
+  transition:
+    transform 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.34s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+  will-change: transform, opacity;
+}
+
+.carrossel-avatares-viewport.arrastando .avatar-opcao-item {
+  transition:
+    opacity 0.15s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.avatar-opcao-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+}
+
+.avatar-opcao-item.avatar-slot-central {
+  opacity: 1;
+  z-index: 3;
+}
+
+.avatar-opcao-item.avatar-slot-foco {
+  box-shadow: 0 12px 24px rgba(43, 125, 233, 0.32), 0 0 0 4px #ffd15c;
+}
+
+.avatar-opcao-item.avatar-slot-borda {
+  opacity: 0.4;
+  z-index: 2;
+}
+
+.avatar-opcao-item.avatar-slot-oculto {
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.btn-seta-avatares {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: #2b7de9;
+  color: #ffffff;
+  font-size: 1.35rem;
+  font-weight: 900;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 0 #1b56a8;
+  transition: transform 0.18s ease, filter 0.18s ease;
+  z-index: 4;
+}
+
+.btn-seta-avatares:hover {
+  transform: scale(1.07);
+  filter: brightness(1.08);
+}
+
+.btn-seta-avatares:active {
+  transform: scale(0.96);
+}
+
+.nome-avatar-foco {
+  margin: 0;
+  font-family: "Trebuchet MS", "Comic Sans MS", Arial, Helvetica, sans-serif;
+  font-size: 1.22rem;
+  font-weight: 800;
+  color: #f2538a;
+  min-height: 1.5em;
+}
+
+.modal-avatares-rodape {
+  width: min(100%, 280px);
+}
+
+.btn-confirmar-avatar {
+  width: 100%;
+}
+
+@media (max-width: 760px) {
+  .modal-avatares-conteudo {
+    --avatar-size: 92px;
+    --avatar-gap: 14px;
+    padding: 24px 14px 22px;
+  }
+
+  .btn-seta-avatares {
+    width: 36px;
+    height: 36px;
+    font-size: 1.1rem;
+  }
+}
+
+
+/* =========================================
+   MODO DE ACESSIBILIDADE: ALTO CONTRASTE (.alto-contraste)
+   ========================================= */
+.titulo-modal-creditos {
+  display: none;
+}
+
+body.alto-contraste .controles-topo,
+body.alto-contraste .pílula-controles {
+  background: #ffffff;
+  border: 3px solid #000000;
+  box-shadow: none;
+}
+
+/* 1. Tela Padrão / Menu Principal */
+body.alto-contraste .btn-jogar {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border: 4px solid #000000 !important;
+  box-shadow: none !important;
+}
+
+body.alto-contraste .btn-jogar span {
+  color: inherit !important;
+}
+
+body.alto-contraste .btn-jogar-base {
+  background-color: #ffffff;
+  color: #000000;
+  border: 4px solid #000000;
+  box-shadow: none;
+}
+
+body.alto-contraste .btn-jogar::before {
+  display: none;
+}
+
+body.alto-contraste .btn-jogar:hover,
+body.alto-contraste .btn-jogar:focus-visible {
+  background: #000000 !important;
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  background-color: #000000;
+  color: #ffffff;
+}
+
+/* 2. Modal de Créditos */
+body.alto-contraste .modal-creditos-conteudo {
+  flex-direction: column;
+  background: #ffffff;
+  border: 4px solid #000000;
+  box-shadow: none;
+  padding: 28px 36px 36px;
+}
+
+body.alto-contraste .titulo-modal-creditos {
+  display: block;
+  margin: 0 0 20px;
+  font-family: "Trebuchet MS", "Comic Sans MS", Arial, Helvetica, sans-serif;
+  font-size: clamp(1.85rem, 3.2vw, 2.5rem);
+  font-weight: 900;
+  color: #000000;
+  text-align: center;
+}
+
+/* 3. Modal de Configurações e Modal de Avatares */
+body.alto-contraste .modal-config-conteudo,
+body.alto-contraste .modal-avatares-conteudo {
+  background: #ffffff;
+  border: 4px solid #000000;
+  box-shadow: none;
+}
+
+body.alto-contraste .config-coluna-perfil,
+body.alto-contraste .config-secao {
+  background: #ffffff;
+  border: 3px solid #000000;
+  box-shadow: none;
+}
+
+body.alto-contraste .config-cabecalho,
+body.alto-contraste .config-cabecalho-rosa,
+body.alto-contraste .config-cabecalho-salmao,
+body.alto-contraste .config-cabecalho-amarelo {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border-bottom: 3px solid #000000 !important;
+  background: #ffffff;
+  color: #000000;
+  border-bottom: 3px solid #000000;
+}
+
+body.alto-contraste .config-avatar-circulo {
+  background: #ffffff;
+  border: 4px solid #000000;
+  box-shadow: none;
+}
+
+body.alto-contraste .config-nickname,
+body.alto-contraste .config-rotulo-opcao,
+body.alto-contraste .titulo-modal-avatares,
+body.alto-contraste .subtitulo-modal-avatares,
+body.alto-contraste .nome-avatar-foco {
+  color: #000000;
+}
+
+body.alto-contraste .btn-config-azul,
+body.alto-contraste #btn-config-editar-avatar {
+  background: #ffffff;
+  color: #000000;
+  border: 3px solid #000000;
+  box-shadow: none;
+}
+
+body.alto-contraste .btn-config-azul:hover,
+body.alto-contraste #btn-config-editar-avatar:hover {
+  background: #000000;
+  color: #ffffff;
+  filter: none;
+}
+
+body.alto-contraste .btn-config-vermelho,
+body.alto-contraste #btn-config-sair {
+  background: #000000;
+  color: #ffffff;
+  border: 3px solid #000000;
+  box-shadow: none;
+}
+
+body.alto-contraste .btn-config-vermelho:hover,
+body.alto-contraste #btn-config-sair:hover {
+  background: #ffffff;
+  color: #000000;
+  filter: none;
+}
+
+body.alto-contraste .config-item-opcao {
+  background: #ffffff;
+  border: 2px solid #000000;
+  box-shadow: none;
+}
+
+body.alto-contraste .config-toggle {
+  background: #ffffff;
+  border: 3px solid #000000;
+  padding: 2px;
+}
+
+body.alto-contraste .config-toggle .config-toggle-knob {
+  width: 22px;
+  height: 22px;
+  background: #000000;
+  box-shadow: none;
+}
+
+body.alto-contraste .config-toggle.ativo {
+  background: #000000;
+  border-color: #000000;
+}
+
+body.alto-contraste .config-toggle.ativo::before {
+  content: "✕";
+  position: absolute;
+  left: 9px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 900;
+  line-height: 1;
+  pointer-events: none;
+}
+
+body.alto-contraste .config-toggle.ativo .config-toggle-knob {
+  background: #ffffff;
+  transform: translateX(26px);
+}
+
+body.alto-contraste .carrossel-avatares-viewport {
+  background: #ffffff;
+  border: 3px solid #000000;
+  box-shadow: none;
+}
+
+body.alto-contraste .avatar-opcao-item.avatar-slot-foco {
+  box-shadow: 0 0 0 4px #000000;
+}
+
+body.alto-contraste .btn-seta-avatares {
+  background: #ffffff;
+  color: #000000;
+  border: 3px solid #000000;
+  box-shadow: none;
+}
+
+body.alto-contraste .btn-seta-avatares:hover {
+  background: #000000;
+  color: #ffffff;
+  filter: none;
+}
+
+
+/* 4. Barra de Controle de Volume em Alto Contraste */
+body.alto-contraste .volume-container:focus-visible,
+body.alto-contraste .volume-icone:focus-visible,
+body.alto-contraste .btn-icone:focus-visible {
+  outline: 3px solid #000000 !important;
+}
+
+body.alto-contraste .volume-slider {
+  accent-color: #000000;
+}
+
+body.alto-contraste .volume-slider::-webkit-slider-runnable-track {
+  background: linear-gradient(
+    to right,
+    #000000 0%,
+    #000000 var(--progresso, 100%),
+    #d4d4d4 var(--progresso, 100%),
+    #d4d4d4 100%
+  ) !important;
+  border: 1px solid #000000 !important;
+}
+
+body.alto-contraste .volume-slider::-webkit-slider-thumb {
+  background: #000000 !important;
+  border: 2px solid #ffffff !important;
+  box-shadow: 0 0 0 1.5px #000000 !important;
+}
+
+body.alto-contraste .volume-slider::-webkit-slider-thumb:hover,
+body.alto-contraste .volume-slider::-webkit-slider-thumb:active {
+  background: #333333 !important;
+}
+
+body.alto-contraste .volume-slider::-moz-range-track {
+  background: #d4d4d4 !important;
+  border: 1px solid #000000 !important;
+}
+
+body.alto-contraste .volume-slider::-moz-range-progress {
+  background: #000000 !important;
+}
+
+body.alto-contraste .volume-slider::-moz-range-thumb {
+  background: #000000 !important;
+  border: 2px solid #ffffff !important;
+  box-shadow: 0 0 0 1.5px #000000 !important;
+}
+
+body.alto-contraste .volume-slider::-moz-range-thumb:hover,
+body.alto-contraste .volume-slider::-moz-range-thumb:active {
+  background: #333333 !important;
+}
+
+
+/* =========================================
+   5. TELA DE SELEÇÃO DE MUNDOS EM ALTO CONTRASTE
+   ========================================= */
+body.alto-contraste,
+body.alto-contraste #menu-fases {
+  background-color: #ffffff !important;
+  background-image: url("assets/images/tela_inicial/Acessibilidade/borda_black.png") !important;
+  background-position: center !important;
+  background-size: 100% 100% !important;
+  background-repeat: no-repeat !important;
+  margin: 0 !important;
+  width: 100vw !important;
+  min-height: 100vh !important;
+}
+
+html.alto-contraste,
+body.alto-contraste .game-container {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100vw !important;
+  min-height: 100vh !important;
+  overflow-x: hidden;
+}
+
+body.alto-contraste #tela-inicial {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background-image: url("assets/images/tela_inicial/Acessibilidade/borda_black.png") !important;
+  background-position: center !important;
+  background-size: 100% 100% !important;
+  background-repeat: no-repeat !important;
+}
+
+body.alto-contraste .perfil-usuario,
+body.alto-contraste .controle-mundo,
+body.alto-contraste #nome-jogador,
+body.alto-contraste #btn-config-mundos span {
+  color: #000000 !important;
+}
+
+body.alto-contraste .controle-mundo {
+  border-left: 2px solid #000000 !important;
+  border-radius: 0 !important;
+}
+
+body.alto-contraste .controle-mundo:hover {
+  background: #f0f0f0 !important;
+}
+
+body.alto-contraste .avatar-usuario {
+  background: #ffffff !important;
+  border: 2px solid #000000 !important;
+}
+
+body.alto-contraste .volume-icone {
+  filter: grayscale(100%) brightness(0) !important;
+}
+
+body.alto-contraste .btn-voltar {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border: 3px solid #000000 !important;
+  box-shadow: none !important;
+}
+
+body.alto-contraste .btn-voltar:hover,
+body.alto-contraste .btn-voltar:focus-visible {
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+body.alto-contraste .btn-seta {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border: 3px solid #000000 !important;
+  box-shadow: none !important;
+}
+
+body.alto-contraste .btn-seta:hover,
+body.alto-contraste .btn-seta:focus-visible {
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+body.alto-contraste .card-mundo img {
+  filter: none;
+}
+
+body.alto-contraste .trilho-progresso {
+  background: #ffffff !important;
+  border: 3px solid #000000 !important;
+  box-shadow: none !important;
+}
+
+body.alto-contraste .preenchimento-progresso {
+  background: #000000 !important;
+}
+
+body.alto-contraste .porcentagem-progresso {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border: 3px solid #000000 !important;
+}
+
+body.alto-contraste #modal-fases {
+  background: #ffffff !important;
+  border: 4px solid #000000 !important;
+  box-shadow: none !important;
+}
+
+body.alto-contraste .titulo-modal-fases {
+  color: #000000 !important;
+}
+
+body.alto-contraste .trilha-fases::before {
+  background: #000000 !important;
+}
+
+body.alto-contraste .btn-fase-modal img {
+  filter: grayscale(100%) contrast(1.15);
+}
+
+body.alto-contraste .sidebar-boss {
+  background: #ffffff !important;
+  border: 4px solid #000000 !important;
+  box-shadow: none !important;
+}
+
+body.alto-contraste .texto-boss-sidebar {
+  color: #000000 !important;
+}
+
+body.alto-contraste .btn-jogar-boss {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border: 3px solid #000000 !important;
+  box-shadow: none !important;
+}
+
+body.alto-contraste .btn-jogar-boss:hover {
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+
+/* =========================================
+   6. TUTORIAL DO MENU E MODAL DE FASES EM ALTO CONTRASTE
+   ========================================= */
+body.alto-contraste #menu-fases.tutorial-menu-ativo,
+body.alto-contraste .tutorial-backdrop-modal {
+  background-color: #161616 !important;
+  background-image:
+    url("assets/images/tela_inicial/Acessibilidade/background.png"),
+    url("assets/images/tela_inicial/Acessibilidade/KKK 1.jpg"),
+    url("assets/images/KKK 1.jpg") !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  backdrop-filter: none !important;
+}
+
+body.alto-contraste .tutorial-modal-overlay {
+  background-color: rgba(0, 0, 0, 0.78) !important;
+  background-image:
+    url("assets/images/tela_inicial/Acessibilidade/background.png"),
+    url("assets/images/tela_inicial/Acessibilidade/KKK 1.jpg"),
+    url("assets/images/KKK 1.jpg") !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  opacity: 0.9 !important;
+}
+
+body.alto-contraste .tutorial-balao,
+body.alto-contraste .tutorial-balao-modal-fase {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border: 3px solid #000000 !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6) !important;
+  text-shadow: none !important;
+}
+
+body.alto-contraste .tutorial-balao::after,
+body.alto-contraste .tutorial-balao-modal-fase::after {
+  border-color: #ffffff transparent transparent transparent !important;
+  filter: drop-shadow(0 3px 0 #000000) !important;
+}
+
+body.alto-contraste .btn-fase-modal.tutorial-destaque-btn-fase {
+  box-shadow: 0 0 0 4px #ffffff, 0 0 0 8px #000000 !important;
+}
+
+body.alto-contraste .tutorial-maozinha {
+  filter: grayscale(100%) contrast(1.25) drop-shadow(0 6px 12px rgba(0, 0, 0, 0.7)) !important;
 }
