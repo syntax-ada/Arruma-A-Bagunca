@@ -16,6 +16,36 @@
     faseConcluida: "assets/audio/Efeitos/Efeitos - FaseConcluida.wav",
   };
 
+  // Narrações curtas usadas para orientar e incentivar a criança. Elas são
+  // mantidas separadas dos efeitos: só uma narração pode tocar por vez, mesmo
+  // quando a fase está dentro do iframe do menu.
+  const NARRACOES = {
+    acerto: [
+      "assets/audio/Narração/Acerto1.mp3",
+      "assets/audio/Narração/Acerto2.mp3",
+      "assets/audio/Narração/Acerto3.mp3",
+      "assets/audio/Narração/Acerto4.mp3",
+    ],
+    erro: [
+      "assets/audio/Narração/Erro1.mp3",
+      "assets/audio/Narração/Erro2.mp3",
+    ],
+    faseBonusInicio: "assets/audio/Narração/FaseBonusInicio.mp3",
+    faseBonusFinal: "assets/audio/Narração/FaseBonusFinal.mp3",
+    faseConcluida: [
+      "assets/audio/Narração/FaseConcluida1.mp3",
+      "assets/audio/Narração/FaseConcluida2.mp3",
+    ],
+    novoMapa: [
+      "assets/audio/Narração/NovoMapaDesbloqueado1.mp3",
+      "assets/audio/Narração/NovoMapaDesbloqueado2.mp3",
+    ],
+    organizarObjetos: "assets/audio/Narração/OrganizarObjetos.mp3",
+    resolverConta: "assets/audio/Narração/ResolverConta.mp3",
+    telaDeFases: "assets/audio/Narração/TelaDeFases.mp3",
+    apelido: "assets/audio/Narração/Apelido.mp3",
+  };
+
   const TRILHAS_MUNDOS = {
     menu: "assets/audio/Mundos/Menu Principal.mp3",
     principal: "assets/audio/Mundos/Menu Principal.mp3",
@@ -40,11 +70,14 @@
 
   const CHAVE_SESSAO = "arruma_bagunca_trilha";
   const CHAVE_VOLUME_LOCAL = "arruma_bagunca_volume";
+  const CHAVE_NARRACOES_LOCAL = "arruma_bagunca_audio_descricao";
   const VOLUME_TRILHA_PADRAO = 0.25; // Volume entre 20% e 30% para não sobrepor efeitos
   const VOLUME_EFEITO_PADRAO = 1.0;  // Efeitos sonoros em volume normal
 
   let silenciadoIframe = false;
   let audio;
+  let audioNarracao;
+  let filaNarracoes = [];
   let interacaoOcorreu = false;
   let metadadosCarregados = false;
   let reproducaoPendente = false;
@@ -86,6 +119,32 @@
 
   let volumeAtual = lerVolumeSalvo();
   let volumeAnterior = volumeAtual > 0 ? volumeAtual : 100;
+  let narracoesAtivas = lerNarracoesAtivas();
+
+  function lerNarracoesAtivas() {
+    try {
+      const salvo = window.localStorage.getItem(CHAVE_NARRACOES_LOCAL);
+      return salvo === null ? true : salvo === "true";
+    } catch (erro) {
+      return true;
+    }
+  }
+
+  function interromperNarracoes() {
+    filaNarracoes = [];
+    if (audioNarracao) {
+      audioNarracao.pause();
+      audioNarracao.currentTime = 0;
+      audioNarracao = null;
+    }
+  }
+
+  function definirNarracoesAtivasNoTopo(ativo) {
+    narracoesAtivas = Boolean(ativo);
+    if (!narracoesAtivas) {
+      interromperNarracoes();
+    }
+  }
 
   function lerEstadoSessao() {
     try {
@@ -164,6 +223,111 @@
     }
   }
 
+  function resolverNarracao(chave) {
+    const opcoes = NARRACOES[chave];
+    if (Array.isArray(opcoes)) {
+      return opcoes[Math.floor(Math.random() * opcoes.length)];
+    }
+    return typeof opcoes === "string" ? opcoes : null;
+  }
+
+  function iniciarProximaNarracao() {
+    const chave = filaNarracoes.shift();
+    if (!chave || !narracoesAtivas || estaSilenciado() || volumeAtual <= 0) {
+      audioNarracao = null;
+      return;
+    }
+
+    const caminho = resolverNarracao(chave);
+    if (!caminho) {
+      iniciarProximaNarracao();
+      return;
+    }
+
+    try {
+      audioNarracao = new Audio(caminho);
+      audioNarracao.preload = "auto";
+      audioNarracao.volume = (volumeAtual / 100) * VOLUME_EFEITO_PADRAO;
+      audioNarracao.addEventListener("ended", () => {
+        audioNarracao = null;
+        iniciarProximaNarracao();
+      }, { once: true });
+      audioNarracao.play().catch(() => {
+        // A primeira interação do jogo libera a reprodução nos navegadores.
+      });
+    } catch (erro) {
+      audioNarracao = null;
+      iniciarProximaNarracao();
+    }
+  }
+
+  function tocarNarracaoNoTopo(chave) {
+    if (!narracoesAtivas || estaSilenciado() || volumeAtual <= 0) {
+      return;
+    }
+
+    try {
+      // Interromper a fala anterior é intencional: a instrução mais recente é
+      // a única relevante e duas vozes simultâneas confundem a criança.
+      if (audioNarracao) {
+        audioNarracao.pause();
+        audioNarracao.currentTime = 0;
+      }
+      audioNarracao = null;
+      filaNarracoes = [chave];
+      iniciarProximaNarracao();
+    } catch (erro) {
+      // A falta de um arquivo de narração não impede o jogo de continuar.
+    }
+  }
+
+  function enfileirarNarracoesNoTopo(chaves) {
+    if (!narracoesAtivas || estaSilenciado() || volumeAtual <= 0) {
+      return;
+    }
+    const novas = (Array.isArray(chaves) ? chaves : [chaves]).filter((chave) => resolverNarracao(chave));
+    if (novas.length === 0) {
+      return;
+    }
+    filaNarracoes.push(...novas);
+    if (!audioNarracao) {
+      iniciarProximaNarracao();
+    }
+  }
+
+  function tocarNarracao(chave) {
+    if (window.parent !== window) {
+      window.parent.postMessage({
+        tipo: "arruma-bagunca:tocar-narracao",
+        narracao: chave,
+      }, "*");
+      return;
+    }
+    tocarNarracaoNoTopo(chave);
+  }
+
+  function enfileirarNarracoes(chaves) {
+    if (window.parent !== window) {
+      window.parent.postMessage({
+        tipo: "arruma-bagunca:enfileirar-narracoes",
+        narracoes: chaves,
+      }, "*");
+      return;
+    }
+    enfileirarNarracoesNoTopo(chaves);
+  }
+
+  function definirNarracoesAtivas(ativo) {
+    if (window.parent !== window) {
+      window.parent.postMessage({
+        tipo: "arruma-bagunca:definir-narracoes",
+        ativas: Boolean(ativo),
+      }, "*");
+      return;
+    }
+    definirNarracoesAtivasNoTopo(ativo);
+  }
+
   function resolverCaminhoTrilha(origem) {
     if (origem === null || origem === undefined || origem === "") {
       return TRILHAS_MUNDOS.menu;
@@ -203,6 +367,9 @@
 
   window.tocarEfeito = tocarEfeito;
   window.tocarEfeitoSonoro = tocarEfeito;
+  window.tocarNarracao = tocarNarracao;
+  window.enfileirarNarracoes = enfileirarNarracoes;
+  window.definirNarracoesAtivas = definirNarracoesAtivas;
   window.trocarTrilhaFundo = trocarTrilhaFundo;
   window.trocarTrilha = trocarTrilhaFundo;
 
@@ -266,6 +433,10 @@
         }
       }
       salvarEstado();
+    }
+    if (audioNarracao) {
+      audioNarracao.muted = v === 0;
+      audioNarracao.volume = (v / 100) * VOLUME_EFEITO_PADRAO;
     }
 
     // Notifica iframe filho se estiver ativo (apenas quando notificarIframe for true)
@@ -490,6 +661,9 @@
         aplicarVolume(num, false);
       }
     }
+    if (evento.key === CHAVE_NARRACOES_LOCAL) {
+      definirNarracoesAtivasNoTopo(evento.newValue === "true");
+    }
   });
 
   // Quando a fase é exibida dentro do menu (iframe), o áudio principal
@@ -675,6 +849,18 @@
 
       if (tipo === "arruma-bagunca:trocar-trilha") {
         trocarTrilhaFundoNoTopo(evento.data.trilha);
+      }
+
+      if (tipo === "arruma-bagunca:tocar-narracao") {
+        tocarNarracaoNoTopo(evento.data.narracao);
+      }
+
+      if (tipo === "arruma-bagunca:enfileirar-narracoes") {
+        enfileirarNarracoesNoTopo(evento.data.narracoes);
+      }
+
+      if (tipo === "arruma-bagunca:definir-narracoes") {
+        definirNarracoesAtivasNoTopo(evento.data.ativas);
       }
 
       if (tipo === "arruma-bagunca:solicitar-estado-som") {

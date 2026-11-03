@@ -131,6 +131,10 @@
     window.trocarTrilhaFundo(mundo.id);
   }
 
+  if (Number(mundo.id) === 5 && Number(faseId) === 1 && typeof window.tocarNarracao === "function") {
+    window.tocarNarracao("faseBonusInicio");
+  }
+
   const btnVoltarFase = document.querySelector("#btn-voltar-fase");
   if (btnVoltarFase) {
     btnVoltarFase.addEventListener("click", function () {

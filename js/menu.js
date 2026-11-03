@@ -26,6 +26,7 @@ const btnFecharSidebarBoss = document.querySelector("#btn-fechar-sidebar-boss");
 const btnJogarBoss = document.querySelector("#btn-jogar-boss");
 const btnIconeBoss = document.querySelector("#btn-icone-boss");
 let sidebarBossFechadaManualmente = false;
+let novoMapaDesbloqueadoPendente = false;
 
 function tocarSomBotao() {
   if (typeof window.tocarEfeito === "function") {
@@ -60,6 +61,10 @@ function mostrarMenuMundos() {
   atualizarInterfaceProgresso();
   if (typeof window.trocarTrilhaFundo === "function") {
     window.trocarTrilhaFundo("menu");
+  }
+  if (novoMapaDesbloqueadoPendente && typeof window.tocarNarracao === "function") {
+    novoMapaDesbloqueadoPendente = false;
+    window.tocarNarracao("novoMapa");
   }
 }
 
@@ -249,6 +254,9 @@ function abrirModalFases(mundoId) {
 
   if (modalFases) {
     modalFases.classList.remove("escondido");
+    if (typeof window.tocarNarracao === "function") {
+      window.tocarNarracao("telaDeFases");
+    }
     const tutorialMenuMundo1 = document.querySelector("#tutorial-menu-mundo1");
     if (tutorialMenuMundo1) {
       tutorialMenuMundo1.classList.add("escondido");
@@ -724,8 +732,11 @@ if (btnFecharConfig) {
 }
 
 const CHAVE_ALTO_CONTRASTE_STORAGE = "arruma_bagunca_alto_contraste";
+const CHAVE_AUDIO_DESCRICAO_STORAGE = "arruma_bagunca_audio_descricao";
 const toggleAltoContraste = document.getElementById("toggle-alto-contraste");
 const labelAltoContraste = document.getElementById("label-alto-contraste");
+const toggleAudioDescricao = document.getElementById("toggle-audio-descricao");
+const labelAudioDescricao = document.getElementById("label-audio-descricao");
 const imgCreditosModal = document.querySelector("#img-creditos, .img-creditos");
 
 function aplicarModoAltoContraste(ativo) {
@@ -820,7 +831,39 @@ function carregarModoAltoContrasteSalvo() {
   }
 }
 
+function aplicarAudioDescricao(ativo) {
+  const estadoAtivo = Boolean(ativo);
+  if (toggleAudioDescricao) {
+    toggleAudioDescricao.classList.toggle("ativo", estadoAtivo);
+    toggleAudioDescricao.setAttribute("aria-checked", String(estadoAtivo));
+  }
+  if (typeof window.definirNarracoesAtivas === "function") {
+    window.definirNarracoesAtivas(estadoAtivo);
+  }
+}
+
+function alternarAudioDescricao() {
+  const novoEstado = !toggleAudioDescricao?.classList.contains("ativo");
+  aplicarAudioDescricao(novoEstado);
+  try {
+    localStorage.setItem(CHAVE_AUDIO_DESCRICAO_STORAGE, String(novoEstado));
+  } catch (_erro) {
+    // O áudio continua valendo nesta página se o armazenamento estiver bloqueado.
+  }
+  tocarSomBotao();
+}
+
+function carregarAudioDescricaoSalva() {
+  try {
+    const salvo = localStorage.getItem(CHAVE_AUDIO_DESCRICAO_STORAGE);
+    aplicarAudioDescricao(salvo === null ? true : salvo === "true");
+  } catch (_erro) {
+    aplicarAudioDescricao(true);
+  }
+}
+
 carregarModoAltoContrasteSalvo();
+carregarAudioDescricaoSalva();
 
 if (toggleAltoContraste) {
   toggleAltoContraste.addEventListener("click", function (evento) {
@@ -835,6 +878,19 @@ if (labelAltoContraste) {
   });
 }
 
+if (toggleAudioDescricao) {
+  toggleAudioDescricao.addEventListener("click", function (evento) {
+    evento.stopPropagation();
+    alternarAudioDescricao();
+  });
+}
+
+if (labelAudioDescricao) {
+  labelAudioDescricao.addEventListener("click", function () {
+    alternarAudioDescricao();
+  });
+}
+
 if (modalConfiguracoes) {
   modalConfiguracoes.addEventListener("click", function (evento) {
     if (evento.target === modalConfiguracoes) {
@@ -843,7 +899,7 @@ if (modalConfiguracoes) {
   });
 
   modalConfiguracoes.querySelectorAll(".config-toggle").forEach(function (botaoToggle) {
-    if (botaoToggle.id === "toggle-alto-contraste") {
+    if (botaoToggle.id === "toggle-alto-contraste" || botaoToggle.id === "toggle-audio-descricao") {
       return;
     }
     botaoToggle.addEventListener("click", function () {
@@ -1041,7 +1097,16 @@ window.addEventListener("message", function (evento) {
   }
 
   const mensagem = evento.data;
-  if (!mensagem || mensagem.tipo !== "arruma-bagunca:navegacao") {
+  if (!mensagem) {
+    return;
+  }
+
+  if (mensagem.tipo === "arruma-bagunca:novo-mapa-desbloqueado") {
+    novoMapaDesbloqueadoPendente = true;
+    return;
+  }
+
+  if (mensagem.tipo !== "arruma-bagunca:navegacao") {
     return;
   }
 

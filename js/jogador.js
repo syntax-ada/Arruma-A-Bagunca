@@ -311,6 +311,9 @@
     limparErroApelido();
     telaIdentificacao.classList.remove("escondido");
     mostrarEtapaApelido();
+    if (typeof window.tocarNarracao === "function") {
+      window.tocarNarracao("apelido");
+    }
   }
 
   if (!telaIdentificacao || !formApelido || !campoApelido) {

@@ -608,6 +608,9 @@ function iniciarDesafioMatematico(dadosQuantidades, operacaoId) {
     const faseAtual = typeof window.obterFaseAtiva === "function" ? window.obterFaseAtiva() : 1;
     if (Number(mundoAtual) === 1 && Number(faseAtual) === 1 && !bossDaFase) {
         iniciarTutorialMatematicaFase1();
+        if (typeof window.tocarNarracao === "function") {
+            window.tocarNarracao("resolverConta");
+        }
     } else {
         removerTutorialMatematicaFase1();
     }
@@ -779,6 +782,9 @@ function verificarRespostaMatematica(valorEscolhido, resultadoCorreto, botaoClic
             return;
         }
 
+        if (typeof window.tocarNarracao === "function") {
+            window.tocarNarracao("acerto");
+        }
         const faseAtual = registrarConclusaoDaFase();
         mostrarFeedbackMatematica(operacao.mensagemSucesso(contaTexto), "success");
         if (tutorialMatematicaFase1Ativo) {
@@ -791,6 +797,9 @@ function verificarRespostaMatematica(valorEscolhido, resultadoCorreto, botaoClic
     } else {
         if (typeof window.tocarEfeito === "function") {
             window.tocarEfeito("errado");
+        }
+        if (typeof window.tocarNarracao === "function") {
+            window.tocarNarracao("erro");
         }
         botaoClicado.classList.add("is-wrong");
         mostrarFeedbackMatematica("Quase lá! Vamos contar de novo? Tente outra resposta.", "error");
@@ -813,8 +822,21 @@ function registrarConclusaoDaFase() {
         ? window.obterTotalFasesMundoAtivo()
         : 3;
 
+    const idDaFase = `${Number(mundoAtual)}-${Number(faseAtual)}`;
+    const antes = typeof obterProgresso === "function" ? obterProgresso() : null;
     if (typeof desbloquearProximaFase === "function") {
         desbloquearProximaFase(faseAtual, mundoAtual, totalFases);
+    }
+
+    const depois = typeof obterProgresso === "function" ? obterProgresso() : null;
+    const foiRegistradaAgora = !antes?.fasesConcluidas?.includes(idDaFase)
+        && depois?.fasesConcluidas?.includes(idDaFase);
+    const proximaFase = foiRegistradaAgora && window.RegrasProgresso?.proximaFase(depois.fasesConcluidas);
+    if (proximaFase && window.parent !== window) {
+        window.parent.postMessage({
+            tipo: "arruma-bagunca:novo-mapa-desbloqueado",
+            fase: proximaFase,
+        }, "*");
     }
 
     return faseAtual;
@@ -868,7 +890,20 @@ function exibirBotoesConclusao(faseAtual, hospedeiro) {
         return;
     }
 
-    if (typeof window.tocarEfeito === "function") {
+    const mundoAtualParaConclusao = typeof window.obterMundoAtivo === "function"
+        ? window.obterMundoAtivo()
+        : 1;
+    if (Number(mundoAtualParaConclusao) === 5) {
+        // A fase bônus termina com uma única fala própria: ela interrompe a
+        // narração de acerto anterior e não mistura o aviso genérico.
+        if (typeof window.tocarNarracao === "function") {
+            window.tocarNarracao("faseBonusFinal");
+        }
+    } else if (typeof window.enfileirarNarracoes === "function") {
+        window.enfileirarNarracoes(["faseConcluida"]);
+    }
+
+    if (Number(mundoAtualParaConclusao) !== 5 && typeof window.tocarEfeito === "function") {
         setTimeout(() => {
             window.tocarEfeito("conclusao");
         }, 350);
