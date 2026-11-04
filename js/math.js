@@ -43,6 +43,7 @@ const PAUSA_ANTES_DA_ORGANIZACAO_MS = DURACAO_ANIMACAO_DERROTA_BOSS_MS;
 // Temporizador ativo para reverter a animação de dano de volta ao estado padrão (idle).
 let timerEstadoBoss = null;
 let tutorialMatematicaFase1Ativo = false;
+let novoMundoDesbloqueadoNestaConclusao = null;
 
 function removerTutorialMatematicaFase1() {
     tutorialMatematicaFase1Ativo = false;
@@ -141,6 +142,70 @@ function exibirComemoracaoTutorialMatematica(aoConcluir) {
     }, 1600);
 }
 
+function exibirComemoracaoAcertoMatematica(mensagem, aoConcluir) {
+    const telaMatematica = document.querySelector("#tela-matematica") || document.body;
+
+    const banner = document.createElement("div");
+    banner.className = "banner-comemoracao-acerto";
+    banner.setAttribute("role", "status");
+    banner.setAttribute("aria-live", "polite");
+    banner.innerHTML = `<span class="icone-banner-acerto" aria-hidden="true">🎉</span> ${mensagem || "Isso!!!! Você acertou!"}`;
+
+    const fogos = document.createElement("div");
+    fogos.className = "fogos-artificio-container";
+    fogos.setAttribute("aria-hidden", "true");
+
+    const posicoes = [
+        { x: "20%", y: "30%", cor: "#ffd13b" },
+        { x: "80%", y: "28%", cor: "#ff4d88" },
+        { x: "32%", y: "65%", cor: "#00e5ff" },
+        { x: "70%", y: "68%", cor: "#76ff03" },
+        { x: "50%", y: "20%", cor: "#ff9100" },
+    ];
+
+    posicoes.forEach((p, idx) => {
+        const estouro = document.createElement("div");
+        estouro.className = `estouro-fogos estouro-${idx + 1}`;
+        estouro.style.setProperty("--fogo-x", p.x);
+        estouro.style.setProperty("--fogo-y", p.y);
+        estouro.style.setProperty("--fogo-cor", p.cor);
+
+        const totalParticulas = 8;
+        for (let i = 0; i < totalParticulas; i++) {
+            const part = document.createElement("span");
+            part.className = `particula-fogo particula-${i + 1}`;
+            const angulo = (i * (360 / totalParticulas)) * (Math.PI / 180);
+            const distancia = 38 + (i % 3) * 12;
+            const px = Math.round(Math.cos(angulo) * distancia);
+            const py = Math.round(Math.sin(angulo) * distancia);
+            part.style.setProperty("--part-x", `${px}px`);
+            part.style.setProperty("--part-y", `${py}px`);
+            estouro.appendChild(part);
+        }
+
+        fogos.appendChild(estouro);
+    });
+
+    telaMatematica.appendChild(fogos);
+    telaMatematica.appendChild(banner);
+
+    if (typeof window.tocarEfeito === "function") {
+        window.tocarEfeito("certo");
+    }
+
+    setTimeout(() => {
+        banner.classList.add("banner-saindo");
+        fogos.classList.add("fogos-saindo");
+        setTimeout(() => {
+            banner.remove();
+            fogos.remove();
+            if (typeof aoConcluir === "function") {
+                aoConcluir();
+            }
+        }, 300);
+    }, 1500);
+}
+
 function limparTimerEstadoBoss() {
     if (timerEstadoBoss !== null) {
         clearTimeout(timerEstadoBoss);
@@ -202,12 +267,13 @@ function definirEstadoVisualBoss(estado) {
     imagem.alt = bossDaFase.imgAlt || bossDaFase.nome || "Adversário da fase";
 }
 
-function navegarEntreTelasDoJogo(destino, url) {
+function navegarEntreTelasDoJogo(destino, url, dadosAdicionais) {
     if (window.parent !== window) {
         window.parent.postMessage({
             tipo: "arruma-bagunca:navegacao",
             destino,
             url,
+            ...(dadosAdicionais || {})
         }, "*");
         return;
     }
@@ -343,6 +409,14 @@ function renderizarBoss() {
     const nome = document.querySelector("#boss-nome");
     if (nome) {
         nome.textContent = bossDaFase.nome || "";
+    }
+
+    const risada = document.querySelector("#boss-risada");
+    if (risada && typeof document !== "undefined") {
+        const isAlto = document.body.classList.contains("alto-contraste") || document.documentElement.classList.contains("alto-contraste");
+        risada.src = isAlto
+            ? "assets/images/mundo_5/Acessibilidade/risada_monstro.png"
+            : "assets/images/mundo_5/risada_monstro.png";
     }
 
     // Renderização dos corações de vida dinâmicos no HUD superior esquerdo
@@ -745,18 +819,15 @@ function verificarRespostaMatematica(valorEscolhido, resultadoCorreto, botaoClic
         }
 
         // Fase com sequência: este acerto NÃO conclui a fase enquanto houver
-        // conta pela frente — mostra o feedback e, depois da pausa, entra a
+        // conta pela frente — mostra o feedback e, depois da comemoração, entra a
         // próxima. A conclusão e a gravação de progresso abaixo ficam para o
         // acerto da última conta.
         if (haProximoDesafio()) {
             mostrarFeedbackMatematica(operacao.mensagemSucesso(contaTexto), "success");
-            const pausaEntreDesafios = bossDaFase
-                ? (Number(bossDaFase.duracaoDanoMs) || DURACAO_ANIMACAO_DANO_BOSS_MS)
-                : PAUSA_ENTRE_DESAFIOS_MS;
-            setTimeout(() => {
+            exibirComemoracaoAcertoMatematica("Isso!!!! Você acertou!", () => {
                 indiceDoDesafioAtual++;
                 iniciarDesafioMatematico(sequenciaDeDesafios[indiceDoDesafioAtual]);
-            }, pausaEntreDesafios);
+            });
             return;
         }
 
@@ -774,8 +845,9 @@ function verificarRespostaMatematica(valorEscolhido, resultadoCorreto, botaoClic
             if (painelMat) {
                 painelMat.classList.add("painel-matematica-sumindo");
             }
-            const duracaoDerrota = (bossDaFase && Number(bossDaFase.duracaoDerrotaMs)) || PAUSA_ANTES_DA_ORGANIZACAO_MS;
-            setTimeout(abrirEtapaDeOrganizacao, duracaoDerrota);
+            exibirComemoracaoAcertoMatematica("Isso!!!! Monstro derrotado!", () => {
+                abrirEtapaDeOrganizacao();
+            });
             return;
         }
 
@@ -786,7 +858,29 @@ function verificarRespostaMatematica(valorEscolhido, resultadoCorreto, botaoClic
                 exibirBotoesConclusao(faseAtual);
             });
         } else {
-            exibirBotoesConclusao(faseAtual);
+            exibirComemoracaoAcertoMatematica("Isso!!!! Você acertou!", () => {
+                const mundoNum = typeof window.obterMundoAtivo === "function"
+                    ? window.obterMundoAtivo()
+                    : (Number(new URLSearchParams(window.location.search).get("mundo")) || 1);
+                let faseNum = 1;
+                if (typeof faseAtual === "number") {
+                    faseNum = faseAtual;
+                } else if (typeof faseAtual === "string") {
+                    const m = faseAtual.match(/\d+/);
+                    faseNum = m ? parseInt(m[0], 10) : 1;
+                }
+
+                // Conclusão imediata da Fase 3 do Mundo 4: aciona a cutscene do Boss no menu
+                if (Number(mundoNum) === 4 && Number(faseNum) >= 3) {
+                    try {
+                        sessionStorage.setItem("arruma_bagunca_mundo_concluido", "4");
+                    } catch (erro) {}
+                    navegarEntreTelasDoJogo("menu", "index.html?view=mundos&mundoConcluido=4", { mundoConcluido: 4 });
+                    return;
+                }
+
+                exibirBotoesConclusao(faseAtual);
+            });
         }
     } else {
         if (typeof window.tocarEfeito === "function") {
@@ -813,8 +907,32 @@ function registrarConclusaoDaFase() {
         ? window.obterTotalFasesMundoAtivo()
         : 3;
 
+    let mundosAntes = [];
+    if (typeof obterProgresso === "function") {
+        try {
+            const p = obterProgresso();
+            mundosAntes = Array.isArray(p?.mundosDesbloqueados) ? p.mundosDesbloqueados.map(Number) : [1];
+        } catch (e) {
+            mundosAntes = [1];
+        }
+    }
+
     if (typeof desbloquearProximaFase === "function") {
         desbloquearProximaFase(faseAtual, mundoAtual, totalFases);
+    }
+
+    novoMundoDesbloqueadoNestaConclusao = null;
+    if (typeof obterProgresso === "function") {
+        try {
+            const pDepois = obterProgresso();
+            const mundosDepois = Array.isArray(pDepois?.mundosDesbloqueados) ? pDepois.mundosDesbloqueados.map(Number) : mundosAntes;
+            const novos = mundosDepois.filter((m) => !mundosAntes.includes(m));
+            if (novos.length > 0) {
+                novoMundoDesbloqueadoNestaConclusao = Number(novos[0]);
+            }
+        } catch (e) {
+            novoMundoDesbloqueadoNestaConclusao = null;
+        }
     }
 
     return faseAtual;
@@ -885,6 +1003,19 @@ function exibirBotoesConclusao(faseAtual, hospedeiro) {
     const containerAcoes = document.createElement("div");
     containerAcoes.className = "acoes-conclusao";
 
+    // Obtenção da configuração do mundo ativo para determinar se existe próxima fase
+    const mundoAtual = typeof window.obterMundoAtivo === "function"
+        ? window.obterMundoAtivo()
+        : (Number(new URLSearchParams(window.location.search).get("mundo")) || 1);
+
+    const mundos = window.MUNDOS || {};
+    const configMundo = mundos[mundoAtual];
+    const totalFases = configMundo && typeof configMundo.totalFases === "number"
+        ? configMundo.totalFases
+        : (typeof window.obterTotalFasesMundoAtivo === "function" ? window.obterTotalFasesMundoAtivo() : 3);
+
+    const mundoConcluidoParaTransicao = numeroFase >= totalFases ? mundoAtual : null;
+
     // Botão Voltar para o Menu
     const btnMenu = document.createElement("button");
     btnMenu.type = "button";
@@ -898,20 +1029,19 @@ function exibirBotoesConclusao(faseAtual, hospedeiro) {
         if (typeof window.trocarTrilhaFundo === "function") {
             window.trocarTrilhaFundo("menu");
         }
-        navegarEntreTelasDoJogo("menu", "index.html?view=mundos");
+        if (mundoConcluidoParaTransicao) {
+            try {
+                sessionStorage.setItem("arruma_bagunca_mundo_concluido", String(mundoConcluidoParaTransicao));
+            } catch (erro) {}
+        } else {
+            try {
+                sessionStorage.removeItem("arruma_bagunca_mundo_concluido");
+            } catch (erro) {}
+        }
+        const urlDestino = `index.html?view=mundos${mundoConcluidoParaTransicao ? `&mundoConcluido=${mundoConcluidoParaTransicao}` : ""}`;
+        navegarEntreTelasDoJogo("menu", urlDestino, { mundoConcluido: mundoConcluidoParaTransicao });
     });
     containerAcoes.appendChild(btnMenu);
-
-    // Obtenção da configuração do mundo ativo para determinar se existe próxima fase
-    const mundoAtual = typeof window.obterMundoAtivo === "function"
-        ? window.obterMundoAtivo()
-        : (Number(new URLSearchParams(window.location.search).get("mundo")) || 1);
-
-    const mundos = window.MUNDOS || {};
-    const configMundo = mundos[mundoAtual];
-    const totalFases = configMundo && typeof configMundo.totalFases === "number"
-        ? configMundo.totalFases
-        : (typeof window.obterTotalFasesMundoAtivo === "function" ? window.obterTotalFasesMundoAtivo() : 3);
 
     // Se houver próxima fase configurada no mundo, renderiza o botão Próxima Fase
     if (numeroFase < totalFases) {

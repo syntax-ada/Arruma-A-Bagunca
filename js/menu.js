@@ -21,7 +21,7 @@ const carrosselMundos = document.querySelector(".carrossel-mundos");
 const btnSetaEsquerda = document.querySelector('.btn-seta[aria-label="Mundo anterior"]');
 const btnSetaDireita = document.querySelector('.btn-seta[aria-label="Próximo mundo"]');
 const conteudoFase = document.querySelector("#conteudo-fase");
-const sidebarBoss = document.querySelector("#sidebar-boss");
+const sidebarBoss = document.querySelector("#boss-sidebar-card, #sidebar-boss");
 const btnFecharSidebarBoss = document.querySelector("#btn-fechar-sidebar-boss");
 const btnJogarBoss = document.querySelector("#btn-jogar-boss");
 const btnIconeBoss = document.querySelector("#btn-icone-boss");
@@ -47,7 +47,209 @@ function abrirFase(url) {
   conteudoFase.classList.remove("escondido");
 }
 
-function mostrarMenuMundos() {
+function obterFonteVideoCutsceneBoss() {
+  const isMobile = window.innerWidth <= 768 || (typeof window.matchMedia === "function" && window.matchMedia("(max-width: 768px)").matches);
+  if (isMobile) {
+    return "assets/images/nova_tela_menu de_fases/cena_boss_celular.mp4";
+  }
+  return "assets/images/nova_tela_menu de_fases/cena_boss_final.mp4";
+}
+
+function reproduzirCutsceneBoss(aoFinalizar) {
+  const modalVideo = document.querySelector("#modal-cutscene-boss");
+  const video = document.querySelector("#video-cutscene-boss");
+  const btnPular = document.querySelector("#btn-pular-cutscene");
+  if (!modalVideo || !video) {
+    if (typeof aoFinalizar === "function") aoFinalizar();
+    return;
+  }
+
+  const fonteVideo = obterFonteVideoCutsceneBoss();
+  const sourceEl = video.querySelector("source");
+  if (sourceEl) {
+    sourceEl.src = fonteVideo;
+  }
+  video.src = fonteVideo;
+  video.load();
+
+  modalVideo.classList.remove("escondido");
+
+  if (typeof window.pausarTrilhaFundo === "function") {
+    window.pausarTrilhaFundo();
+  }
+
+  let finalizado = false;
+  function finalizar() {
+    if (finalizado) return;
+    finalizado = true;
+    if (btnPular) btnPular.onclick = null;
+    video.onended = null;
+    video.onerror = null;
+    video.onclick = null;
+    try {
+      video.pause();
+      video.currentTime = 0;
+    } catch (e) {}
+    modalVideo.classList.add("escondido");
+
+    if (typeof window.trocarTrilhaFundo === "function") {
+      window.trocarTrilhaFundo("menu");
+    }
+
+    if (typeof aoFinalizar === "function") {
+      aoFinalizar();
+    }
+  }
+
+  if (btnPular) {
+    btnPular.onclick = finalizar;
+  }
+  video.onended = finalizar;
+  video.onerror = function () {
+    console.warn("[menu.js] Falha ao reproduzir cutscene do Boss. Avançando.");
+    finalizar();
+  };
+
+  video.onclick = function () {
+    if (video.muted) {
+      video.muted = false;
+    }
+  };
+
+  video.muted = false;
+  const promessaPlay = video.play();
+  if (promessaPlay !== undefined) {
+    promessaPlay.catch(() => {
+      video.muted = true;
+      video.play().catch(() => {});
+    });
+  }
+}
+
+function exibirTransicaoCadeado(mundoConcluido, aoFinalizar) {
+  const proximoMundo = Number(mundoConcluido) + 1;
+  const modal = document.querySelector("#modal-transicao-cadeado");
+  const imgMundo = document.querySelector("#img-mundo-desbloqueado");
+  const iconeCadeado = document.querySelector("#icone-cadeado-transicao");
+  const subtitulo = document.querySelector("#subtitulo-transicao-cadeado");
+  const btnContinuar = document.querySelector("#btn-continuar-transicao");
+  const arena = document.querySelector("#arena-cadeado");
+
+  if (!modal || proximoMundo > 4) {
+    if (typeof aoFinalizar === "function") aoFinalizar();
+    return;
+  }
+
+  const DADOS_MUNDOS = {
+    2: { nome: "Mundo 2: O Parque", img: "assets/images/nova_tela_menu de_fases/mundo_2.png" },
+    3: { nome: "Mundo 3: A Praia", img: "assets/images/nova_tela_menu de_fases/mundo_3.png" },
+    4: { nome: "Mundo 4: O Acampamento", img: "assets/images/nova_tela_menu de_fases/mundo_4.png" },
+  };
+
+  const info = DADOS_MUNDOS[proximoMundo] || DADOS_MUNDOS[2];
+
+  if (imgMundo) {
+    imgMundo.src = info.img;
+    imgMundo.alt = info.nome;
+    imgMundo.classList.remove("mundo-desbloqueado-brilho");
+  }
+
+  if (subtitulo) {
+    subtitulo.textContent = `Você desbloqueou o ${info.nome}!`;
+  }
+
+  if (iconeCadeado) {
+    iconeCadeado.textContent = "🔒";
+    iconeCadeado.className = "icone-cadeado-transicao cadeado-tremendo";
+  }
+  arena?.classList.remove("efeito-explosao-ativo");
+
+  modal.classList.remove("escondido");
+
+  if (typeof window.tocarEfeito === "function") {
+    window.tocarEfeito("conclusao");
+  }
+
+  const timerQuebra = setTimeout(() => {
+    if (iconeCadeado) {
+      iconeCadeado.textContent = "🔓";
+      iconeCadeado.classList.remove("cadeado-tremendo");
+      iconeCadeado.classList.add("cadeado-quebrado");
+    }
+    if (imgMundo) {
+      imgMundo.classList.add("mundo-desbloqueado-brilho");
+    }
+    arena?.classList.add("efeito-explosao-ativo");
+    if (typeof window.tocarEfeito === "function") {
+      window.tocarEfeito("certo");
+    }
+  }, 950);
+
+  let fechado = false;
+  function fechar() {
+    if (fechado) return;
+    fechado = true;
+    clearTimeout(timerQuebra);
+    modal.classList.add("escondido");
+    if (btnContinuar) btnContinuar.onclick = null;
+
+    if (typeof aoFinalizar === "function") {
+      aoFinalizar();
+    }
+  }
+
+  if (btnContinuar) {
+    btnContinuar.onclick = fechar;
+  }
+}
+
+const CHAVE_TRANSICOES_VISTAS = "arruma_bagunca_transicoes_vistas";
+
+function obterTransicoesVistas() {
+  try {
+    const salvas = localStorage.getItem(CHAVE_TRANSICOES_VISTAS);
+    if (!salvas) return [];
+    const lista = JSON.parse(salvas);
+    return Array.isArray(lista) ? lista.map(Number) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function transicaoJaFoiVista(mundoConcluido) {
+  const num = Number(mundoConcluido);
+  if (!num) return true;
+  const vistas = obterTransicoesVistas();
+  return vistas.includes(num);
+}
+
+function marcarTransicaoComoVista(mundoConcluido) {
+  const num = Number(mundoConcluido);
+  if (!num) return;
+  const vistas = obterTransicoesVistas();
+  if (!vistas.includes(num)) {
+    vistas.push(num);
+    try {
+      localStorage.setItem(CHAVE_TRANSICOES_VISTAS, JSON.stringify(vistas));
+    } catch (e) {}
+  }
+}
+
+function limparTransicoesVistas() {
+  try {
+    localStorage.removeItem(CHAVE_TRANSICOES_VISTAS);
+  } catch (e) {}
+}
+
+function rolarCarrosselParaMundo(mundoId) {
+  if (!carrosselMundos) return;
+  const card = carrosselMundos.querySelector(`[data-mundo="${mundoId}"]`);
+  if (card && typeof card.scrollIntoView === "function") {
+    card.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+  }
+}
+
+function mostrarMenuMundos(mundoConcluido) {
   if (!conteudoFase) {
     return;
   }
@@ -58,8 +260,46 @@ function mostrarMenuMundos() {
   controlesIniciais?.classList.add("escondido");
   menuFases?.classList.remove("escondido");
   atualizarInterfaceProgresso();
-  if (typeof window.trocarTrilhaFundo === "function") {
-    window.trocarTrilhaFundo("menu");
+
+  const numMundo = Number(mundoConcluido);
+  const devAtivo = isModoDevAtivo();
+
+  // Conclusão do Mundo 4 (Fase 3): aciona obrigatoriamente a cutscene do Boss
+  if (numMundo === 4) {
+    reproduzirCutsceneBoss(() => {
+      sidebarBossFechadaManualmente = false;
+      atualizarInterfaceProgresso();
+      const sidebar = document.querySelector("#sidebar-boss");
+      if (sidebar) {
+        sidebar.classList.remove("escondido");
+        sidebar.classList.add("animacao-destaque-boss");
+        setTimeout(() => sidebar.classList.remove("animacao-destaque-boss"), 1400);
+      }
+    });
+  } else if (numMundo >= 1 && numMundo <= 3) {
+    // Quebra de cadeado: exibida no primeiro desbloqueio e sempre que o Modo Dev estiver ativo
+    if (devAtivo || !transicaoJaFoiVista(numMundo)) {
+      marcarTransicaoComoVista(numMundo);
+      exibirTransicaoCadeado(numMundo, () => {
+        mundoSelecionado = numMundo + 1;
+        atualizarInterfaceProgresso();
+        rolarCarrosselParaMundo(numMundo + 1);
+        if (typeof window.trocarTrilhaFundo === "function") {
+          window.trocarTrilhaFundo("menu");
+        }
+      });
+    } else {
+      mundoSelecionado = numMundo + 1;
+      atualizarInterfaceProgresso();
+      rolarCarrosselParaMundo(numMundo + 1);
+      if (typeof window.trocarTrilhaFundo === "function") {
+        window.trocarTrilhaFundo("menu");
+      }
+    }
+  } else {
+    if (typeof window.trocarTrilhaFundo === "function") {
+      window.trocarTrilhaFundo("menu");
+    }
   }
 }
 
@@ -432,7 +672,9 @@ if (btnJogarBoss) {
     tocarSomBotao();
     const devAtivo = isModoDevAtivo();
     const sufixoDev = devAtivo ? "&dev=true" : "";
-    abrirFase(`fase1.html?mundo=5&fase=1${sufixoDev}`);
+    reproduzirCutsceneBoss(() => {
+      abrirFase(`fase1.html?mundo=5&fase=1${sufixoDev}`);
+    });
   });
 }
 
@@ -790,6 +1032,16 @@ function aplicarModoAltoContraste(ativo) {
       padrao: "assets/images/nova_tela_menu de_fases/mundo_4.png",
       altoContraste: "assets/images/nova_tela_menu de_fases/Acessibilidade/mundo4.png",
     },
+    {
+      seletor: ".fundo-boss-sidebar, #boss-sidebar-card .fundo-boss-sidebar",
+      padrao: "assets/images/nova_tela_menu de_fases/fundo_boss.png",
+      altoContraste: "assets/images/nova_tela_menu de_fases/Acessibilidade/Fundo_boss.png",
+    },
+    {
+      seletor: ".img-boss-sidebar, #boss-sidebar-card .img-boss-sidebar",
+      padrao: "assets/images/nova_tela_menu de_fases/boss_mundo.png",
+      altoContraste: "assets/images/nova_tela_menu de_fases/Acessibilidade/boss_mundo.png",
+    },
   ];
 
   imagensMundos.forEach(function (mundo) {
@@ -1046,7 +1298,14 @@ window.addEventListener("message", function (evento) {
   }
 
   if (mensagem.destino === "menu") {
-    mostrarMenuMundos();
+    let mundoConcluido = mensagem.mundoConcluido;
+    if (!mundoConcluido) {
+      try {
+        mundoConcluido = parseInt(sessionStorage.getItem("arruma_bagunca_mundo_concluido"), 10) || null;
+        sessionStorage.removeItem("arruma_bagunca_mundo_concluido");
+      } catch (e) {}
+    }
+    mostrarMenuMundos(mundoConcluido);
   } else if (typeof mensagem.url === "string" && mensagem.url.startsWith("fase1.html?")) {
     abrirFase(mensagem.url);
   }
@@ -1060,13 +1319,26 @@ window.addEventListener("message", function (evento) {
 function verificarParametroView() {
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.get("view") === "mundos") {
+    let mundoConcluido = parseInt(urlParams.get("mundoConcluido"), 10) || null;
+    if (!mundoConcluido) {
+      try {
+        mundoConcluido = parseInt(sessionStorage.getItem("arruma_bagunca_mundo_concluido"), 10) || null;
+      } catch (e) {}
+    }
+    try {
+      sessionStorage.removeItem("arruma_bagunca_mundo_concluido");
+    } catch (e) {}
+
     if (telaInicial && controlesIniciais && menuFases) {
       const jogador = typeof window.obterJogadorIdentificado === "function"
         ? window.obterJogadorIdentificado()
         : null;
 
-      if (jogador) {
+      if (jogador || isModoDevAtivo()) {
         entrarNoMenuDeMundos();
+        if (mundoConcluido) {
+          mostrarMenuMundos(mundoConcluido);
+        }
       } else {
         abrirIdentificacaoDoJogador();
       }
@@ -1079,6 +1351,12 @@ function verificarParametroView() {
 window.addEventListener("arruma-bagunca:progresso-atualizado", function () {
   atualizarInterfaceProgresso();
 });
+
+if (typeof window !== "undefined") {
+  window.exibirTransicaoCadeado = exibirTransicaoCadeado;
+  window.reproduzirCutsceneBoss = reproduzirCutsceneBoss;
+  window.limparTransicoesVistas = limparTransicoesVistas;
+}
 
 document.addEventListener("DOMContentLoaded", function () {
   atualizarInterfaceProgresso();

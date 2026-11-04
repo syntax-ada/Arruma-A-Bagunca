@@ -148,6 +148,9 @@
       return;
     }
 
+    if (typeof window.limparTransicoesVistas === "function") {
+      window.limparTransicoesVistas();
+    }
     if (typeof atualizarInterfaceProgresso === "function") {
       atualizarInterfaceProgresso();
     }
@@ -161,6 +164,9 @@
       return;
     }
 
+    if (typeof window.limparTransicoesVistas === "function") {
+      window.limparTransicoesVistas();
+    }
     if (typeof atualizarInterfaceProgresso === "function") {
       atualizarInterfaceProgresso();
     }
@@ -565,6 +571,9 @@
   // ==========================================================
   function desbloquearMenuVisualSeNecessario() {
     // Delega ao menu.js a atualização visual e liberação de fases no Modo Dev
+    if (typeof window.limparTransicoesVistas === "function") {
+      window.limparTransicoesVistas();
+    }
     if (typeof atualizarInterfaceProgresso === "function") {
       atualizarInterfaceProgresso();
     }

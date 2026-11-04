@@ -204,7 +204,20 @@
   window.tocarEfeito = tocarEfeito;
   window.tocarEfeitoSonoro = tocarEfeito;
   window.trocarTrilhaFundo = trocarTrilhaFundo;
+  function pausarTrilhaFundo() {
+    if (window.parent !== window) {
+      window.parent.postMessage({
+        tipo: "arruma-bagunca:pausar-trilha",
+      }, "*");
+      return;
+    }
+    if (audio && !audio.paused) {
+      audio.pause();
+    }
+  }
+
   window.trocarTrilha = trocarTrilhaFundo;
+  window.pausarTrilhaFundo = pausarTrilhaFundo;
 
   function atualizarVisualElementos(v) {
     const iconeSrc = resolverIconeVolume(v);
@@ -675,6 +688,12 @@
 
       if (tipo === "arruma-bagunca:trocar-trilha") {
         trocarTrilhaFundoNoTopo(evento.data.trilha);
+      }
+
+      if (tipo === "arruma-bagunca:pausar-trilha") {
+        if (audio && !audio.paused) {
+          audio.pause();
+        }
       }
 
       if (tipo === "arruma-bagunca:solicitar-estado-som") {

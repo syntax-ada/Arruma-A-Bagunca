@@ -73,7 +73,7 @@ Os Mundos 1 a 4 são as etapas principais; o Mundo 5 é a fase bônus (organiza�
   - ao soltar, o painel fecha e valem as mesmas regras de sempre (acerto, erro, retorno do objeto, contadores e objetos guardados);
   - a área de objetos não reserva mais espaço nas laterais para as cestas;
   - em paisagem, a grade de objetos usa a largura toda (até 8 por linha, então até 16 objetos ficam em 2 linhas) e o tamanho de cada objeto também respeita a altura da tela, com mínimo de 44 px;
-  - o tutorial de arraste da Fase 1 do Mundo 1 não é exibido; o tutorial da conta continua.
+  - o tutorial de arraste da Fase 1 do Mundo 1 adapta as coordenadas e o alinhamento para as cestas no rodapé do celular; o tutorial da conta continua.
 
   Fora do modo O4 (tablets, inclusive em tela dividida, computadores com qualquer tamanho de janela, celular usando mouse), as cestas e os tutoriais funcionam como antes. Se a detecção falhar ou o navegador não entender `:has()` no CSS, o modo fica desligado.
 - **Teclado (parcial):** Enter ou Espaço sobre uma cesta posiciona nela o próximo objeto disponível. Não é possível arrastar objetos pelo teclado. No modo O4, o painel aparece quando uma cesta recebe o foco.
@@ -367,7 +367,7 @@ Não são obrigações imediatas; cada incremento deve ser avaliado antes de com
 - Versionar o esquema de `players` numa migração revisada pela equipe. Criar `.vercelignore` e limitar requisições à API.
 - Confirmar se a arte do Mundo 5 é a definitiva (o comentário no topo de `js/mundos/mundo5.js` ainda diz "provisório" e está desatualizado). Os comentários de `js/math.js` também citam os balões `hud_branco.png` e `hud_branco2.png`, mas o código não os aplica (o elemento `.caixa-instrucoes` não existe mais em `fase1.html`).
 - Teclado completo, configurações de acessibilidade, instruções por áudio e testes em dispositivos reais.
-- Testar o modo O4 em aparelhos reais (iPhone com Safari, Android com Chrome, tablets, inclusive em tela dividida) e decidir se o tutorial de arraste ganha uma versão para o celular.
+- Testar o modo O4 em aparelhos reais (iPhone com Safari, Android com Chrome, tablets, inclusive em tela dividida).
 - Responsividade fora do modo O4: sobreposição das cestas laterais em janelas baixas de computador (ver seção 5, limitações). No modo O4, testar em aparelho real a grade de objetos em paisagem.
 - Corrigir ou remover `scratch/test_boss_fluxo.html`.
 - Decidir o que fazer com o que chegou junto do alto contraste e ainda não funciona: os interruptores de som, música e áudio-descrição; o "Sair" do modal; a escolha local de avatar (fica ou volta ao avatar único?); os 17 áudios de narração sem uso; as cestas de alto contraste do Mundo 5; as três imagens de fundo ausentes.

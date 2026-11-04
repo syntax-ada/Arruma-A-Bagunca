@@ -86,66 +86,51 @@
 
   // ==========================================================
   // CATÁLOGO DE MODELOS DISPONÍVEIS POR CATEGORIA (MUNDO 5)
+  // Utiliza os assets coloridos originais do jogo (Mundo 1)
   // ==========================================================
-  const MODELOS_BEBIDAS = [
-    {
-      baseId: "agua",
-      category: "bebidas",
-      itemName: "a água",
-      ariaLabel: "Garrafa de água mineral. Arraste para a cesta de bebidas.",
-      imgSrc: "assets/images/mundo_5/sprites_mundo5/agua.png",
-      imgAlt: "Garrafa de água",
-    },
-    {
-      baseId: "coca",
-      category: "bebidas",
-      itemName: "o refrigerante",
-      ariaLabel: "Lata de refrigerante. Arraste para a cesta de bebidas.",
-      imgSrc: "assets/images/mundo_5/sprites_mundo5/coca.png",
-      imgAlt: "Lata de refrigerante",
-    },
-    {
-      baseId: "refri-laranja",
-      category: "bebidas",
-      itemName: "o refrigerante de laranja",
-      ariaLabel: "Garrafa de suco de laranja. Arraste para a cesta de bebidas.",
-      imgSrc: "assets/images/mundo_5/sprites_mundo5/refri_laranja.png",
-      imgAlt: "Refrigerante de laranja",
-    },
-  ];
-
   const MODELOS_BRINQUEDOS = [
-    {
-      baseId: "bola-volei",
-      category: "brinquedos",
-      itemName: "a bola de vôlei",
-      ariaLabel: "Bola de vôlei. Arraste para a cesta de brinquedos.",
-      imgSrc: "assets/images/mundo_5/sprites_mundo5/bola de volei.png",
-      imgAlt: "Bola de vôlei",
-    },
-    {
-      baseId: "robo",
-      category: "brinquedos",
-      itemName: "o robô",
-      ariaLabel: "Robô de brinquedo. Arraste para a cesta de brinquedos.",
-      imgSrc: "assets/images/mundo_5/sprites_mundo5/robo.png",
-      imgAlt: "Robô de brinquedo",
-    },
     {
       baseId: "urso",
       category: "brinquedos",
-      itemName: "o ursinho de pelúcia",
-      ariaLabel: "Ursinho de pelúcia. Arraste para a cesta de brinquedos.",
-      imgSrc: "assets/images/mundo_5/sprites_mundo5/urso.png",
-      imgAlt: "Ursinho de pelúcia",
+      itemName: "o ursinho",
+      ariaLabel: "Ursinho de brinquedo. Arraste para a cesta de brinquedos.",
+      imgSrc: "assets/images/tela_fase1/urso.png",
+      imgAlt: "Ursinho de brinquedo",
     },
     {
-      baseId: "tremzinho",
+      baseId: "trenzinho",
       category: "brinquedos",
       itemName: "o trenzinho",
       ariaLabel: "Trenzinho de brinquedo. Arraste para a cesta de brinquedos.",
-      imgSrc: "assets/images/mundo_5/sprites_mundo5/tremzinho.png",
+      imgSrc: "assets/images/tela_fase1/tremzinho.png",
       imgAlt: "Trenzinho de brinquedo",
+    },
+  ];
+
+  const MODELOS_COMIDAS = [
+    {
+      baseId: "banana",
+      category: "comidas",
+      itemName: "a banana",
+      ariaLabel: "Banana. Arraste para a cesta de comidas.",
+      imgSrc: "assets/images/tela_fase1/banana.png",
+      imgAlt: "Banana",
+    },
+    {
+      baseId: "maca",
+      category: "comidas",
+      itemName: "a maçã",
+      ariaLabel: "Maçã. Arraste para a cesta de comidas.",
+      imgSrc: "assets/images/tela_fase1/maça.png",
+      imgAlt: "Maçã",
+    },
+    {
+      baseId: "pera",
+      category: "comidas",
+      itemName: "a pera",
+      ariaLabel: "Pera. Arraste para a cesta de comidas.",
+      imgSrc: "assets/images/tela_fase1/pera.png",
+      imgAlt: "Pera",
     },
   ];
 
@@ -164,16 +149,16 @@
     const fn = getGerarItensFaseFn();
     return fn ? fn([
       { categoria: "brinquedos", quantidade: 3, modelos: MODELOS_BRINQUEDOS },
-      { categoria: "bebidas", quantidade: 3, modelos: MODELOS_BEBIDAS },
+      { categoria: "comidas", quantidade: 3, modelos: MODELOS_COMIDAS },
     ]) : [];
   }
 
   // ==========================================================
   // CESTAS UNIFICADAS DO MUNDO 5 (DESAFIO FINAL)
-  // Imagens unificadas contendo cesto, etiqueta e bolinha de contagem
+  // Utiliza as cestas coloridas originais do Mundo 1
   // ==========================================================
-  const SPRITES_CESTA_BEBIDAS_MUNDO5 = "assets/images/mundo_5/sprites_mundo5/cesta_bebidas.png";
-  const SPRITES_CESTA_BRINQUEDOS_MUNDO5 = "assets/images/mundo_5/sprites_mundo5/cesta_brinquedos.png";
+  const SPRITES_CESTA_BRINQUEDOS_MUNDO5 = "assets/images/mundo_1/cesta_brinquedos.png";
+  const SPRITES_CESTA_COMIDAS_MUNDO5 = "assets/images/mundo_1/cesta_comidas.png";
 
   // ==========================================================
   // CONFIGURAÇÃO DA FASE ÚNICA (Mundo 5 — Desafio Final)
@@ -213,18 +198,18 @@
         accepts: "brinquedos",
         nome: "Brinquedos",
         ariaLabel: "Cesta de brinquedos",
-        icone: "🏐",
+        icone: "🧸",
         posicao: "esq-centro",
         sprites: SPRITES_CESTA_BRINQUEDOS_MUNDO5,
       },
       {
-        id: "cesta-bebidas",
-        accepts: "bebidas",
-        nome: "Bebidas",
-        ariaLabel: "Cesta de bebidas",
-        icone: "🥤",
+        id: "cesta-comidas",
+        accepts: "comidas",
+        nome: "Comidas",
+        ariaLabel: "Cesta de comidas",
+        icone: "🍎",
         posicao: "dir-centro",
-        sprites: SPRITES_CESTA_BEBIDAS_MUNDO5,
+        sprites: SPRITES_CESTA_COMIDAS_MUNDO5,
       },
     ],
   };
