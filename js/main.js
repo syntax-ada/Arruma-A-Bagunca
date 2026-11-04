@@ -138,6 +138,10 @@
     window.trocarTrilhaFundo(mundo.id);
   }
 
+  if (Number(mundo.id) === 5 && Number(faseId) === 1 && typeof window.tocarNarracao === "function") {
+    window.tocarNarracao("faseBonusInicio");
+  }
+
   const btnVoltarFase = document.querySelector("#btn-voltar-fase");
   if (btnVoltarFase) {
     btnVoltarFase.addEventListener("click", function () {
@@ -146,6 +150,15 @@
       }
       if (typeof window.trocarTrilhaFundo === "function") {
         window.trocarTrilhaFundo("menu");
+      }
+      try {
+        localStorage.removeItem("playBossCutscene");
+        sessionStorage.removeItem("playBossCutscene");
+        localStorage.removeItem("arruma_bagunca_cutscene_boss");
+        sessionStorage.removeItem("arruma_bagunca_cutscene_boss");
+      } catch (_erro) {}
+      if (typeof window !== "undefined") {
+        window.playBossCutscene = false;
       }
       if (typeof navegarEntreTelasDoJogo === "function" && window.parent !== window) {
         navegarEntreTelasDoJogo("menu", "index.html");

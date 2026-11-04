@@ -5,6 +5,9 @@
 (function inicializarModoDev() {
   const CHAVE_SESSION_DEV = "arruma_bagunca_dev";
 
+  // Configuração padrão rigorosamente false: o modo dev só é habilitado por ação explícita
+  window.modoDevLiberado = false;
+
   const storageSession = typeof window !== "undefined" && window.sessionStorage ? window.sessionStorage : null;
 
   if (!storageSession) {
@@ -26,7 +29,7 @@
   const urlParams = new URLSearchParams(window.location.search);
   const devParam = urlParams.get("dev");
   const devDesligadoNaUrl = devParam === "false" || devParam === "0";
-  const devPedidoNaUrl = urlParams.has("dev") && !devDesligadoNaUrl;
+  const devPedidoNaUrl = devParam === "true" || devParam === "1";
   const ambienteLocal = ehAmbienteLocal();
 
   function ehAmbienteLocal() {
@@ -501,7 +504,16 @@
 
   function desativarModoDev() {
     storageSession.removeItem(CHAVE_SESSION_DEV);
+    try {
+      localStorage.removeItem(CHAVE_SESSION_DEV);
+      localStorage.removeItem("arruma_bagunca_progresso_dev");
+    } catch (e) {}
     window.modoDevLiberado = false;
+    delete window.dev;
+    const painel = document.querySelector("#dev-painel-container");
+    if (painel && typeof painel.remove === "function") {
+      painel.remove();
+    }
     const params = new URLSearchParams(window.location.search);
     params.delete("dev");
     const query = params.toString() ? `?${params.toString()}` : "";
@@ -961,17 +973,29 @@
   function decidirModoDev() {
     if (devDesligadoNaUrl) {
       storageSession.removeItem(CHAVE_SESSION_DEV);
+      try {
+        localStorage.removeItem(CHAVE_SESSION_DEV);
+        localStorage.removeItem("arruma_bagunca_progresso_dev");
+      } catch (e) {}
+      window.modoDevLiberado = false;
       return;
     }
 
-    // Ambiente local: o fluxo de sempre (?dev=true liga e fica lembrado na aba).
+    // Acesso à URL base sem parâmetro explícito de dev: limpa persistência e mantém desativado
+    if (!devPedidoNaUrl) {
+      storageSession.removeItem(CHAVE_SESSION_DEV);
+      try {
+        localStorage.removeItem(CHAVE_SESSION_DEV);
+        localStorage.removeItem("arruma_bagunca_progresso_dev");
+      } catch (e) {}
+      window.modoDevLiberado = false;
+      return;
+    }
+
+    // Ambiente local: ação explícita (?dev=true na URL) habilita o modo dev
     if (ambienteLocal) {
-      if (devPedidoNaUrl) {
-        storageSession.setItem(CHAVE_SESSION_DEV, "true");
-      }
-      if (storageSession.getItem(CHAVE_SESSION_DEV) === "true") {
-        ativarModoDev();
-      }
+      storageSession.setItem(CHAVE_SESSION_DEV, "true");
+      ativarModoDev();
       return;
     }
 
@@ -992,6 +1016,7 @@
       if (estado === "invalida") {
         storageSession.removeItem(CHAVE_SESSION_DEV);
       }
+      window.modoDevLiberado = false;
       console.info("[DEV] Painel bloqueado: sessão administrativa ausente, expirada ou indisponível (admin.html).");
     });
   }

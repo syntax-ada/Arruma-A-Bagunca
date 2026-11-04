@@ -929,15 +929,11 @@
     clip-path: inset(0 0 40% 0);
 }
 
-/* 6. Cesta de Brinquedos (Mundo 3 e 5) / Balde Vermelho */
+/* 6. Cesta de Brinquedos (Mundo 3) / Balde Vermelho */
 .cesta-brinquedos-mundo3 .itens-sobrepostos,
-.cesta-brinquedos-mundo5 .itens-sobrepostos,
 .mundo-3 .cesta-brinquedos .itens-sobrepostos,
-.mundo-5 .cesta-brinquedos .itens-sobrepostos,
 .mundo-3 #cesta-brinquedos .itens-sobrepostos,
-.mundo-5 #cesta-brinquedos .itens-sobrepostos,
-.mundo-3 [data-accepts="brinquedos"] .itens-sobrepostos,
-.mundo-5 [data-accepts="brinquedos"] .itens-sobrepostos {
+.mundo-3 [data-accepts="brinquedos"] .itens-sobrepostos {
     top: -22%;
     left: 14%;
     width: 78%;
@@ -947,16 +943,39 @@
 }
 
 .cesta-brinquedos-mundo3 .itens-sobrepostos img,
-.cesta-brinquedos-mundo5 .itens-sobrepostos img,
 .mundo-3 .cesta-brinquedos .itens-sobrepostos img,
-.mundo-5 .cesta-brinquedos .itens-sobrepostos img,
 .cesta-brinquedos-mundo3 .itens-sobrepostos .item-sobreposto,
-.cesta-brinquedos-mundo5 .itens-sobrepostos .item-sobreposto,
-.mundo-3 .cesta-brinquedos .itens-sobrepostos .item-sobreposto,
-.mundo-5 .cesta-brinquedos .itens-sobrepostos .item-sobreposto {
+.mundo-3 .cesta-brinquedos .itens-sobrepostos .item-sobreposto {
     transform: translateY(12%) scale(1.08);
     margin: 0 4px;
     clip-path: inset(0 0 20% 0);
+}
+
+/* 7. Cesta de Brinquedos (Mundo 5) — Replicação exata do Mundo 1 (Desktop) e profundidade na cesta marrom */
+.cesta-brinquedos-mundo5 .itens-sobrepostos,
+.mundo-5 .cesta-brinquedos .itens-sobrepostos,
+.mundo-5 #cesta-brinquedos .itens-sobrepostos,
+.mundo-5 [data-accepts="brinquedos"] .itens-sobrepostos {
+    top: 6%;
+    left: 18%;
+    width: 64%;
+    height: 24%;
+    overflow: hidden;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.cesta-brinquedos-mundo5 .itens-sobrepostos img,
+.cesta-brinquedos-mundo5 .itens-sobrepostos .item-sobreposto,
+.mundo-5 .cesta-brinquedos .itens-sobrepostos img,
+.mundo-5 .cesta-brinquedos .itens-sobrepostos .item-sobreposto,
+.mundo-5 #cesta-brinquedos .itens-sobrepostos img,
+.mundo-5 #cesta-brinquedos .itens-sobrepostos .item-sobreposto,
+.mundo-5 [data-accepts="brinquedos"] .itens-sobrepostos img,
+.mundo-5 [data-accepts="brinquedos"] .itens-sobrepostos .item-sobreposto {
+    transform: translateY(8%) scale(1);
+    margin: 0;
+    clip-path: inset(0 0 40% 0);
 }
 
 .drop-zone.is-over {
@@ -3325,6 +3344,7 @@ body.alto-contraste.mundo-5 .itens-sobrepostos .item-sobreposto {
 
 
 /* 2.3. Ajuste fino de elevação e profundidade dos itens no Mundo 3 (Praia) */
+@media (min-width: 769px) {
 body.alto-contraste.mundo-3 .cesta-bebidas .itens-sobrepostos {
     top: 15% !important;
     left: 10% !important;
@@ -3374,6 +3394,7 @@ body.alto-contraste.mundo-3 .cesta-comidas .itens-sobrepostos .item-sobreposto {
     margin: 0 -5px !important;
     clip-path: none !important;
 }
+}
 
 /* ==========================================================
    2.4. MUNDO 4: ACAMPAMENTO (COMIDA E MOCHILA)
@@ -3422,6 +3443,7 @@ body.alto-contraste.mundo-4 [data-accepts="mochila"] .contador-itens {
 /* 2. Sobreposição e Profundidade dos Itens */
 
 /* Cesta de Comida (Mundo 4) — alinhamento idêntico aos Mundos 2 e 3 */
+@media (min-width: 769px) {
 body.alto-contraste.mundo-4 .cesta-comida .itens-sobrepostos,
 body.alto-contraste.mundo-4 .cesta-comidas .itens-sobrepostos,
 body.alto-contraste.mundo-4 #cesta-comida .itens-sobrepostos,
@@ -3450,6 +3472,7 @@ body.alto-contraste.mundo-4 .cesta-comida-mundo4 .itens-sobrepostos .item-sobrep
     transform: translateY(16%) scale(1.02) !important;
     margin: 0 -5px !important;
     clip-path: none !important;
+}
 }
 
 /* Mochila (Mundo 4) — itens posicionados no compartimento com base oculta atrás do bolso/aba frontal */

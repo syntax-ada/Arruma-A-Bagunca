@@ -570,6 +570,9 @@ function startGame(config) {
   if (activeConfig.boss && typeof iniciarEtapaMatematica === "function") {
     iniciarEtapaMatematica(null, activeConfig);
   } else if (deveExibirTutorialFase1) {
+    if (typeof window.tocarNarracao === "function") {
+      window.tocarNarracao("organizarObjetos");
+    }
     iniciarTutorialArrasteFase1();
   }
 }
@@ -699,6 +702,9 @@ function finishDrag(event) {
 
     if (isOrganizationComplete()) {
       showFeedback("Parabéns! Você organizou todos os objetos!", "success");
+      if (typeof window.tocarNarracao === "function") {
+        window.tocarNarracao("acerto");
+      }
       if (activeConfig?.boss) {
         document.body.classList.add("cenario-arrumado");
         if (activeConfig.fundoArrumado) {
@@ -1015,6 +1021,9 @@ function handleDropZoneKeyboard(event) {
 
     if (isOrganizationComplete()) {
       showFeedback("Parabéns! Você organizou todos os objetos!", "success");
+      if (typeof window.tocarNarracao === "function") {
+        window.tocarNarracao("acerto");
+      }
       if (activeConfig?.boss) {
         document.body.classList.add("cenario-arrumado");
         if (activeConfig.fundoArrumado) {

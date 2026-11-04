@@ -30,6 +30,125 @@
   const TEMPO_LIMITE_MS = 8000;
   // Única opção de avatar aprovada pela equipe nesta versão.
   const AVATARES = { padrao: "👤" };
+
+  const IMAGEM_AVATAR_PADRAO =
+    'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><circle cx="32" cy="32" r="32" fill="%23d8e2ec"/><circle cx="32" cy="24" r="12" fill="%238a99ad"/><path d="M12 56c0-11 9-20 20-20s20 9 20 20" fill="%238a99ad"/></svg>';
+
+  const MAPA_AVATARES_CATALOGO = {
+    cachorro: "assets/images/Settings/Avatares/Cachorro.png",
+    gato: "assets/images/Settings/Avatares/Gato.png",
+    coala: "assets/images/Settings/Avatares/Coala.png",
+    coelho: "assets/images/Settings/Avatares/Coelho.png",
+    raposo: "assets/images/Settings/Avatares/raposo.png",
+    golfinho: "assets/images/Settings/Avatares/Golfinho.png",
+    "ave-maluca": "assets/images/Settings/Avatares/Ave maluca.png",
+    galineo: "assets/images/Settings/Avatares/galineo.png",
+    chifrudo: "assets/images/Settings/Avatares/chifrudo.png",
+    monstro: "assets/images/Settings/Avatares/Monstro!.png",
+  };
+
+  function resolverSrcAvatar(valor) {
+    if (!valor || typeof valor !== "string") {
+      return null;
+    }
+    const valorLimpo = valor.trim();
+    if (!valorLimpo || valorLimpo === "padrao" || valorLimpo === "👤") {
+      return null;
+    }
+    if (MAPA_AVATARES_CATALOGO[valorLimpo.toLowerCase()]) {
+      return MAPA_AVATARES_CATALOGO[valorLimpo.toLowerCase()];
+    }
+    return valorLimpo;
+  }
+
+  function obterAvatarDoUsuario(identificador) {
+    if (!identificador) {
+      return null;
+    }
+    let apelido = null;
+    let id = null;
+    let avatarProp = null;
+
+    if (typeof identificador === "string") {
+      apelido = identificador;
+    } else if (typeof identificador === "object") {
+      apelido = identificador.apelido || null;
+      id = identificador.id || null;
+      avatarProp = identificador.avatar || null;
+    }
+
+    try {
+      if (apelido) {
+        const salvoPorApelido = window.localStorage?.getItem("avatar_" + apelido);
+        if (salvoPorApelido) {
+          const resolvido = resolverSrcAvatar(salvoPorApelido);
+          if (resolvido) {
+            return resolvido;
+          }
+        }
+      }
+      if (id) {
+        const salvoPorId = window.localStorage?.getItem("avatar_" + id);
+        if (salvoPorId) {
+          const resolvido = resolverSrcAvatar(salvoPorId);
+          if (resolvido) {
+            return resolvido;
+          }
+        }
+      }
+    } catch (_erro) {
+      // Ignora erro de acesso ao localStorage.
+    }
+
+    if (avatarProp) {
+      const resolvido = resolverSrcAvatar(avatarProp);
+      if (resolvido) {
+        return resolvido;
+      }
+    }
+
+    return null;
+  }
+
+  function salvarAvatarDoUsuario(identificador, srcAvatar) {
+    if (!identificador || !srcAvatar) {
+      return;
+    }
+    let apelido = null;
+    let id = null;
+
+    if (typeof identificador === "string") {
+      apelido = identificador;
+    } else if (typeof identificador === "object") {
+      apelido = identificador.apelido || null;
+      id = identificador.id || null;
+      identificador.avatar = srcAvatar;
+      guardarJogadorIdentificado(identificador);
+    }
+
+    try {
+      if (apelido) {
+        window.localStorage?.setItem("avatar_" + apelido, srcAvatar);
+      }
+      if (id) {
+        window.localStorage?.setItem("avatar_" + id, srcAvatar);
+      }
+    } catch (_erro) {
+      // Ignora falha de armazenamento em modo restrito.
+    }
+  }
+
+  function renderizarElementoAvatar(container, srcAvatar, altTexto) {
+    if (!container) {
+      return;
+    }
+    container.textContent = "";
+    const img = document.createElement("img");
+    img.src = srcAvatar || IMAGEM_AVATAR_PADRAO;
+    img.alt = altTexto || "Avatar";
+    img.draggable = false;
+    container.appendChild(img);
+  }
   const MENSAGEM_VAZIO = "Escreva um apelido para continuar.";
   const MENSAGEM_NAO_PERMITIDO = "Esse apelido não pode ser usado. Escolha outro!";
 
@@ -98,7 +217,8 @@
       nomeJogadorMenu.textContent = jogador?.apelido || "Jogador";
     }
     if (avatarJogadorMenu) {
-      avatarJogadorMenu.textContent = obterAvatar(jogador?.avatar);
+      const avatarSrc = obterAvatarDoUsuario(jogador) || IMAGEM_AVATAR_PADRAO;
+      renderizarElementoAvatar(avatarJogadorMenu, avatarSrc, "Avatar de " + (jogador?.apelido || "Jogador"));
     }
   }
 
@@ -206,7 +326,9 @@
       ? "Esse é o seu perfil?"
       : "Vamos criar o seu perfil com este apelido?";
     apelidoConfirmacao.textContent = existe ? jogador.apelido : perfilEmConfirmacao.apelido;
-    avatarConfirmacao.textContent = obterAvatar(existe ? jogador.avatar : "padrao");
+    const nomeConfirmado = existe ? jogador.apelido : perfilEmConfirmacao.apelido;
+    const avatarSrc = obterAvatarDoUsuario(existe ? jogador : nomeConfirmado) || IMAGEM_AVATAR_PADRAO;
+    renderizarElementoAvatar(avatarConfirmacao, avatarSrc, "Avatar de " + nomeConfirmado);
 
     esconderAvisoConexao();
     etapaApelido.classList.add("escondido");
@@ -279,6 +401,10 @@
     const resultado = await chamarApi("/api/jogadores", { apelido: campoApelido.value });
     const jogador = resultado.tipo === "ok" ? resultado.dados?.jogador : null;
     if (jogador) {
+      const avatarSalvo = obterAvatarDoUsuario(jogador);
+      if (avatarSalvo) {
+        jogador.avatar = avatarSalvo;
+      }
       guardarJogadorIdentificado(jogador);
       atualizarPerfilNoMenu(jogador);
       await carregarProgressoDoJogador(jogador, resultado.dados.sessao);
@@ -311,6 +437,9 @@
     limparErroApelido();
     telaIdentificacao.classList.remove("escondido");
     mostrarEtapaApelido();
+    if (typeof window.tocarNarracao === "function") {
+      window.tocarNarracao("apelido");
+    }
   }
 
   if (!telaIdentificacao || !formApelido || !campoApelido) {
@@ -357,4 +486,9 @@
 
   window.iniciarIdentificacao = iniciarIdentificacao;
   window.obterJogadorIdentificado = obterJogadorIdentificado;
+  window.guardarJogadorIdentificado = guardarJogadorIdentificado;
+  window.obterAvatarDoUsuario = obterAvatarDoUsuario;
+  window.salvarAvatarDoUsuario = salvarAvatarDoUsuario;
+  window.renderizarElementoAvatar = renderizarElementoAvatar;
+  window.IMAGEM_AVATAR_PADRAO = IMAGEM_AVATAR_PADRAO;
 })();

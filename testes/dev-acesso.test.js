@@ -149,9 +149,10 @@ test("ambiente local: ?dev=true liga o painel sem consultar o servidor", async (
   }
 });
 
-test("ambiente local: indicador já gravado na aba mantém o painel; ?dev=false desliga", async () => {
-  const lembrado = await abrirPagina("http://localhost:3000/", { sessao: { [CHAVE_DEV]: "true" } });
-  assert.ok(painelLigado(lembrado));
+test("ambiente local: acesso sem ?dev=true limpa o indicador e não ativa o painel; ?dev=false desliga", async () => {
+  const semParametro = await abrirPagina("http://localhost:3000/", { sessao: { [CHAVE_DEV]: "true" } });
+  assert.ok(painelDesligado(semParametro));
+  assert.equal(semParametro.indicador(), null);
 
   const desligado = await abrirPagina("http://localhost:3000/?dev=false", { sessao: { [CHAVE_DEV]: "true" } });
   assert.ok(painelDesligado(desligado));
@@ -198,8 +199,8 @@ test("site publicado: servidor indisponível também não liga o painel (falha f
   }
 });
 
-test("site publicado: com sessão administrativa válida no servidor, o painel aparece", async () => {
-  for (const url of ["https://jogo.exemplo.app/", "https://jogo.exemplo.app/fase1.html?mundo=1&fase=1&dev=true"]) {
+test("site publicado: com sessão administrativa válida no servidor, o painel aparece com ?dev=true", async () => {
+  for (const url of ["https://jogo.exemplo.app/?dev=true", "https://jogo.exemplo.app/fase1.html?mundo=1&fase=1&dev=true"]) {
     const pagina = await abrirPagina(url, { sessao: { [CHAVE_DEV]: "true" }, respostaSessao: 200 });
     assert.ok(painelLigado(pagina), url);
     assert.deepEqual(pagina.chamadas, [{ rota: "/api/admin/sessao", metodo: "GET" }]);
@@ -207,7 +208,7 @@ test("site publicado: com sessão administrativa válida no servidor, o painel a
 });
 
 test("site publicado: desativar o modo DEV também encerra a sessão no servidor", async () => {
-  const pagina = await abrirPagina("https://jogo.exemplo.app/?view=mundos", {
+  const pagina = await abrirPagina("https://jogo.exemplo.app/?view=mundos&dev=true", {
     sessao: { [CHAVE_DEV]: "true" },
     respostaSessao: 200,
   });

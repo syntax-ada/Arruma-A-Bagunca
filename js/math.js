@@ -682,6 +682,9 @@ function iniciarDesafioMatematico(dadosQuantidades, operacaoId) {
     const faseAtual = typeof window.obterFaseAtiva === "function" ? window.obterFaseAtiva() : 1;
     if (Number(mundoAtual) === 1 && Number(faseAtual) === 1 && !bossDaFase) {
         iniciarTutorialMatematicaFase1();
+        if (typeof window.tocarNarracao === "function") {
+            window.tocarNarracao("resolverConta");
+        }
     } else {
         removerTutorialMatematicaFase1();
     }
@@ -851,6 +854,9 @@ function verificarRespostaMatematica(valorEscolhido, resultadoCorreto, botaoClic
             return;
         }
 
+        if (typeof window.tocarNarracao === "function") {
+            window.tocarNarracao("acerto");
+        }
         const faseAtual = registrarConclusaoDaFase();
         mostrarFeedbackMatematica(operacao.mensagemSucesso(contaTexto), "success");
         if (tutorialMatematicaFase1Ativo) {
@@ -886,6 +892,9 @@ function verificarRespostaMatematica(valorEscolhido, resultadoCorreto, botaoClic
         if (typeof window.tocarEfeito === "function") {
             window.tocarEfeito("errado");
         }
+        if (typeof window.tocarNarracao === "function") {
+            window.tocarNarracao("erro");
+        }
         botaoClicado.classList.add("is-wrong");
         mostrarFeedbackMatematica("Quase lá! Vamos contar de novo? Tente outra resposta.", "error");
     }
@@ -917,6 +926,8 @@ function registrarConclusaoDaFase() {
         }
     }
 
+    const idDaFase = `${Number(mundoAtual)}-${Number(faseAtual)}`;
+    const antes = typeof obterProgresso === "function" ? obterProgresso() : null;
     if (typeof desbloquearProximaFase === "function") {
         desbloquearProximaFase(faseAtual, mundoAtual, totalFases);
     }
@@ -933,6 +944,36 @@ function registrarConclusaoDaFase() {
         } catch (e) {
             novoMundoDesbloqueadoNestaConclusao = null;
         }
+    }
+
+    const mundoNum = Number(mundoAtual) || 1;
+    const faseNum = Number(faseAtual) || 1;
+    const totalFasesNum = Number(totalFases) || 3;
+    const ehUltimaFase = faseNum >= totalFasesNum;
+    const proximoMundo = novoMundoDesbloqueadoNestaConclusao || (ehUltimaFase ? mundoNum + 1 : null);
+
+    // Salva o estado de transição no encerramento da fase antes do retorno ao menu
+    if (ehUltimaFase && proximoMundo && proximoMundo <= 4) {
+        try {
+            sessionStorage.setItem("mundoDesbloqueadoAnimacao", String(proximoMundo));
+            sessionStorage.setItem("playLockAnimation", "true");
+            sessionStorage.setItem("arruma_bagunca_mundo_concluido", String(mundoNum));
+            sessionStorage.setItem("arruma_bagunca_mundo_desbloqueado_animacao", String(proximoMundo));
+            localStorage.setItem("mundoDesbloqueadoAnimacao", String(proximoMundo));
+            localStorage.setItem("playLockAnimation", "true");
+            localStorage.setItem("arruma_bagunca_mundo_concluido", String(mundoNum));
+            localStorage.setItem("arruma_bagunca_mundo_desbloqueado_animacao", String(proximoMundo));
+        } catch (_) {}
+    }
+    const depois = typeof obterProgresso === "function" ? obterProgresso() : null;
+    const foiRegistradaAgora = !antes?.fasesConcluidas?.includes(idDaFase)
+        && depois?.fasesConcluidas?.includes(idDaFase);
+    const proximaFase = foiRegistradaAgora && window.RegrasProgresso?.proximaFase(depois.fasesConcluidas);
+    if (proximaFase && window.parent !== window) {
+        window.parent.postMessage({
+            tipo: "arruma-bagunca:novo-mapa-desbloqueado",
+            fase: proximaFase,
+        }, "*");
     }
 
     return faseAtual;
@@ -986,7 +1027,20 @@ function exibirBotoesConclusao(faseAtual, hospedeiro) {
         return;
     }
 
-    if (typeof window.tocarEfeito === "function") {
+    const mundoAtualParaConclusao = typeof window.obterMundoAtivo === "function"
+        ? window.obterMundoAtivo()
+        : 1;
+    if (Number(mundoAtualParaConclusao) === 5) {
+        // A fase bônus termina com uma única fala própria: ela interrompe a
+        // narração de acerto anterior e não mistura o aviso genérico.
+        if (typeof window.tocarNarracao === "function") {
+            window.tocarNarracao("faseBonusFinal");
+        }
+    } else if (typeof window.enfileirarNarracoes === "function") {
+        window.enfileirarNarracoes(["faseConcluida"]);
+    }
+
+    if (Number(mundoAtualParaConclusao) !== 5 && typeof window.tocarEfeito === "function") {
         setTimeout(() => {
             window.tocarEfeito("conclusao");
         }, 350);
@@ -1015,6 +1069,7 @@ function exibirBotoesConclusao(faseAtual, hospedeiro) {
         : (typeof window.obterTotalFasesMundoAtivo === "function" ? window.obterTotalFasesMundoAtivo() : 3);
 
     const mundoConcluidoParaTransicao = numeroFase >= totalFases ? mundoAtual : null;
+    const proximoMundoParaAnimacao = mundoConcluidoParaTransicao ? Number(mundoConcluidoParaTransicao) + 1 : null;
 
     // Botão Voltar para o Menu
     const btnMenu = document.createElement("button");
@@ -1029,17 +1084,44 @@ function exibirBotoesConclusao(faseAtual, hospedeiro) {
         if (typeof window.trocarTrilhaFundo === "function") {
             window.trocarTrilhaFundo("menu");
         }
+        try {
+            localStorage.removeItem("playBossCutscene");
+            sessionStorage.removeItem("playBossCutscene");
+            localStorage.removeItem("arruma_bagunca_cutscene_boss");
+            sessionStorage.removeItem("arruma_bagunca_cutscene_boss");
+        } catch (_erro) {}
+        if (typeof window !== "undefined") {
+            window.playBossCutscene = false;
+        }
         if (mundoConcluidoParaTransicao) {
             try {
                 sessionStorage.setItem("arruma_bagunca_mundo_concluido", String(mundoConcluidoParaTransicao));
+                sessionStorage.setItem("mundoDesbloqueadoAnimacao", String(proximoMundoParaAnimacao));
+                sessionStorage.setItem("playLockAnimation", "true");
+                sessionStorage.setItem("arruma_bagunca_mundo_desbloqueado_animacao", String(proximoMundoParaAnimacao));
+                localStorage.setItem("arruma_bagunca_mundo_concluido", String(mundoConcluidoParaTransicao));
+                localStorage.setItem("mundoDesbloqueadoAnimacao", String(proximoMundoParaAnimacao));
+                localStorage.setItem("playLockAnimation", "true");
+                localStorage.setItem("arruma_bagunca_mundo_desbloqueado_animacao", String(proximoMundoParaAnimacao));
             } catch (erro) {}
         } else {
             try {
                 sessionStorage.removeItem("arruma_bagunca_mundo_concluido");
+                sessionStorage.removeItem("mundoDesbloqueadoAnimacao");
+                sessionStorage.removeItem("playLockAnimation");
+                sessionStorage.removeItem("arruma_bagunca_mundo_desbloqueado_animacao");
+                localStorage.removeItem("arruma_bagunca_mundo_concluido");
+                localStorage.removeItem("mundoDesbloqueadoAnimacao");
+                localStorage.removeItem("playLockAnimation");
+                localStorage.removeItem("arruma_bagunca_mundo_desbloqueado_animacao");
             } catch (erro) {}
         }
-        const urlDestino = `index.html?view=mundos${mundoConcluidoParaTransicao ? `&mundoConcluido=${mundoConcluidoParaTransicao}` : ""}`;
-        navegarEntreTelasDoJogo("menu", urlDestino, { mundoConcluido: mundoConcluidoParaTransicao });
+        const urlDestino = `index.html?view=mundos${mundoConcluidoParaTransicao ? `&mundoConcluido=${mundoConcluidoParaTransicao}&mundoDesbloqueadoAnimacao=${proximoMundoParaAnimacao}&playLockAnimation=true` : ""}`;
+        navegarEntreTelasDoJogo("menu", urlDestino, {
+            mundoConcluido: mundoConcluidoParaTransicao,
+            mundoDesbloqueadoAnimacao: proximoMundoParaAnimacao,
+            playLockAnimation: Boolean(mundoConcluidoParaTransicao)
+        });
     });
     containerAcoes.appendChild(btnMenu);
 
