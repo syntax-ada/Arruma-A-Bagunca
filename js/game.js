@@ -3,6 +3,7 @@ let dropZones = [];
 const feedbackMessage = document.querySelector("#feedback-message");
 
 let activeDrag = null;
+let dragRafId = null;
 
 // ==========================================================
 // FUNÇÕES DE RANDOMIZAÇÃO E GERAÇÃO REUTILIZÁVEL DE OBJETOS
@@ -586,19 +587,32 @@ function startDrag(event) {
 
   const itemRect = item.getBoundingClientRect();
 
+  // Cache das posições das cestas para evitar getBoundingClientRect no moveDrag
+  const dropZoneRects = Array.from(dropZones).map((dropZone) => ({
+    dropZone,
+    rect: dropZone.getBoundingClientRect(),
+  }));
+
   // Durante o arraste, o objeto passa a usar a tela toda como referência.
   item.style.position = "fixed";
-  item.style.left = `${itemRect.left}px`;
-  item.style.top = `${itemRect.top}px`;
+  item.style.left = "0px";
+  item.style.top = "0px";
   item.style.width = `${itemRect.width}px`;
   item.style.height = `${itemRect.height}px`;
+  item.style.transform = `translate3d(${itemRect.left}px, ${itemRect.top}px, 0) scale(1.18)`;
 
   activeDrag = {
     item,
     pointerId: event.pointerId,
     // Mantém o centro visual do objeto abaixo do mouse ou toque.
-    shiftX: item.offsetWidth / 2,
-    shiftY: item.offsetHeight / 2,
+    shiftX: itemRect.width / 2,
+    shiftY: itemRect.height / 2,
+    itemWidth: itemRect.width,
+    itemHeight: itemRect.height,
+    dropZoneRects,
+    rafPending: false,
+    lastClientX: event.clientX,
+    lastClientY: event.clientY,
   };
 
   item.setPointerCapture(event.pointerId);
@@ -614,8 +628,22 @@ function moveDrag(event) {
     return;
   }
 
-  moveItemToPointer(activeDrag.item, event.clientX, event.clientY);
-  updateDropZoneHighlight(event.clientX, event.clientY);
+  activeDrag.lastClientX = event.clientX;
+  activeDrag.lastClientY = event.clientY;
+
+  if (activeDrag.rafPending) {
+    return;
+  }
+
+  activeDrag.rafPending = true;
+  dragRafId = requestAnimationFrame(() => {
+    if (!activeDrag || !activeDrag.rafPending) {
+      return;
+    }
+    activeDrag.rafPending = false;
+    moveItemToPointer(activeDrag.item, activeDrag.lastClientX, activeDrag.lastClientY);
+    updateDropZoneHighlight(activeDrag.lastClientX, activeDrag.lastClientY);
+  });
 }
 
 function adicionarItemSobreposto(dropZone, item) {
@@ -667,6 +695,11 @@ function adicionarItemSobreposto(dropZone, item) {
 function finishDrag(event) {
   if (!isCurrentPointer(event)) {
     return;
+  }
+
+  if (dragRafId) {
+    cancelAnimationFrame(dragRafId);
+    dragRafId = null;
   }
 
   const item = activeDrag.item;
@@ -776,6 +809,11 @@ function cancelDrag(event) {
     return;
   }
 
+  if (dragRafId) {
+    cancelAnimationFrame(dragRafId);
+    dragRafId = null;
+  }
+
   const item = activeDrag.item;
 
   item.classList.remove("is-dragging");
@@ -794,13 +832,17 @@ function isCurrentPointer(event) {
 }
 
 function moveItemToPointer(item, clientX, clientY) {
+  const itemWidth = activeDrag?.itemWidth ?? item.offsetWidth;
+  const itemHeight = activeDrag?.itemHeight ?? item.offsetHeight;
   const newLeft = clientX - activeDrag.shiftX;
   const newTop = clientY - activeDrag.shiftY;
-  const maxLeft = window.innerWidth - item.offsetWidth;
-  const maxTop = window.innerHeight - item.offsetHeight;
+  const maxLeft = window.innerWidth - itemWidth;
+  const maxTop = window.innerHeight - itemHeight;
 
-  item.style.left = `${limitNumber(newLeft, 0, maxLeft)}px`;
-  item.style.top = `${limitNumber(newTop, 0, maxTop)}px`;
+  const limitedX = limitNumber(newLeft, 0, maxLeft);
+  const limitedY = limitNumber(newTop, 0, maxTop);
+
+  item.style.transform = `translate3d(${limitedX}px, ${limitedY}px, 0) scale(1.18)`;
 }
 
 function limitNumber(value, min, max) {
@@ -808,6 +850,16 @@ function limitNumber(value, min, max) {
 }
 
 function findDropZoneAtPoint(clientX, clientY) {
+  if (activeDrag && activeDrag.dropZoneRects) {
+    const match = activeDrag.dropZoneRects.find(({ rect }) => (
+      clientX >= rect.left &&
+      clientX <= rect.right &&
+      clientY >= rect.top &&
+      clientY <= rect.bottom
+    ));
+    return match ? match.dropZone : null;
+  }
+
   return Array.from(dropZones).find((dropZone) => {
     const dropZoneRect = dropZone.getBoundingClientRect();
 
@@ -926,10 +978,12 @@ function returnItemToStart(item) {
   item.style.top = "";
   item.style.width = "";
   item.style.height = "";
+  item.style.transform = "";
 }
 
 function restoreItemPositioning(item) {
   item.style.position = "";
+  item.style.transform = "";
 }
 
 function updateDropZoneHighlight(clientX, clientY) {

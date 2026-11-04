@@ -224,6 +224,8 @@
     return null;
   }
 
+  const poolEfeitos = {};
+
   function tocarEfeito(tipoOuCaminho) {
     if (!somJogoAtivo || estaSilenciado() || volumeAtual <= 0) {
       return;
@@ -235,8 +237,13 @@
     }
 
     try {
-      const audioEfeito = new Audio(caminho);
+      let audioEfeito = poolEfeitos[caminho];
+      if (!audioEfeito) {
+        audioEfeito = new Audio(caminho);
+        poolEfeitos[caminho] = audioEfeito;
+      }
       audioEfeito.volume = (volumeAtual / 100) * VOLUME_EFEITO_PADRAO;
+      audioEfeito.currentTime = 0;
       audioEfeito.play().catch(() => {
         // Evita exceção se o navegador suspender reprodução automática antes de interação
       });

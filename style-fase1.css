@@ -315,6 +315,7 @@
     cursor: grabbing;
     z-index: 100;
     transform: scale(1.18);
+    transition: box-shadow 0.15s ease, background-color 0.2s ease, border-color 0.2s ease;
     background: #ffffff;
     border-color: #f2538a;
     box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.95), 0 0 26px rgba(242, 83, 138, 0.95), 0 16px 32px rgba(0, 0, 0, 0.35);
@@ -980,7 +981,8 @@
 
 .drop-zone.is-over {
     transform: scale(1.08);
-    filter: drop-shadow(0 0 22px rgba(255, 255, 255, 0.88)) drop-shadow(0 0 32px rgba(242, 83, 138, 0.88));
+    box-shadow: 0 0 24px rgba(242, 83, 138, 0.85), 0 0 10px rgba(255, 255, 255, 0.9);
+    border-radius: 20px;
 }
 
 .drop-zone:focus-visible {
@@ -2290,7 +2292,8 @@
 .categoria.tutorial-destaque-cesta,
 .cesta-container.tutorial-destaque-cesta {
     z-index: 48;
-    filter: drop-shadow(0 0 22px rgba(255, 255, 255, 0.85)) drop-shadow(0 0 32px rgba(242, 83, 138, 0.85));
+    box-shadow: 0 0 24px rgba(242, 83, 138, 0.85), 0 0 10px rgba(255, 255, 255, 0.9);
+    border-radius: 20px;
 }
 
 .tutorial-balao-fase {

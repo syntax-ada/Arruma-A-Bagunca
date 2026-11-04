@@ -144,6 +144,7 @@ function exibirComemoracaoTutorialMatematica(aoConcluir) {
 
 function exibirComemoracaoAcertoMatematica(mensagem, aoConcluir) {
     const telaMatematica = document.querySelector("#tela-matematica") || document.body;
+    const fragmento = document.createDocumentFragment();
 
     const banner = document.createElement("div");
     banner.className = "banner-comemoracao-acerto";
@@ -186,8 +187,9 @@ function exibirComemoracaoAcertoMatematica(mensagem, aoConcluir) {
         fogos.appendChild(estouro);
     });
 
-    telaMatematica.appendChild(fogos);
-    telaMatematica.appendChild(banner);
+    fragmento.appendChild(fogos);
+    fragmento.appendChild(banner);
+    telaMatematica.appendChild(fragmento);
 
     if (typeof window.tocarEfeito === "function") {
         window.tocarEfeito("certo");
