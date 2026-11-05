@@ -16,6 +16,36 @@
     faseConcluida: "assets/audio/Efeitos/Efeitos - FaseConcluida.wav",
   };
 
+  // Narrações curtas usadas para orientar e incentivar a criança. Elas são
+  // mantidas separadas dos efeitos: só uma narração pode tocar por vez, mesmo
+  // quando a fase está dentro do iframe do menu.
+  const NARRACOES = {
+    acerto: [
+      "assets/audio/Narração/Acerto1.mp3",
+      "assets/audio/Narração/Acerto2.mp3",
+      "assets/audio/Narração/Acerto3.mp3",
+      "assets/audio/Narração/Acerto4.mp3",
+    ],
+    erro: [
+      "assets/audio/Narração/Erro1.mp3",
+      "assets/audio/Narração/Erro2.mp3",
+    ],
+    faseBonusInicio: "assets/audio/Narração/FaseBonusInicio.mp3",
+    faseBonusFinal: "assets/audio/Narração/FaseBonusFinal.mp3",
+    faseConcluida: [
+      "assets/audio/Narração/FaseConcluida1.mp3",
+      "assets/audio/Narração/FaseConcluida2.mp3",
+    ],
+    novoMapa: [
+      "assets/audio/Narração/NovoMapaDesbloqueado1.mp3",
+      "assets/audio/Narração/NovoMapaDesbloqueado2.mp3",
+    ],
+    organizarObjetos: "assets/audio/Narração/OrganizarObjetos.mp3",
+    resolverConta: "assets/audio/Narração/ResolverConta.mp3",
+    telaDeFases: "assets/audio/Narração/TelaDeFases.mp3",
+    apelido: "assets/audio/Narração/Apelido.mp3",
+  };
+
   const TRILHAS_MUNDOS = {
     menu: "assets/audio/Mundos/Menu Principal.mp3",
     principal: "assets/audio/Mundos/Menu Principal.mp3",
@@ -40,11 +70,16 @@
 
   const CHAVE_SESSAO = "arruma_bagunca_trilha";
   const CHAVE_VOLUME_LOCAL = "arruma_bagunca_volume";
+  const CHAVE_MUSICA_LOCAL = "arruma_bagunca_musica";
+  const CHAVE_SOM_JOGO_LOCAL = "arruma_bagunca_som_jogo";
+  const CHAVE_NARRACOES_LOCAL = "arruma_bagunca_audio_descricao";
   const VOLUME_TRILHA_PADRAO = 0.25; // Volume entre 20% e 30% para não sobrepor efeitos
   const VOLUME_EFEITO_PADRAO = 1.0;  // Efeitos sonoros em volume normal
 
   let silenciadoIframe = false;
   let audio;
+  let audioNarracao;
+  let filaNarracoes = [];
   let interacaoOcorreu = false;
   let metadadosCarregados = false;
   let reproducaoPendente = false;
@@ -84,8 +119,54 @@
     return ICONES_VOLUME.mudo;
   }
 
+  function lerMusicaAtiva() {
+    try {
+      const salvo = window.localStorage.getItem(CHAVE_MUSICA_LOCAL);
+      return salvo === null ? true : salvo === "true";
+    } catch (erro) {
+      return true;
+    }
+  }
+
+  function lerSomJogoAtivo() {
+    try {
+      const salvo = window.localStorage.getItem(CHAVE_SOM_JOGO_LOCAL);
+      return salvo === null ? true : salvo === "true";
+    } catch (erro) {
+      return true;
+    }
+  }
+
   let volumeAtual = lerVolumeSalvo();
   let volumeAnterior = volumeAtual > 0 ? volumeAtual : 100;
+  let musicaAtiva = lerMusicaAtiva();
+  let somJogoAtivo = lerSomJogoAtivo();
+  let narracoesAtivas = lerNarracoesAtivas();
+
+  function lerNarracoesAtivas() {
+    try {
+      const salvo = window.localStorage.getItem(CHAVE_NARRACOES_LOCAL);
+      return salvo === null ? true : salvo === "true";
+    } catch (erro) {
+      return true;
+    }
+  }
+
+  function interromperNarracoes() {
+    filaNarracoes = [];
+    if (audioNarracao) {
+      audioNarracao.pause();
+      audioNarracao.currentTime = 0;
+      audioNarracao = null;
+    }
+  }
+
+  function definirNarracoesAtivasNoTopo(ativo) {
+    narracoesAtivas = Boolean(ativo);
+    if (!narracoesAtivas) {
+      interromperNarracoes();
+    }
+  }
 
   function lerEstadoSessao() {
     try {
@@ -143,8 +224,10 @@
     return null;
   }
 
+  const poolEfeitos = {};
+
   function tocarEfeito(tipoOuCaminho) {
-    if (estaSilenciado() || volumeAtual <= 0) {
+    if (!somJogoAtivo || estaSilenciado() || volumeAtual <= 0) {
       return;
     }
 
@@ -154,14 +237,124 @@
     }
 
     try {
-      const audioEfeito = new Audio(caminho);
+      let audioEfeito = poolEfeitos[caminho];
+      if (!audioEfeito) {
+        audioEfeito = new Audio(caminho);
+        poolEfeitos[caminho] = audioEfeito;
+      }
       audioEfeito.volume = (volumeAtual / 100) * VOLUME_EFEITO_PADRAO;
+      audioEfeito.currentTime = 0;
       audioEfeito.play().catch(() => {
         // Evita exceção se o navegador suspender reprodução automática antes de interação
       });
     } catch (erro) {
       // Tratamento defensivo
     }
+  }
+
+  function resolverNarracao(chave) {
+    const opcoes = NARRACOES[chave];
+    if (Array.isArray(opcoes)) {
+      return opcoes[Math.floor(Math.random() * opcoes.length)];
+    }
+    return typeof opcoes === "string" ? opcoes : null;
+  }
+
+  function iniciarProximaNarracao() {
+    const chave = filaNarracoes.shift();
+    if (!chave || !narracoesAtivas || estaSilenciado() || volumeAtual <= 0) {
+      audioNarracao = null;
+      return;
+    }
+
+    const caminho = resolverNarracao(chave);
+    if (!caminho) {
+      iniciarProximaNarracao();
+      return;
+    }
+
+    try {
+      audioNarracao = new Audio(caminho);
+      audioNarracao.preload = "auto";
+      audioNarracao.volume = (volumeAtual / 100) * VOLUME_EFEITO_PADRAO;
+      audioNarracao.addEventListener("ended", () => {
+        audioNarracao = null;
+        iniciarProximaNarracao();
+      }, { once: true });
+      audioNarracao.play().catch(() => {
+        // A primeira interação do jogo libera a reprodução nos navegadores.
+      });
+    } catch (erro) {
+      audioNarracao = null;
+      iniciarProximaNarracao();
+    }
+  }
+
+  function tocarNarracaoNoTopo(chave) {
+    if (!narracoesAtivas || estaSilenciado() || volumeAtual <= 0) {
+      return;
+    }
+
+    try {
+      // Interromper a fala anterior é intencional: a instrução mais recente é
+      // a única relevante e duas vozes simultâneas confundem a criança.
+      if (audioNarracao) {
+        audioNarracao.pause();
+        audioNarracao.currentTime = 0;
+      }
+      audioNarracao = null;
+      filaNarracoes = [chave];
+      iniciarProximaNarracao();
+    } catch (erro) {
+      // A falta de um arquivo de narração não impede o jogo de continuar.
+    }
+  }
+
+  function enfileirarNarracoesNoTopo(chaves) {
+    if (!narracoesAtivas || estaSilenciado() || volumeAtual <= 0) {
+      return;
+    }
+    const novas = (Array.isArray(chaves) ? chaves : [chaves]).filter((chave) => resolverNarracao(chave));
+    if (novas.length === 0) {
+      return;
+    }
+    filaNarracoes.push(...novas);
+    if (!audioNarracao) {
+      iniciarProximaNarracao();
+    }
+  }
+
+  function tocarNarracao(chave) {
+    if (window.parent !== window) {
+      window.parent.postMessage({
+        tipo: "arruma-bagunca:tocar-narracao",
+        narracao: chave,
+      }, "*");
+      return;
+    }
+    tocarNarracaoNoTopo(chave);
+  }
+
+  function enfileirarNarracoes(chaves) {
+    if (window.parent !== window) {
+      window.parent.postMessage({
+        tipo: "arruma-bagunca:enfileirar-narracoes",
+        narracoes: chaves,
+      }, "*");
+      return;
+    }
+    enfileirarNarracoesNoTopo(chaves);
+  }
+
+  function definirNarracoesAtivas(ativo) {
+    if (window.parent !== window) {
+      window.parent.postMessage({
+        tipo: "arruma-bagunca:definir-narracoes",
+        ativas: Boolean(ativo),
+      }, "*");
+      return;
+    }
+    definirNarracoesAtivasNoTopo(ativo);
   }
 
   function resolverCaminhoTrilha(origem) {
@@ -203,8 +396,33 @@
 
   window.tocarEfeito = tocarEfeito;
   window.tocarEfeitoSonoro = tocarEfeito;
+  window.tocarNarracao = tocarNarracao;
+  window.enfileirarNarracoes = enfileirarNarracoes;
+  window.definirNarracoesAtivas = definirNarracoesAtivas;
   window.trocarTrilhaFundo = trocarTrilhaFundo;
+  function pausarTrilhaFundo() {
+    if (window.parent !== window) {
+      window.parent.postMessage({
+        tipo: "arruma-bagunca:pausar-trilha",
+      }, "*");
+      return;
+    }
+    if (audio && !audio.paused) {
+      audio.pause();
+    }
+  }
+
   window.trocarTrilha = trocarTrilhaFundo;
+  window.pausarTrilhaFundo = pausarTrilhaFundo;
+  window.definirMusicaAtiva = definirMusicaAtiva;
+  window.obterMusicaAtiva = () => musicaAtiva;
+  window.definirSomJogoAtivo = definirSomJogoAtivo;
+  window.obterSomJogoAtivo = () => somJogoAtivo;
+  window.definirEfeitosAtivos = definirSomJogoAtivo;
+  window.obterEfeitosAtivos = () => somJogoAtivo;
+  window.isSfxEnabled = () => somJogoAtivo;
+  window.isMusicEnabled = () => musicaAtiva;
+  window.aplicarVolume = aplicarVolume;
 
   function atualizarVisualElementos(v) {
     const iconeSrc = resolverIconeVolume(v);
@@ -229,10 +447,94 @@
     document.querySelectorAll("[data-controle-som]").forEach((elem) => {
       elem.setAttribute("aria-pressed", String(v === 0));
     });
+
+    // Sincroniza o switch "Som do jogo" do modal de configurações (estritamente SFX)
+    const toggleSomJogo = document.querySelector("#toggle-som-jogo");
+    if (toggleSomJogo) {
+      toggleSomJogo.classList.toggle("ativo", somJogoAtivo);
+      toggleSomJogo.setAttribute("aria-checked", String(somJogoAtivo));
+    }
+
+    // Sincroniza o switch "Música" do modal de configurações (estritamente BGM)
+    const toggleMusica = document.querySelector("#toggle-musica");
+    if (toggleMusica) {
+      toggleMusica.classList.toggle("ativo", musicaAtiva);
+      toggleMusica.setAttribute("aria-checked", String(musicaAtiva));
+    }
+  }
+
+  function definirSomJogoAtivoNoTopo(ativo) {
+    somJogoAtivo = Boolean(ativo);
+    try {
+      window.localStorage.setItem(CHAVE_SOM_JOGO_LOCAL, String(somJogoAtivo));
+    } catch (erro) {}
+
+    const faseIncorporada = document.querySelector("#conteudo-fase");
+    if (faseIncorporada && faseIncorporada.contentWindow) {
+      faseIncorporada.contentWindow.postMessage({
+        tipo: "arruma-bagunca:estado-som-jogo",
+        ativo: somJogoAtivo,
+      }, "*");
+    }
+
+    atualizarVisualElementos(volumeAtual);
+  }
+
+  function definirSomJogoAtivo(ativo) {
+    if (window.parent !== window) {
+      somJogoAtivo = Boolean(ativo);
+      try {
+        window.localStorage.setItem(CHAVE_SOM_JOGO_LOCAL, String(somJogoAtivo));
+      } catch (erro) {}
+      atualizarVisualElementos(volumeAtual);
+      window.parent.postMessage({
+        tipo: "arruma-bagunca:definir-som-jogo",
+        ativo: Boolean(ativo),
+      }, "*");
+      return;
+    }
+    definirSomJogoAtivoNoTopo(ativo);
+  }
+
+  function definirMusicaAtivaNoTopo(ativo) {
+    musicaAtiva = Boolean(ativo);
+    try {
+      window.localStorage.setItem(CHAVE_MUSICA_LOCAL, String(musicaAtiva));
+    } catch (erro) {}
+
+    if (audio) {
+      if (!musicaAtiva) {
+        audio.pause();
+      } else if (!estaSilenciado() && volumeAtual > 0 && (interacaoOcorreu || !reproducaoPendente)) {
+        tocar();
+      }
+      salvarEstado();
+    }
+
+    atualizarVisualElementos(volumeAtual);
+  }
+
+  function definirMusicaAtiva(ativo) {
+    if (window.parent !== window) {
+      window.parent.postMessage({
+        tipo: "arruma-bagunca:definir-musica",
+        ativa: Boolean(ativo),
+      }, "*");
+      return;
+    }
+    definirMusicaAtivaNoTopo(ativo);
   }
 
   function aplicarVolume(novoValor, salvar = true, notificarIframe = true) {
     const v = Math.max(0, Math.min(100, Math.round(Number(novoValor) || 0)));
+    const aumentouVolume = v > volumeAtual;
+
+    // Se o toggle "Som do jogo" (SFX) estiver desligado e o jogador aumentar o volume pelo slider global,
+    // reativa automaticamente o toggle "Som do jogo". A "Música" mantém seu estado independente.
+    if (interagindoComSlider && aumentouVolume && !somJogoAtivo) {
+      definirSomJogoAtivo(true);
+    }
+
     volumeAtual = v;
     if (v > 0) {
       volumeAnterior = v;
@@ -261,11 +563,15 @@
       } else {
         audio.muted = false;
         audio.volume = (v / 100) * VOLUME_TRILHA_PADRAO;
-        if (audio.paused && (interacaoOcorreu || !reproducaoPendente)) {
+        if (musicaAtiva && audio.paused && (interacaoOcorreu || !reproducaoPendente)) {
           tocar();
         }
       }
       salvarEstado();
+    }
+    if (audioNarracao) {
+      audioNarracao.muted = v === 0;
+      audioNarracao.volume = (v / 100) * VOLUME_EFEITO_PADRAO;
     }
 
     // Notifica iframe filho se estiver ativo (apenas quando notificarIframe for true)
@@ -343,6 +649,7 @@
           if (rect.height <= 0) return;
           const pct = 1 - ((e.clientY - rect.top) / rect.height);
           const val = Math.max(0, Math.min(100, Math.round(pct * 100)));
+          interagindoComSlider = true;
           slider.value = val;
           aplicarVolume(val, true);
         }
@@ -490,6 +797,15 @@
         aplicarVolume(num, false);
       }
     }
+    if (evento.key === CHAVE_NARRACOES_LOCAL) {
+      definirNarracoesAtivasNoTopo(evento.newValue === "true");
+    }
+    if (evento.key === CHAVE_SOM_JOGO_LOCAL) {
+      definirSomJogoAtivoNoTopo(evento.newValue === "true");
+    }
+    if (evento.key === CHAVE_MUSICA_LOCAL) {
+      definirMusicaAtivaNoTopo(evento.newValue === "true");
+    }
   });
 
   // Quando a fase é exibida dentro do menu (iframe), o áudio principal
@@ -524,11 +840,15 @@
             aplicarVolume(volumeAnterior > 0 ? volumeAnterior : 100, false);
           }
         }
+      } else if (tipo === "arruma-bagunca:estado-som-jogo") {
+        somJogoAtivo = Boolean(evento.data.ativo);
+        atualizarVisualElementos(volumeAtual);
       }
     });
 
     window.parent.postMessage({ tipo: "arruma-bagunca:solicitar-estado-volume" }, "*");
     window.parent.postMessage({ tipo: "arruma-bagunca:solicitar-estado-som" }, "*");
+    window.parent.postMessage({ tipo: "arruma-bagunca:solicitar-estado-som-jogo" }, "*");
     return;
   }
 
@@ -556,7 +876,7 @@
   }
 
   function tocar() {
-    if (audio.muted) {
+    if (audio.muted || !musicaAtiva) {
       return;
     }
 
@@ -582,7 +902,7 @@
       audio.currentTime = estado.tempo;
     }
 
-    if ((estado.tocando || reproducaoPendente) && !audio.muted) {
+    if ((estado.tocando || reproducaoPendente) && !audio.muted && musicaAtiva) {
       reproducaoPendente = false;
       tocar();
     }
@@ -590,7 +910,7 @@
 
   function registrarInteracao() {
     interacaoOcorreu = true;
-    if (!audio.muted && (reproducaoPendente || audio.paused)) {
+    if (!audio.muted && musicaAtiva && (reproducaoPendente || audio.paused)) {
       tocar();
     }
   }
@@ -607,7 +927,7 @@
 
     if (mesmaTrilha) {
       trilhaAtual = caminho;
-      if (!audio.muted && audio.paused && (interacaoOcorreu || !reproducaoPendente)) {
+      if (!audio.muted && musicaAtiva && audio.paused && (interacaoOcorreu || !reproducaoPendente)) {
         tocar();
       }
       return;
@@ -619,7 +939,7 @@
     audio.currentTime = 0;
     salvarEstado();
 
-    if (!audio.muted) {
+    if (!audio.muted && musicaAtiva) {
       if (interacaoOcorreu) {
         tocar();
       } else {
@@ -675,6 +995,39 @@
 
       if (tipo === "arruma-bagunca:trocar-trilha") {
         trocarTrilhaFundoNoTopo(evento.data.trilha);
+      }
+
+      if (tipo === "arruma-bagunca:pausar-trilha") {
+        if (audio && !audio.paused) {
+          audio.pause();
+        }
+      }
+
+      if (tipo === "arruma-bagunca:tocar-narracao") {
+        tocarNarracaoNoTopo(evento.data.narracao);
+      }
+
+      if (tipo === "arruma-bagunca:enfileirar-narracoes") {
+        enfileirarNarracoesNoTopo(evento.data.narracoes);
+      }
+
+      if (tipo === "arruma-bagunca:definir-narracoes") {
+        definirNarracoesAtivasNoTopo(evento.data.ativas);
+      }
+
+      if (tipo === "arruma-bagunca:definir-musica") {
+        definirMusicaAtivaNoTopo(evento.data.ativa);
+      }
+
+      if (tipo === "arruma-bagunca:definir-som-jogo") {
+        definirSomJogoAtivoNoTopo(evento.data.ativo);
+      }
+
+      if (tipo === "arruma-bagunca:solicitar-estado-som-jogo") {
+        evento.source?.postMessage({
+          tipo: "arruma-bagunca:estado-som-jogo",
+          ativo: somJogoAtivo,
+        }, "*");
       }
 
       if (tipo === "arruma-bagunca:solicitar-estado-som") {

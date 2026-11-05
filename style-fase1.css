@@ -55,6 +55,33 @@
     .btn-voltar-fase img {
         width: 46px;
     }
+
+    /* Nos Mundos 1 ao 4, o botão voltar tem área de toque e tamanho ampliados no mobile */
+    body:not(.mundo-5) .btn-voltar-fase,
+    .pagina-fase1:not(.mundo-5) .btn-voltar-fase {
+        top: 12px;
+        left: 10px;
+        padding: 4px;
+        min-width: 64px;
+        min-height: 48px;
+    }
+
+    body:not(.mundo-5) .btn-voltar-fase img,
+    .pagina-fase1:not(.mundo-5) .btn-voltar-fase img {
+        width: clamp(68px, 17vw, 84px);
+    }
+
+    body.alto-contraste:not(.mundo-5) .btn-voltar-fase {
+        top: 12px !important;
+        left: 10px !important;
+        padding: 4px !important;
+        min-width: 64px !important;
+        min-height: 48px !important;
+    }
+
+    body.alto-contraste:not(.mundo-5) .btn-voltar-fase img {
+        width: clamp(68px, 17vw, 84px) !important;
+    }
 }
 
 .btn-som-fase {
@@ -128,6 +155,22 @@
 
     .btn-som-fase .volume-slider {
         margin-top: 28px;
+    }
+
+    /* Nos Mundos 1 ao 4, o slider de volume expande para o LADO (horizontalmente) em vez de para baixo */
+    body:not(.mundo-5) .btn-som-fase .volume-slider,
+    body:not(.mundo-5) #volume-container-fase .volume-slider,
+    .pagina-fase1:not(.mundo-5) .btn-som-fase .volume-slider {
+        top: 50%;
+        bottom: auto;
+        right: calc(100% + 10px);
+        left: auto;
+        margin-top: 0;
+        margin-bottom: 0;
+        width: 100px;
+        height: 28px;
+        transform: translateY(-50%);
+        transform-origin: right center;
     }
 }
 
@@ -271,10 +314,22 @@
 .draggable-item.is-dragging {
     cursor: grabbing;
     z-index: 100;
-    transform: scale(1.15);
-    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.28);
-    background: rgba(255, 255, 255, 0.98);
-    border-color: #24577a;
+    transform: scale(1.18);
+    transition: box-shadow 0.15s ease, background-color 0.2s ease, border-color 0.2s ease;
+    background: #ffffff;
+    border-color: #f2538a;
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.95), 0 0 26px rgba(242, 83, 138, 0.95), 0 16px 32px rgba(0, 0, 0, 0.35);
+}
+
+.draggable-item:hover:not(.is-correct) {
+    border-color: #f2538a;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.85), 0 0 16px rgba(242, 83, 138, 0.65);
+}
+
+.draggable-item:active:not(.is-correct) {
+    border-color: #f2538a;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.95), 0 0 22px rgba(242, 83, 138, 0.9);
+    transform: scale(1.08);
 }
 
 .draggable-item.is-correct {
@@ -397,20 +452,26 @@
     height: 20.2%;
 }
 
-/* Cesta Comidas específica do Mundo 1 */
+/* Cesta Comidas específica dos Mundos 1 e 5 */
 .mundo-1 .cesta-comidas .contador-itens,
 .mundo-1 #cesta-comidas .contador-itens,
-.mundo-1 [data-accepts="comidas"] .contador-itens {
+.mundo-1 [data-accepts="comidas"] .contador-itens,
+.mundo-5 .cesta-comidas .contador-itens,
+.mundo-5 #cesta-comidas .contador-itens,
+.mundo-5 [data-accepts="comidas"] .contador-itens {
     top: 0%;
     right: 0%;
     width: 22%;
     height: 26.2%;
 }
 
-/* Cesta Brinquedos Padrão (Mundo 1) */
+/* Cesta Brinquedos Padrão (Mundos 1 e 5) */
 .cesta-brinquedos .contador-itens,
 #cesta-brinquedos .contador-itens,
-[data-accepts="brinquedos"] .contador-itens {
+[data-accepts="brinquedos"] .contador-itens,
+.mundo-5 .cesta-brinquedos .contador-itens,
+.mundo-5 #cesta-brinquedos .contador-itens,
+.mundo-5 [data-accepts="brinquedos"] .contador-itens {
     top: 0%;
     right: 1%;
     width: 19.3%;
@@ -427,13 +488,10 @@
     height: 19.5%;
 }
 
-/* Cesta Brinquedos (Mundos 3 e 5 - Praia/Desafio Final) */
+/* Cesta Brinquedos (Mundo 3 - Praia) */
 .mundo-3 .cesta-brinquedos .contador-itens,
 .mundo-3 #cesta-brinquedos .contador-itens,
-.mundo-3 [data-accepts="brinquedos"] .contador-itens,
-.mundo-5 .cesta-brinquedos .contador-itens,
-.mundo-5 #cesta-brinquedos .contador-itens,
-.mundo-5 [data-accepts="brinquedos"] .contador-itens {
+.mundo-3 [data-accepts="brinquedos"] .contador-itens {
     top: 2.8%;
     right: 3.7%;
     width: 21.6%;
@@ -481,7 +539,7 @@
     align-items: flex-end;
     gap: -4px;
     pointer-events: none;
-    z-index: 1;
+    z-index: 2;
     overflow: hidden;
 }
 
@@ -548,26 +606,35 @@
 }
 
 /* 1.1. Mochila (Mundo 4) — ativa sobreposição física e efeito de profundidade */
+.mundo-4 .cesta-mochila .cesta-img,
+.mundo-4 #cesta-mochila .cesta-img,
+.mundo-4 [data-accepts="mochila"] .cesta-img {
+    position: relative;
+    z-index: 2;
+}
+
 .mundo-4 .cesta-mochila .itens-sobrepostos,
 .mundo-4 #cesta-mochila .itens-sobrepostos,
 .mundo-4 [data-accepts="mochila"] .itens-sobrepostos {
     display: flex;
-    top: 14%;
-    left: 14%;
-    width: 62%;
-    height: 25%;
+    top: -20%;
+    left: 12%;
+    width: 60%;
+    height: 30%;
     overflow: hidden;
     align-items: flex-end;
     justify-content: center;
+    z-index: 1;
 }
 
 .mundo-4 .cesta-mochila .itens-sobrepostos img,
 .mundo-4 .cesta-mochila .itens-sobrepostos .item-sobreposto {
-    transform: translateY(15%) scale(1.05);
-    margin: 0 2px;
+    transform: translateY(2%) scale(1.18);
+    margin: 0 -2px;
+    clip-path: inset(0 0 30% 0);
 }
 
-/* 2. Cestas de Vime com Alça (Brinquedos do M2) */
+/* 2. Cestas de Vime com Alça (Comidas e Brinquedos do M2) */
 .cesta-comidas .itens-sobrepostos,
 .cesta-comida .itens-sobrepostos,
 .cesta-brinquedos-mundo2 .itens-sobrepostos,
@@ -602,8 +669,8 @@
 .mundo-4 [data-accepts="comida"] .itens-sobrepostos,
 .mundo-4 [data-accepts="comidas"] .itens-sobrepostos,
 .cesta-comida-mundo4 .itens-sobrepostos {
-    top: 15%;
-    left: 12%;
+    top: 20%;
+    left: 15%;
     width: 64%;
     height: 23%;
     overflow: hidden;
@@ -621,15 +688,15 @@
 .mundo-4 [data-accepts="comidas"] .itens-sobrepostos .item-sobreposto,
 .cesta-comida-mundo4 .itens-sobrepostos .item-sobreposto {
     transform: translateY(16%) scale(1.02);
-    margin: 0 1px;
+    margin: 0 -5px;
+    clip-path: none;
 }
 
 /* 3. Cestas do Estilo Mundo 1 (Comida, Brinquedos, Materiais) */
 .mundo-1 .itens-sobrepostos,
 .mundo-2 .cesta-comida .itens-sobrepostos,
 .mundo-2 [data-accepts="comida"] .itens-sobrepostos,
-.mundo-5 .cesta-comidas .itens-sobrepostos,
-.mundo-5 .cesta-materiais .itens-sobrepostos,
+.mundo-5 .itens-sobrepostos,
 .cesta-materiais .itens-sobrepostos,
 #cesta-materiais .itens-sobrepostos,
 [data-accepts="materiais"] .itens-sobrepostos {
@@ -639,27 +706,31 @@
     height: 22%;
     overflow: hidden;
     align-items: flex-end;
+    z-index: 2;
 }
+
 
 /* 3.0. Cesta de Comidas / Piquenique (Mundo 3) — centralizada no vão da alça e assentada no tecido xadrez */
 .mundo-3 .cesta-comidas .itens-sobrepostos,
 .mundo-3 #cesta-comidas .itens-sobrepostos,
 .mundo-3 [data-accepts="comidas"] .itens-sobrepostos {
-    top: 15%;
-    left: 12%;
+    top: 20%;
+    left: 15%;
     width: 64%;
     height: 23%;
     overflow: hidden;
     align-items: flex-end;
 }
 
+.mundo-3 .cesta-comidas .itens-sobrepostos img,
+.mundo-3 .cesta-comidas .itens-sobrepostos .item-sobreposto {
+    transform: translateY(16%) scale(1.02);
+    margin: 0 -5px;
+    clip-path: none;
+}
+
 .mundo-1 .itens-sobrepostos img,
 .mundo-1 .itens-sobrepostos .item-sobreposto,
-.mundo-2 .cesta-comida .itens-sobrepostos img,
-.mundo-3 .cesta-comidas .itens-sobrepostos img,
-.mundo-3 .cesta-comidas .itens-sobrepostos .item-sobreposto,
-.mundo-5 .cesta-comidas .itens-sobrepostos img,
-.mundo-5 .cesta-materiais .itens-sobrepostos img,
 .cesta-materiais .itens-sobrepostos img,
 .cesta-materiais .itens-sobrepostos .item-sobreposto,
 #cesta-materiais .itens-sobrepostos img,
@@ -667,13 +738,7 @@
     transform: translateY(18%) scale(1);
 }
 
-.mundo-3 .cesta-comidas .itens-sobrepostos img,
-.mundo-3 .cesta-comidas .itens-sobrepostos .item-sobreposto {
-    transform: translateY(16%) scale(1.02);
-    margin: 0 1px;
-}
-
-/* 3.1. Cesta de Brinquedos (Mundo 1) — eleva sutilmente os brinquedos mantendo o recorte na borda frontal */
+/* 3.1. Cesta de Brinquedos (Mundos 1 e 5) — eleva sutilmente os brinquedos mantendo o recorte na borda frontal */
 .mundo-1 .itens-sobrepostos,
 .mundo-1 .cesta-brinquedos .itens-sobrepostos,
 .mundo-1 #cesta-brinquedos .itens-sobrepostos,
@@ -683,9 +748,17 @@
 .mundo-1 [data-accepts="comidas"] .itens-sobrepostos,
 .mundo-1 .cesta-materiais .itens-sobrepostos,
 .mundo-1 #cesta-materiais .itens-sobrepostos,
-.mundo-1 [data-accepts="materiais"] .itens-sobrepostos {
+.mundo-1 [data-accepts="materiais"] .itens-sobrepostos,
+.mundo-5 .cesta-brinquedos .itens-sobrepostos,
+.mundo-5 #cesta-brinquedos .itens-sobrepostos,
+.mundo-5 [data-accepts="brinquedos"] .itens-sobrepostos {
     top: 6%;
+    left: 18%;
+    width: 64%;
     height: 24%;
+    overflow: hidden;
+    align-items: flex-end;
+    justify-content: center;
 }
 
 .mundo-1 .cesta-brinquedos .itens-sobrepostos img,
@@ -693,7 +766,13 @@
 .mundo-1 #cesta-brinquedos .itens-sobrepostos img,
 .mundo-1 #cesta-brinquedos .itens-sobrepostos .item-sobreposto,
 .mundo-1 [data-accepts="brinquedos"] .itens-sobrepostos img,
-.mundo-1 [data-accepts="brinquedos"] .itens-sobrepostos .item-sobreposto {
+.mundo-1 [data-accepts="brinquedos"] .itens-sobrepostos .item-sobreposto,
+.mundo-5 .cesta-brinquedos .itens-sobrepostos img,
+.mundo-5 .cesta-brinquedos .itens-sobrepostos .item-sobreposto,
+.mundo-5 #cesta-brinquedos .itens-sobrepostos img,
+.mundo-5 #cesta-brinquedos .itens-sobrepostos .item-sobreposto,
+.mundo-5 [data-accepts="brinquedos"] .itens-sobrepostos img,
+.mundo-5 [data-accepts="brinquedos"] .itens-sobrepostos .item-sobreposto {
     transform: translateY(8%) scale(1);
     clip-path: inset(0 0 40% 0);
 }
@@ -717,10 +796,13 @@
     clip-path: inset(0 0 40% 0);
 }
 
-/* 3.3. Ajuste Fino — Cesta de Comida (Mundo 1): grupo levemente mais alto e à esquerda + banana na vertical */
+/* 3.3. Ajuste Fino — Cesta de Comida (Mundos 1 e 5): grupo levemente mais alto e à esquerda + banana na vertical */
 .mundo-1 .cesta-comidas .itens-sobrepostos,
 .mundo-1 #cesta-comidas .itens-sobrepostos,
-.mundo-1 [data-accepts="comidas"] .itens-sobrepostos {
+.mundo-1 [data-accepts="comidas"] .itens-sobrepostos,
+.mundo-5 .cesta-comidas .itens-sobrepostos,
+.mundo-5 #cesta-comidas .itens-sobrepostos,
+.mundo-5 [data-accepts="comidas"] .itens-sobrepostos {
     top: 4%;
     left: 14%;
     height: 24%;
@@ -731,7 +813,13 @@
 .mundo-1 #cesta-comidas .itens-sobrepostos img,
 .mundo-1 #cesta-comidas .itens-sobrepostos .item-sobreposto,
 .mundo-1 [data-accepts="comidas"] .itens-sobrepostos img,
-.mundo-1 [data-accepts="comidas"] .itens-sobrepostos .item-sobreposto {
+.mundo-1 [data-accepts="comidas"] .itens-sobrepostos .item-sobreposto,
+.mundo-5 .cesta-comidas .itens-sobrepostos img,
+.mundo-5 .cesta-comidas .itens-sobrepostos .item-sobreposto,
+.mundo-5 #cesta-comidas .itens-sobrepostos img,
+.mundo-5 #cesta-comidas .itens-sobrepostos .item-sobreposto,
+.mundo-5 [data-accepts="comidas"] .itens-sobrepostos img,
+.mundo-5 [data-accepts="comidas"] .itens-sobrepostos .item-sobreposto {
     transform: translateY(3%) scale(1);
     clip-path: inset(0 0 40% 0);
 }
@@ -744,14 +832,26 @@
 .mundo-1 [data-accepts="comidas"] .itens-sobrepostos img[src*="maca"],
 .mundo-1 .cesta-comidas .itens-sobrepostos img[src*="pera"],
 .mundo-1 #cesta-comidas .itens-sobrepostos img[src*="pera"],
-.mundo-1 [data-accepts="comidas"] .itens-sobrepostos img[src*="pera"] {
+.mundo-1 [data-accepts="comidas"] .itens-sobrepostos img[src*="pera"],
+.mundo-5 .cesta-comidas .itens-sobrepostos img[src*="maça"],
+.mundo-5 #cesta-comidas .itens-sobrepostos img[src*="maça"],
+.mundo-5 [data-accepts="comidas"] .itens-sobrepostos img[src*="maça"],
+.mundo-5 .cesta-comidas .itens-sobrepostos img[src*="maca"],
+.mundo-5 #cesta-comidas .itens-sobrepostos img[src*="maca"],
+.mundo-5 [data-accepts="comidas"] .itens-sobrepostos img[src*="maca"],
+.mundo-5 .cesta-comidas .itens-sobrepostos img[src*="pera"],
+.mundo-5 #cesta-comidas .itens-sobrepostos img[src*="pera"],
+.mundo-5 [data-accepts="comidas"] .itens-sobrepostos img[src*="pera"] {
     transform: translateY(3%) scale(1.02);
     clip-path: inset(0 0 40% 0);
 }
 
 .mundo-1 .cesta-comidas .itens-sobrepostos img[src*="banana"],
 .mundo-1 #cesta-comidas .itens-sobrepostos img[src*="banana"],
-.mundo-1 [data-accepts="comidas"] .itens-sobrepostos img[src*="banana"] {
+.mundo-1 [data-accepts="comidas"] .itens-sobrepostos img[src*="banana"],
+.mundo-5 .cesta-comidas .itens-sobrepostos img[src*="banana"],
+.mundo-5 #cesta-comidas .itens-sobrepostos img[src*="banana"],
+.mundo-5 [data-accepts="comidas"] .itens-sobrepostos img[src*="banana"] {
     transform-origin: center center;
     transform: translateY(3%) rotate(-90deg) scale(1.05);
     clip-path: inset(0 0 0 50%);
@@ -802,6 +902,7 @@
     margin: 0 -3px;
 }
 
+/* 5. Cesta de Bebidas / Cooler (Mundo 3) */
 /* 5. Cesta de Bebidas / Cooler (Mundo 3 e 5) */
 .cesta-bebidas .itens-sobrepostos,
 #cesta-bebidas .itens-sobrepostos,
@@ -809,7 +910,7 @@
 .mundo-3 .cesta-bebidas .itens-sobrepostos,
 .mundo-3 #cesta-bebidas .itens-sobrepostos,
 .mundo-3 [data-accepts="bebidas"] .itens-sobrepostos {
-    top: 10%;
+    top: 15%;
     left: 10%;
     width: 80%;
     height: 26%;
@@ -826,42 +927,62 @@
 .mundo-3 .cesta-bebidas .itens-sobrepostos .item-sobreposto {
     transform: translateY(16%) scale(1.12);
     margin: 0 2px;
-    clip-path: none;
+    clip-path: inset(0 0 40% 0);
 }
 
-/* 6. Cesta de Brinquedos (Mundo 3 e 5) / Balde Vermelho */
+/* 6. Cesta de Brinquedos (Mundo 3) / Balde Vermelho */
 .cesta-brinquedos-mundo3 .itens-sobrepostos,
-.cesta-brinquedos-mundo5 .itens-sobrepostos,
 .mundo-3 .cesta-brinquedos .itens-sobrepostos,
-.mundo-5 .cesta-brinquedos .itens-sobrepostos,
 .mundo-3 #cesta-brinquedos .itens-sobrepostos,
-.mundo-5 #cesta-brinquedos .itens-sobrepostos,
-.mundo-3 [data-accepts="brinquedos"] .itens-sobrepostos,
-.mundo-5 [data-accepts="brinquedos"] .itens-sobrepostos {
+.mundo-3 [data-accepts="brinquedos"] .itens-sobrepostos {
     top: -22%;
     left: 14%;
     width: 78%;
     height: 27%;
     overflow: hidden;
-    align-items: flex-end;
     justify-content: center;
 }
 
 .cesta-brinquedos-mundo3 .itens-sobrepostos img,
-.cesta-brinquedos-mundo5 .itens-sobrepostos img,
 .mundo-3 .cesta-brinquedos .itens-sobrepostos img,
-.mundo-5 .cesta-brinquedos .itens-sobrepostos img,
 .cesta-brinquedos-mundo3 .itens-sobrepostos .item-sobreposto,
-.cesta-brinquedos-mundo5 .itens-sobrepostos .item-sobreposto,
-.mundo-3 .cesta-brinquedos .itens-sobrepostos .item-sobreposto,
-.mundo-5 .cesta-brinquedos .itens-sobrepostos .item-sobreposto {
+.mundo-3 .cesta-brinquedos .itens-sobrepostos .item-sobreposto {
     transform: translateY(12%) scale(1.08);
     margin: 0 4px;
-    clip-path: none;
+    clip-path: inset(0 0 20% 0);
+}
+
+/* 7. Cesta de Brinquedos (Mundo 5) — Replicação exata do Mundo 1 (Desktop) e profundidade na cesta marrom */
+.cesta-brinquedos-mundo5 .itens-sobrepostos,
+.mundo-5 .cesta-brinquedos .itens-sobrepostos,
+.mundo-5 #cesta-brinquedos .itens-sobrepostos,
+.mundo-5 [data-accepts="brinquedos"] .itens-sobrepostos {
+    top: 6%;
+    left: 18%;
+    width: 64%;
+    height: 24%;
+    overflow: hidden;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.cesta-brinquedos-mundo5 .itens-sobrepostos img,
+.cesta-brinquedos-mundo5 .itens-sobrepostos .item-sobreposto,
+.mundo-5 .cesta-brinquedos .itens-sobrepostos img,
+.mundo-5 .cesta-brinquedos .itens-sobrepostos .item-sobreposto,
+.mundo-5 #cesta-brinquedos .itens-sobrepostos img,
+.mundo-5 #cesta-brinquedos .itens-sobrepostos .item-sobreposto,
+.mundo-5 [data-accepts="brinquedos"] .itens-sobrepostos img,
+.mundo-5 [data-accepts="brinquedos"] .itens-sobrepostos .item-sobreposto {
+    transform: translateY(8%) scale(1);
+    margin: 0;
+    clip-path: inset(0 0 40% 0);
 }
 
 .drop-zone.is-over {
-    transform: scale(1.04);
+    transform: scale(1.08);
+    box-shadow: 0 0 24px rgba(242, 83, 138, 0.85), 0 0 10px rgba(255, 255, 255, 0.9);
+    border-radius: 20px;
 }
 
 .drop-zone:focus-visible {
@@ -1048,6 +1169,11 @@
         max-width: min(29vw, 120px);
     }
 
+    .categoria.tutorial-destaque-cesta,
+    .cesta-container.tutorial-destaque-cesta {
+        z-index: 48;
+    }
+
     .cesta,
     .cesta-img {
         width: 100%;
@@ -1056,17 +1182,128 @@
         padding: 0 !important;
     }
 
-    .etiqueta-categoria,
-    .categoria-img {
-        width: 100%;
-        max-width: min(29vw, 120px);
-        margin: 0 auto !important;
-        padding: 0 !important;
+    .itens-sobrepostos {
+        top: 6%;
+        left: 18%;
+        width: 64%;
+        height: 24%;
+        overflow: hidden;
+        z-index: 2;
+    }
+
+    /* Calibração das cestas na metade inferior para telas menores nos Mundos 2, 3 e 4 */
+    body.mundo-2 .cesta-brinquedos .itens-sobrepostos,
+    body.mundo-2 .cesta-comidas .itens-sobrepostos,
+    body.mundo-3 .cesta-comidas .itens-sobrepostos,
+    body.alto-contraste.mundo-3 .cesta-comidas .itens-sobrepostos,
+    body.mundo-4 .cesta-comida .itens-sobrepostos,
+    body.mundo-4 .cesta-comidas .itens-sobrepostos,
+    body.alto-contraste.mundo-4 .cesta-comida .itens-sobrepostos,
+    body.alto-contraste.mundo-4 .cesta-comidas .itens-sobrepostos {
+        top: 21% !important;
+        height: 25% !important;
+    }
+
+    body.mundo-2 .cesta-animais .itens-sobrepostos {
+        top: 34%;
+        left: 2%;
+        height: auto;
+        min-height: 25%;
+        overflow: visible;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 2px;
+    }
+
+    body.mundo-2 .cesta-animais .itens-sobrepostos img,
+    body.mundo-2 .cesta-animais .itens-sobrepostos .item-sobreposto {
+        width: clamp(22px, 4.8vw, 32px);
+        max-width: 44%;
+        height: auto;
+        clip-path: none;
+        transform: scale(0.98) translateY(0);
+        margin: 0 -2px;
+    }
+
+    body.mundo-3 .cesta-bebidas .itens-sobrepostos,
+    body.alto-contraste.mundo-3 .cesta-bebidas .itens-sobrepostos {
+        top: 21% !important;
+        height: 25% !important;
+        overflow: visible !important;
+        align-items: flex-end !important;
+        justify-content: center !important;
+    }
+
+    body.mundo-3 .cesta-bebidas .itens-sobrepostos img,
+    body.mundo-3 .cesta-bebidas .itens-sobrepostos .item-sobreposto,
+    body.alto-contraste.mundo-3 .cesta-bebidas .itens-sobrepostos img,
+    body.alto-contraste.mundo-3 .cesta-bebidas .itens-sobrepostos .item-sobreposto {
+        transform: translateY(0) scale(1) !important;
+        clip-path: inset(0 0 60% 0) !important;
+    }
+
+    body.mundo-3 .cesta-brinquedos .itens-sobrepostos,
+    body.alto-contraste.mundo-3 .cesta-brinquedos .itens-sobrepostos {
+        top: -20% !important;
+        height: 27% !important;
+        align-items: flex-end !important;
+        justify-content: center !important;
+        overflow: hidden !important;
+    }
+
+    body.mundo-3 .cesta-brinquedos .itens-sobrepostos img,
+    body.mundo-3 .cesta-brinquedos .itens-sobrepostos .item-sobreposto,
+    body.alto-contraste.mundo-3 .cesta-brinquedos .itens-sobrepostos img,
+    body.alto-contraste.mundo-3 .cesta-brinquedos .itens-sobrepostos .item-sobreposto {
+        transform: translateY(0) scale(1) !important;
+        clip-path: inset(0 0 40% 0) !important;
+    }
+
+    body.mundo-3 .cesta-comidas .itens-sobrepostos img,
+    body.mundo-3 .cesta-comidas .itens-sobrepostos .item-sobreposto,
+    body.alto-contraste.mundo-3 .cesta-comidas .itens-sobrepostos img,
+    body.alto-contraste.mundo-3 .cesta-comidas .itens-sobrepostos .item-sobreposto,
+    body.mundo-4 .cesta-comida .itens-sobrepostos img,
+    body.mundo-4 .cesta-comidas .itens-sobrepostos img,
+    body.mundo-4 .cesta-comida-mundo4 .itens-sobrepostos img,
+    body.mundo-4 .cesta-comida .itens-sobrepostos .item-sobreposto,
+    body.mundo-4 .cesta-comidas .itens-sobrepostos .item-sobreposto,
+    body.mundo-4 .cesta-comida-mundo4 .itens-sobrepostos .item-sobreposto,
+    body.alto-contraste.mundo-4 .cesta-comida .itens-sobrepostos img,
+    body.alto-contraste.mundo-4 .cesta-comidas .itens-sobrepostos img,
+    body.alto-contraste.mundo-4 .cesta-comida-mundo4 .itens-sobrepostos img,
+    body.alto-contraste.mundo-4 .cesta-comida .itens-sobrepostos .item-sobreposto,
+    body.alto-contraste.mundo-4 .cesta-comidas .itens-sobrepostos .item-sobreposto,
+    body.alto-contraste.mundo-4 .cesta-comida-mundo4 .itens-sobrepostos .item-sobreposto {
+        transform: translateY(0) scale(1) !important;
+        clip-path: inset(0 0 40% 0) !important;
     }
 
     .itens-sobrepostos img,
     .item-sobreposto {
-        width: clamp(20px, 6vw, 28px);
+        width: clamp(20px, 6vw, 30px);
+        max-width: 44%;
+        height: auto;
+        max-height: 100%;
+        object-fit: contain;
+        transform: translateY(8%) scale(1);
+        clip-path: inset(0 0 40% 0);
+    }
+
+    /* Escala corrigida da cesta de Material Escolar (Mundo 1) em telas menores */
+    body.mundo-1 .cesta-materiais,
+    body.mundo-1 #cesta-materiais,
+    body.mundo-1 [data-accepts="materiais"] {
+        transform: scale(1.36);
+        transform-origin: center bottom;
+    }
+
+    body.mundo-1 .cesta-materiais.drop-zone.is-over,
+    body.mundo-1 #cesta-materiais.drop-zone.is-over,
+    body.mundo-1 [data-accepts="materiais"].drop-zone.is-over {
+        transform: scale(1.44);
     }
 }
 
@@ -1120,19 +1357,26 @@
     transition: opacity 0.15s ease;
 }
 
-/* Aparece durante o arraste, quando uma cesta recebe o foco pelo teclado e no
-   tutorial da conta, que mostra as cestas com as quantidades. */
+/* Aparece durante o arraste, quando uma cesta recebe o foco pelo teclado,
+   no tutorial de arraste e no tutorial da conta, que mostra as cestas com as quantidades. */
 [data-modo-cestas="celular"] .tela-organizacao:has(.draggable-item.is-dragging) #area-categorias,
 [data-modo-cestas="celular"] #area-categorias:focus-within,
-[data-modo-cestas="celular"] .tutorial-matematica-ativo #area-categorias {
+[data-modo-cestas="celular"] .tutorial-matematica-ativo #area-categorias,
+[data-modo-cestas="celular"] .tela-organizacao:has(#tutorial-overlay) #area-categorias,
+[data-modo-cestas="celular"] .tela-organizacao:has(.tutorial-destaque-cesta) #area-categorias,
+[data-modo-cestas="celular"] #area-categorias:has(.tutorial-destaque-cesta) {
     opacity: 1;
 }
 
-/* No tutorial da conta, só as cestas aparecem (como no layout de sempre),
-   sem a faixa branca do painel. */
-[data-modo-cestas="celular"] .tutorial-matematica-ativo #area-categorias {
+/* No tutorial de arraste e no tutorial da conta, só as cestas aparecem (como no layout de sempre),
+   sem a faixa branca do painel, com z-index abaixo da mãozinha e do balão. */
+[data-modo-cestas="celular"] .tutorial-matematica-ativo #area-categorias,
+[data-modo-cestas="celular"] .tela-organizacao:has(#tutorial-overlay) #area-categorias,
+[data-modo-cestas="celular"] .tela-organizacao:has(.tutorial-destaque-cesta) #area-categorias,
+[data-modo-cestas="celular"] #area-categorias:has(.tutorial-destaque-cesta) {
     background: transparent;
     box-shadow: none;
+    z-index: 48;
 }
 
 [data-modo-cestas="celular"] #area-categorias .drop-zone {
@@ -1148,9 +1392,37 @@
     pointer-events: none;
 }
 
+/* Cesta alvo no tutorial recebe toque para soltura */
+[data-modo-cestas="celular"] .tela-organizacao:has(#tutorial-overlay) #area-categorias .drop-zone.tutorial-destaque-cesta,
+[data-modo-cestas="celular"] #area-categorias .drop-zone.tutorial-destaque-cesta {
+    pointer-events: auto;
+}
+
 /* Destaque da cesta sob o dedo (como no computador, um pouco maior). */
 [data-modo-cestas="celular"] #area-categorias .drop-zone.is-over {
     transform: scale(1.08);
+}
+
+/* Escala corrigida da cesta de Material Escolar (Mundo 1) no modo celular */
+[data-modo-cestas="celular"] body.mundo-1 #area-categorias .cesta-materiais,
+[data-modo-cestas="celular"] body.mundo-1 #area-categorias #cesta-materiais,
+[data-modo-cestas="celular"] body.mundo-1 #area-categorias [data-accepts="materiais"] {
+    transform: scale(1.36);
+    transform-origin: center bottom;
+}
+
+[data-modo-cestas="celular"] body.mundo-1 #area-categorias .cesta-materiais.drop-zone.is-over,
+[data-modo-cestas="celular"] body.mundo-1 #area-categorias #cesta-materiais.drop-zone.is-over,
+[data-modo-cestas="celular"] body.mundo-1 #area-categorias [data-accepts="materiais"].drop-zone.is-over {
+    transform: scale(1.44);
+}
+
+[data-modo-cestas="celular"] .tutorial-texto-desktop {
+    display: none !important;
+}
+
+[data-modo-cestas="celular"] .tutorial-texto-mobile {
+    display: inline !important;
 }
 
 [data-modo-cestas="celular"] #area-categorias .cesta-img {
@@ -1158,6 +1430,121 @@
     height: auto;
     max-width: var(--largura-max-cesta);
     max-height: var(--altura-max-cesta);
+}
+
+/* Divisão de camadas e profundidade dos itens nas cestas do celular */
+[data-modo-cestas="celular"] #area-categorias .itens-sobrepostos {
+    position: absolute;
+    top: 6%;
+    left: 18%;
+    width: 64%;
+    height: 24%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 2;
+}
+
+[data-modo-cestas="celular"] body.mundo-2 #area-categorias .cesta-brinquedos .itens-sobrepostos,
+[data-modo-cestas="celular"] body.mundo-2 #area-categorias .cesta-comidas .itens-sobrepostos,
+[data-modo-cestas="celular"] body.mundo-3 #area-categorias .cesta-comidas .itens-sobrepostos,
+[data-modo-cestas="celular"] body.alto-contraste.mundo-3 #area-categorias .cesta-comidas .itens-sobrepostos,
+[data-modo-cestas="celular"] body.mundo-4 #area-categorias .cesta-comida .itens-sobrepostos,
+[data-modo-cestas="celular"] body.mundo-4 #area-categorias .cesta-comidas .itens-sobrepostos,
+[data-modo-cestas="celular"] body.alto-contraste.mundo-4 #area-categorias .cesta-comida .itens-sobrepostos,
+[data-modo-cestas="celular"] body.alto-contraste.mundo-4 #area-categorias .cesta-comidas .itens-sobrepostos {
+    top: 21% !important;
+    height: 25% !important;
+}
+
+[data-modo-cestas="celular"] body.mundo-2 #area-categorias .cesta-animais .itens-sobrepostos {
+    top: 34%;
+    left: 2%;
+    height: auto;
+    min-height: 25%;
+    overflow: visible;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 2px;
+}
+
+[data-modo-cestas="celular"] body.mundo-2 #area-categorias .cesta-animais .itens-sobrepostos img,
+[data-modo-cestas="celular"] body.mundo-2 #area-categorias .cesta-animais .itens-sobrepostos .item-sobreposto {
+    width: clamp(18px, 4.8vw, 26px);
+    max-width: 44%;
+    height: auto;
+    clip-path: none;
+    transform: scale(0.98) translateY(0);
+    margin: 0 -2px;
+}
+
+[data-modo-cestas="celular"] body.mundo-3 #area-categorias .cesta-bebidas .itens-sobrepostos,
+[data-modo-cestas="celular"] body.alto-contraste.mundo-3 #area-categorias .cesta-bebidas .itens-sobrepostos {
+    top: 21% !important;
+    height: 25% !important;
+    overflow: visible !important;
+    align-items: flex-end !important;
+    justify-content: center !important;
+}
+
+[data-modo-cestas="celular"] body.mundo-3 #area-categorias .cesta-bebidas .itens-sobrepostos img,
+[data-modo-cestas="celular"] body.mundo-3 #area-categorias .cesta-bebidas .itens-sobrepostos .item-sobreposto,
+[data-modo-cestas="celular"] body.alto-contraste.mundo-3 #area-categorias .cesta-bebidas .itens-sobrepostos img,
+[data-modo-cestas="celular"] body.alto-contraste.mundo-3 #area-categorias .cesta-bebidas .itens-sobrepostos .item-sobreposto {
+    transform: translateY(0) scale(1) !important;
+    clip-path: inset(0 0 60% 0) !important;
+}
+
+[data-modo-cestas="celular"] body.mundo-3 #area-categorias .cesta-brinquedos .itens-sobrepostos,
+[data-modo-cestas="celular"] body.alto-contraste.mundo-3 #area-categorias .cesta-brinquedos .itens-sobrepostos {
+    top: -20% !important;
+    height: 27% !important;
+    align-items: flex-end !important;
+    justify-content: center !important;
+    overflow: hidden !important;
+}
+
+[data-modo-cestas="celular"] body.mundo-3 #area-categorias .cesta-brinquedos .itens-sobrepostos img,
+[data-modo-cestas="celular"] body.mundo-3 #area-categorias .cesta-brinquedos .itens-sobrepostos .item-sobreposto,
+[data-modo-cestas="celular"] body.alto-contraste.mundo-3 #area-categorias .cesta-brinquedos .itens-sobrepostos img,
+[data-modo-cestas="celular"] body.alto-contraste.mundo-3 #area-categorias .cesta-brinquedos .itens-sobrepostos .item-sobreposto {
+    transform: translateY(0) scale(1) !important;
+    clip-path: inset(0 0 40% 0) !important;
+}
+
+[data-modo-cestas="celular"] body.mundo-3 #area-categorias .cesta-comidas .itens-sobrepostos img,
+[data-modo-cestas="celular"] body.mundo-3 #area-categorias .cesta-comidas .itens-sobrepostos .item-sobreposto,
+[data-modo-cestas="celular"] body.alto-contraste.mundo-3 #area-categorias .cesta-comidas .itens-sobrepostos img,
+[data-modo-cestas="celular"] body.alto-contraste.mundo-3 #area-categorias .cesta-comidas .itens-sobrepostos .item-sobreposto,
+[data-modo-cestas="celular"] body.mundo-4 #area-categorias .cesta-comida .itens-sobrepostos img,
+[data-modo-cestas="celular"] body.mundo-4 #area-categorias .cesta-comidas .itens-sobrepostos img,
+[data-modo-cestas="celular"] body.mundo-4 #area-categorias .cesta-comida-mundo4 .itens-sobrepostos img,
+[data-modo-cestas="celular"] body.mundo-4 #area-categorias .cesta-comida .itens-sobrepostos .item-sobreposto,
+[data-modo-cestas="celular"] body.mundo-4 #area-categorias .cesta-comidas .itens-sobrepostos .item-sobreposto,
+[data-modo-cestas="celular"] body.mundo-4 #area-categorias .cesta-comida-mundo4 .itens-sobrepostos .item-sobreposto,
+[data-modo-cestas="celular"] body.alto-contraste.mundo-4 #area-categorias .cesta-comida .itens-sobrepostos img,
+[data-modo-cestas="celular"] body.alto-contraste.mundo-4 #area-categorias .cesta-comidas .itens-sobrepostos img,
+[data-modo-cestas="celular"] body.alto-contraste.mundo-4 #area-categorias .cesta-comida-mundo4 .itens-sobrepostos img,
+[data-modo-cestas="celular"] body.alto-contraste.mundo-4 #area-categorias .cesta-comida .itens-sobrepostos .item-sobreposto,
+[data-modo-cestas="celular"] body.alto-contraste.mundo-4 #area-categorias .cesta-comidas .itens-sobrepostos .item-sobreposto,
+[data-modo-cestas="celular"] body.alto-contraste.mundo-4 #area-categorias .cesta-comida-mundo4 .itens-sobrepostos .item-sobreposto {
+    transform: translateY(0) scale(1) !important;
+    clip-path: inset(0 0 40% 0) !important;
+}
+
+[data-modo-cestas="celular"] #area-categorias .itens-sobrepostos img,
+[data-modo-cestas="celular"] #area-categorias .itens-sobrepostos .item-sobreposto {
+    width: clamp(18px, 5.5vw, 28px);
+    max-width: 44%;
+    height: auto;
+    max-height: 100%;
+    object-fit: contain;
+    transform: translateY(8%) scale(1);
+    clip-path: inset(0 0 40% 0);
 }
 
 /* As cestas não ficam mais nas laterais, então a área de objetos não precisa
@@ -1383,11 +1770,19 @@
 .botao-opcao-matematica:hover:not(:disabled) {
     transform: scale(1.08);
     background: #19405b;
+    border-color: #ffffff;
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.95), 0 0 24px rgba(242, 83, 138, 0.95), 0 6px 14px rgba(0, 0, 0, 0.2);
+}
+
+.botao-opcao-matematica:active:not(:disabled) {
+    transform: scale(0.96);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.95), 0 0 18px rgba(242, 83, 138, 0.85);
 }
 
 .botao-opcao-matematica:focus-visible {
     outline: 4px solid #e05d2f;
     outline-offset: 4px;
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.95), 0 0 24px rgba(242, 83, 138, 0.95);
 }
 
 .botao-opcao-matematica.is-correct {
@@ -1665,33 +2060,50 @@
 }
 
 @media (max-width: 768px) {
-    .boss-hud-vidas {
-        top: 10px;
-        left: 64px;
+    .boss-hud-vidas,
+    .mundo-5 .boss-hud-vidas,
+    .mundo-5 #boss-hud-vidas {
+        top: 14px;
+        left: clamp(10px, 3vw, 16px);
         padding: 4px 10px;
         gap: 5px;
+        height: 34px;
+        box-sizing: border-box;
     }
 
     .boss-hud-vidas .coracao-vida {
         font-size: 1.25rem;
+        line-height: 1;
+    }
+
+    /* Personagem do Boss com tamanho ampliado e posição ligeiramente elevada para destacar o corpo */
+    .area-boss {
+        top: 56%;
     }
 
     .boss-figura-container {
-        width: clamp(300px, 68vw, 480px);
-        height: clamp(230px, 52vw, 370px);
-        max-height: 56vh;
+        width: clamp(360px, 84vw, 560px);
+        height: clamp(280px, 65vw, 440px);
+        max-height: 64vh;
     }
 
     .boss-imagem {
         width: 100%;
         height: 100%;
-        max-height: 56vh;
+        max-height: 64vh;
+        transform: scale(1.06);
+        transform-origin: center bottom;
     }
 
+    .boss-imagem.estado-derrota {
+        transform: scale(1.14);
+    }
+
+    /* Balão de risada posicionado bem mais próximo do corpo do Boss */
     .boss-risada {
         width: clamp(95px, 20vw, 130px);
-        right: -24%;
-        top: -12%;
+        right: 1%;
+        top: 2%;
     }
 
     .fase-com-boss .painel-matematica {
@@ -1880,7 +2292,8 @@
 .categoria.tutorial-destaque-cesta,
 .cesta-container.tutorial-destaque-cesta {
     z-index: 48;
-    filter: drop-shadow(0 0 22px rgba(255, 255, 255, 0.85)) drop-shadow(0 0 32px rgba(242, 83, 138, 0.85));
+    box-shadow: 0 0 24px rgba(242, 83, 138, 0.85), 0 0 10px rgba(255, 255, 255, 0.9);
+    border-radius: 20px;
 }
 
 .tutorial-balao-fase {
@@ -1917,6 +2330,14 @@
     border-style: solid;
     border-color: #f2538a transparent transparent transparent;
     filter: drop-shadow(0 3px 0 #ffffff);
+}
+
+.tutorial-texto-desktop {
+    display: inline;
+}
+
+.tutorial-texto-mobile {
+    display: none;
 }
 
 @keyframes pulsoBalaoTutorialFase {
@@ -2003,6 +2424,69 @@
     95%, 100% {
         opacity: 0;
         transform: translate(var(--tut-end-x, 20vw), var(--tut-end-y, 50vh)) scale(1.15) rotate(4deg);
+    }
+}
+
+@media (max-width: 768px) {
+    .tutorial-texto-desktop {
+        display: none !important;
+    }
+
+    .tutorial-texto-mobile {
+        display: inline !important;
+    }
+
+    .tutorial-balao-fase {
+        font-size: clamp(0.88rem, 3.4vw, 1.05rem);
+        padding: 9px 16px;
+        max-width: min(92vw, 340px);
+        border-radius: 18px;
+        border-width: 2.5px;
+        line-height: 1.25;
+    }
+
+    .tutorial-balao-fase::after {
+        bottom: -10px;
+        border-width: 10px 9px 0 9px;
+    }
+
+    .tutorial-balao-central {
+        font-size: clamp(1rem, 4vw, 1.25rem);
+        padding: 12px 22px;
+        max-width: min(90vw, 360px);
+    }
+
+    .pagina-fase1 img.tutorial-maozinha-arraste,
+    .tutorial-maozinha-arraste {
+        width: clamp(48px, 11vw, 68px);
+    }
+
+    .tutorial-estrelas-recompensa {
+        width: 110px;
+        height: 60px;
+    }
+
+    .estrela-particula {
+        font-size: 1.35rem;
+    }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+    .tutorial-balao-fase {
+        font-size: clamp(0.85rem, 3vh, 1rem);
+        padding: 6px 14px;
+        border-radius: 14px;
+        border-width: 2px;
+    }
+
+    .tutorial-balao-central {
+        font-size: clamp(0.92rem, 3.5vh, 1.1rem);
+        padding: 8px 18px;
+    }
+
+    .pagina-fase1 img.tutorial-maozinha-arraste,
+    .tutorial-maozinha-arraste {
+        width: clamp(42px, 14vh, 56px);
     }
 }
 
@@ -2400,6 +2884,25 @@
         gap: 4px;
     }
 
+    /* Nos Mundos 1 ao 4, a HUD de instruções é deslocada mais para baixo, criando respiro seguro dos botões superiores */
+    body:not(.mundo-5) .topo-fase1 {
+        padding-top: clamp(20px, 4.5vh, 30px);
+    }
+
+    body:not(.mundo-5) .hud-instrucoes {
+        margin-top: clamp(24px, 5vh, 36px);
+    }
+
+    /* No Mundo 5 (Boss), a HUD desce o suficiente para desobstruir vidas e o botão voltar */
+    .mundo-5 .topo-fase1 {
+        padding-top: clamp(56px, 12vh, 72px);
+    }
+
+    .mundo-5 .hud-instrucoes {
+        margin-top: clamp(8px, 1.8vh, 14px);
+        width: min(84vw, 420px);
+    }
+
     .hud-instrucoes .feedback-message,
     .hud-instrucoes .hud-texto-matematica {
         font-size: clamp(0.85rem, 2.5vw, 1rem);
@@ -2475,6 +2978,20 @@ body.alto-contraste .cesta-recompensa-tutorial,
 body.alto-contraste .tutorial-matematica-ativo #tela-organizacao .categoria,
 body.alto-contraste .tutorial-matematica-ativo #tela-organizacao .cesta-container {
     filter: drop-shadow(0 0 4px #ffffff) drop-shadow(0 0 8px #000000) !important;
+}
+
+body.alto-contraste .draggable-item.is-dragging {
+    background: #ffffff !important;
+    border: 3px solid #000000 !important;
+    box-shadow: 0 0 0 4px #ffffff, 0 0 0 7px #000000 !important;
+    transform: scale(1.18) !important;
+}
+
+body.alto-contraste .drop-zone.is-over,
+body.alto-contraste .cesta-container.is-over,
+body.alto-contraste .categoria.is-over {
+    filter: drop-shadow(0 0 4px #ffffff) drop-shadow(0 0 12px #000000) !important;
+    transform: scale(1.08) !important;
 }
 
 body.alto-contraste .tutorial-matematica-ativo #opcoes-matematica {
@@ -2573,7 +3090,9 @@ body.alto-contraste.mundo-1 .contador-circulo,
 body.alto-contraste.mundo-2 .contador-itens,
 body.alto-contraste.mundo-2 .contador-circulo,
 body.alto-contraste.mundo-3 .contador-itens,
-body.alto-contraste.mundo-3 .contador-circulo {
+body.alto-contraste.mundo-3 .contador-circulo,
+body.alto-contraste.mundo-4 .contador-itens,
+body.alto-contraste.mundo-4 .contador-circulo {
     position: absolute !important;
     display: flex !important;
     justify-content: center !important;
@@ -2606,7 +3125,8 @@ body.alto-contraste .contador-itens span,
 body.alto-contraste span.contador-numero,
 body.alto-contraste.mundo-1 .contador-numero,
 body.alto-contraste.mundo-2 .contador-numero,
-body.alto-contraste.mundo-3 .contador-numero {
+body.alto-contraste.mundo-3 .contador-numero,
+body.alto-contraste.mundo-4 .contador-numero {
     position: static !important;
     transform: none !important;
     margin: 0 !important;
@@ -2640,7 +3160,13 @@ body.alto-contraste.mundo-1 .cesta-brinquedos .contador-itens,
 body.alto-contraste.mundo-1 #cesta-brinquedos .contador-circulo,
 body.alto-contraste.mundo-1 #cesta-brinquedos .contador-itens,
 body.alto-contraste.mundo-1 [data-accepts="brinquedos"] .contador-circulo,
-body.alto-contraste.mundo-1 [data-accepts="brinquedos"] .contador-itens {
+body.alto-contraste.mundo-1 [data-accepts="brinquedos"] .contador-itens,
+body.alto-contraste.mundo-5 .cesta-brinquedos .contador-circulo,
+body.alto-contraste.mundo-5 .cesta-brinquedos .contador-itens,
+body.alto-contraste.mundo-5 #cesta-brinquedos .contador-circulo,
+body.alto-contraste.mundo-5 #cesta-brinquedos .contador-itens,
+body.alto-contraste.mundo-5 [data-accepts="brinquedos"] .contador-circulo,
+body.alto-contraste.mundo-5 [data-accepts="brinquedos"] .contador-itens {
     top: 0% !important;
     right: 1% !important;
     left: auto !important;
@@ -2661,7 +3187,13 @@ body.alto-contraste.mundo-1 .cesta-comidas .contador-itens,
 body.alto-contraste.mundo-1 #cesta-comidas .contador-circulo,
 body.alto-contraste.mundo-1 #cesta-comidas .contador-itens,
 body.alto-contraste.mundo-1 [data-accepts="comidas"] .contador-circulo,
-body.alto-contraste.mundo-1 [data-accepts="comidas"] .contador-itens {
+body.alto-contraste.mundo-1 [data-accepts="comidas"] .contador-itens,
+body.alto-contraste.mundo-5 .cesta-comidas .contador-circulo,
+body.alto-contraste.mundo-5 .cesta-comidas .contador-itens,
+body.alto-contraste.mundo-5 #cesta-comidas .contador-circulo,
+body.alto-contraste.mundo-5 #cesta-comidas .contador-itens,
+body.alto-contraste.mundo-5 [data-accepts="comidas"] .contador-circulo,
+body.alto-contraste.mundo-5 [data-accepts="comidas"] .contador-itens {
     top: 0% !important;
     right: 0% !important;
     left: auto !important;
@@ -2794,7 +3326,8 @@ body.alto-contraste.mundo-3 [data-accepts="comidas"] .contador-itens {
 body.alto-contraste.mundo-1 .itens-sobrepostos,
 body.alto-contraste.mundo-2 .itens-sobrepostos,
 body.alto-contraste.mundo-3 .itens-sobrepostos,
-body.alto-contraste.mundo-4 .itens-sobrepostos {
+body.alto-contraste.mundo-4 .itens-sobrepostos,
+body.alto-contraste.mundo-5 .itens-sobrepostos {
     display: flex !important;
 }
 
@@ -2805,13 +3338,18 @@ body.alto-contraste.mundo-2 .itens-sobrepostos .item-sobreposto,
 body.alto-contraste.mundo-3 .itens-sobrepostos img,
 body.alto-contraste.mundo-3 .itens-sobrepostos .item-sobreposto,
 body.alto-contraste.mundo-4 .itens-sobrepostos img,
-body.alto-contraste.mundo-4 .itens-sobrepostos .item-sobreposto {
+body.alto-contraste.mundo-4 .itens-sobrepostos .item-sobreposto,
+body.alto-contraste.mundo-5 .itens-sobrepostos img,
+body.alto-contraste.mundo-5 .itens-sobrepostos .item-sobreposto {
     display: block !important;
 }
 
-/* Ajuste fino de elevação e profundidade dos itens no Mundo 3 (sensação de estarem guardados/dentro) */
+
+
+/* 2.3. Ajuste fino de elevação e profundidade dos itens no Mundo 3 (Praia) */
+@media (min-width: 769px) {
 body.alto-contraste.mundo-3 .cesta-bebidas .itens-sobrepostos {
-    top: 10% !important;
+    top: 15% !important;
     left: 10% !important;
     width: 80% !important;
     height: 26% !important;
@@ -2824,7 +3362,7 @@ body.alto-contraste.mundo-3 .cesta-bebidas .itens-sobrepostos img,
 body.alto-contraste.mundo-3 .cesta-bebidas .itens-sobrepostos .item-sobreposto {
     transform: translateY(16%) scale(1.12) !important;
     margin: 0 2px !important;
-    clip-path: none !important;
+    clip-path: inset(0 0 40% 0) !important;
 }
 
 body.alto-contraste.mundo-3 .cesta-brinquedos .itens-sobrepostos {
@@ -2841,12 +3379,12 @@ body.alto-contraste.mundo-3 .cesta-brinquedos .itens-sobrepostos img,
 body.alto-contraste.mundo-3 .cesta-brinquedos .itens-sobrepostos .item-sobreposto {
     transform: translateY(12%) scale(1.08) !important;
     margin: 0 4px !important;
-    clip-path: none !important;
+    clip-path: inset(0 0 20% 0) !important;
 }
 
 body.alto-contraste.mundo-3 .cesta-comidas .itens-sobrepostos {
-    top: 15% !important;
-    left: 12% !important;
+    top: 20% !important;
+    left: 15% !important;
     width: 64% !important;
     height: 23% !important;
     overflow: hidden !important;
@@ -2856,7 +3394,9 @@ body.alto-contraste.mundo-3 .cesta-comidas .itens-sobrepostos {
 body.alto-contraste.mundo-3 .cesta-comidas .itens-sobrepostos img,
 body.alto-contraste.mundo-3 .cesta-comidas .itens-sobrepostos .item-sobreposto {
     transform: translateY(16%) scale(1.02) !important;
-    margin: 0 1px !important;
+    margin: 0 -5px !important;
+    clip-path: none !important;
+}
 }
 
 /* ==========================================================
@@ -2906,6 +3446,7 @@ body.alto-contraste.mundo-4 [data-accepts="mochila"] .contador-itens {
 /* 2. Sobreposição e Profundidade dos Itens */
 
 /* Cesta de Comida (Mundo 4) — alinhamento idêntico aos Mundos 2 e 3 */
+@media (min-width: 769px) {
 body.alto-contraste.mundo-4 .cesta-comida .itens-sobrepostos,
 body.alto-contraste.mundo-4 .cesta-comidas .itens-sobrepostos,
 body.alto-contraste.mundo-4 #cesta-comida .itens-sobrepostos,
@@ -2913,8 +3454,8 @@ body.alto-contraste.mundo-4 #cesta-comidas .itens-sobrepostos,
 body.alto-contraste.mundo-4 [data-accepts="comida"] .itens-sobrepostos,
 body.alto-contraste.mundo-4 [data-accepts="comidas"] .itens-sobrepostos,
 body.alto-contraste.mundo-4 .cesta-comida-mundo4 .itens-sobrepostos {
-    top: 15% !important;
-    left: 12% !important;
+    top: 20% !important;
+    left: 15% !important;
     width: 64% !important;
     height: 23% !important;
     overflow: hidden !important;
@@ -2932,26 +3473,113 @@ body.alto-contraste.mundo-4 [data-accepts="comida"] .itens-sobrepostos .item-sob
 body.alto-contraste.mundo-4 [data-accepts="comidas"] .itens-sobrepostos .item-sobreposto,
 body.alto-contraste.mundo-4 .cesta-comida-mundo4 .itens-sobrepostos .item-sobreposto {
     transform: translateY(16%) scale(1.02) !important;
-    margin: 0 1px !important;
+    margin: 0 -5px !important;
+    clip-path: none !important;
+}
 }
 
 /* Mochila (Mundo 4) — itens posicionados no compartimento com base oculta atrás do bolso/aba frontal */
+body.alto-contraste.mundo-4 .cesta-mochila .cesta-img,
+body.alto-contraste.mundo-4 #cesta-mochila .cesta-img,
+body.alto-contraste.mundo-4 [data-accepts="mochila"] .cesta-img {
+    position: relative !important;
+    z-index: 2 !important;
+}
+
 body.alto-contraste.mundo-4 .cesta-mochila .itens-sobrepostos,
 body.alto-contraste.mundo-4 #cesta-mochila .itens-sobrepostos,
 body.alto-contraste.mundo-4 [data-accepts="mochila"] .itens-sobrepostos {
-    top: 14% !important;
-    left: 14% !important;
-    width: 62% !important;
-    height: 25% !important;
+    top: -20% !important;
+    left: 12% !important;
+    width: 60% !important;
+    height: 30% !important;
+    overflow: hidden !important;
+    align-items: flex-end !important;
+    justify-content: center !important;
+    z-index: 1 !important;
+}
+
+body.alto-contraste.mundo-4 .cesta-mochila .itens-sobrepostos img,
+body.alto-contraste.mundo-4 .cesta-mochila .itens-sobrepostos .item-sobreposto {
+    transform: translateY(2%) scale(1.18) !important;
+    margin: 0 -2px !important;
+    clip-path: inset(0 0 30% 0) !important;
+}
+
+/* ==========================================================
+   2.5. MUNDO 5: SOBREPOSIÇÃO DAS CESTAS EM ALTO CONTRASTE
+   Idêntica à lógica, classes e posicionamento do Mundo 1
+   (A Casa), compartilhando as cestas de acessibilidade de
+   brinquedos e comidas.
+   ========================================================== */
+
+/* Cesta de Brinquedos (Mundo 5 em Alto Contraste — idêntica ao Mundo 1) */
+body.alto-contraste.mundo-5 .cesta-brinquedos .itens-sobrepostos,
+body.alto-contraste.mundo-5 #cesta-brinquedos .itens-sobrepostos,
+body.alto-contraste.mundo-5 [data-accepts="brinquedos"] .itens-sobrepostos {
+    top: 6% !important;
+    left: 18% !important;
+    width: 64% !important;
+    height: 24% !important;
     overflow: hidden !important;
     align-items: flex-end !important;
     justify-content: center !important;
 }
 
-body.alto-contraste.mundo-4 .cesta-mochila .itens-sobrepostos img,
-body.alto-contraste.mundo-4 .cesta-mochila .itens-sobrepostos .item-sobreposto {
-    transform: translateY(15%) scale(1.05) !important;
-    margin: 0 2px !important;
+body.alto-contraste.mundo-5 .cesta-brinquedos .itens-sobrepostos img,
+body.alto-contraste.mundo-5 .cesta-brinquedos .itens-sobrepostos .item-sobreposto,
+body.alto-contraste.mundo-5 #cesta-brinquedos .itens-sobrepostos img,
+body.alto-contraste.mundo-5 #cesta-brinquedos .itens-sobrepostos .item-sobreposto,
+body.alto-contraste.mundo-5 [data-accepts="brinquedos"] .itens-sobrepostos img,
+body.alto-contraste.mundo-5 [data-accepts="brinquedos"] .itens-sobrepostos .item-sobreposto {
+    transform: translateY(8%) scale(1) !important;
+    clip-path: inset(0 0 40% 0) !important;
+    margin: 0 !important;
+}
+
+/* Cesta de Comidas (Mundo 5 em Alto Contraste — idêntica ao Mundo 1) */
+body.alto-contraste.mundo-5 .cesta-comidas .itens-sobrepostos,
+body.alto-contraste.mundo-5 #cesta-comidas .itens-sobrepostos,
+body.alto-contraste.mundo-5 [data-accepts="comidas"] .itens-sobrepostos {
+    top: 4% !important;
+    left: 14% !important;
+    width: 64% !important;
+    height: 24% !important;
+    overflow: hidden !important;
+    align-items: flex-end !important;
+    justify-content: center !important;
+}
+
+body.alto-contraste.mundo-5 .cesta-comidas .itens-sobrepostos img,
+body.alto-contraste.mundo-5 .cesta-comidas .itens-sobrepostos .item-sobreposto,
+body.alto-contraste.mundo-5 #cesta-comidas .itens-sobrepostos img,
+body.alto-contraste.mundo-5 #cesta-comidas .itens-sobrepostos .item-sobreposto,
+body.alto-contraste.mundo-5 [data-accepts="comidas"] .itens-sobrepostos img,
+body.alto-contraste.mundo-5 [data-accepts="comidas"] .itens-sobrepostos .item-sobreposto {
+    transform: translateY(3%) scale(1) !important;
+    clip-path: inset(0 0 40% 0) !important;
+    margin: 0 !important;
+}
+
+body.alto-contraste.mundo-5 .cesta-comidas .itens-sobrepostos img[src*="maça"],
+body.alto-contraste.mundo-5 #cesta-comidas .itens-sobrepostos img[src*="maça"],
+body.alto-contraste.mundo-5 [data-accepts="comidas"] .itens-sobrepostos img[src*="maça"],
+body.alto-contraste.mundo-5 .cesta-comidas .itens-sobrepostos img[src*="maca"],
+body.alto-contraste.mundo-5 #cesta-comidas .itens-sobrepostos img[src*="maca"],
+body.alto-contraste.mundo-5 [data-accepts="comidas"] .itens-sobrepostos img[src*="maca"],
+body.alto-contraste.mundo-5 .cesta-comidas .itens-sobrepostos img[src*="pera"],
+body.alto-contraste.mundo-5 #cesta-comidas .itens-sobrepostos img[src*="pera"],
+body.alto-contraste.mundo-5 [data-accepts="comidas"] .itens-sobrepostos img[src*="pera"] {
+    transform: translateY(3%) scale(1.02) !important;
+    clip-path: inset(0 0 40% 0) !important;
+}
+
+body.alto-contraste.mundo-5 .cesta-comidas .itens-sobrepostos img[src*="banana"],
+body.alto-contraste.mundo-5 #cesta-comidas .itens-sobrepostos img[src*="banana"],
+body.alto-contraste.mundo-5 [data-accepts="comidas"] .itens-sobrepostos img[src*="banana"] {
+    transform-origin: center center !important;
+    transform: translateY(3%) rotate(-90deg) scale(1.05) !important;
+    clip-path: inset(0 0 0 50%) !important;
 }
 
 /* ==========================================================
@@ -3119,4 +3747,372 @@ body.alto-contraste .titulo-vitoria,
 body.alto-contraste .subtitulo-vitoria {
     color: #000000 !important;
     text-shadow: none !important;
+}
+
+/* ==========================================================
+   4.9. INTERFACE DO BOSS (MUNDO 5) NO MODO NORMAL
+   ========================================================== */
+
+/* Botão Voltar (no canto superior direito para não sobrepor o HUD de vidas) */
+.mundo-5 .btn-voltar-fase,
+.mundo-5 #btn-voltar-fase {
+    top: 14px;
+    right: 16px;
+    left: auto;
+    bottom: auto;
+}
+
+/* Botão de Volume (canto inferior esquerdo na fase do Boss) */
+.mundo-5 .btn-som-fase,
+.mundo-5 #volume-container-fase,
+.mundo-5 .volume-container {
+    top: auto;
+    right: auto;
+    bottom: 16px;
+    left: 16px;
+    z-index: 200;
+}
+
+/* Expansão do Volume para CIMA (upwards) para não sair da área visível */
+.mundo-5 .btn-som-fase .volume-slider,
+.mundo-5 #volume-container-fase .volume-slider,
+.mundo-5 .volume-container .volume-slider {
+    top: auto;
+    bottom: 130%;
+    margin-top: 0;
+    margin-bottom: 32px;
+    transform: translateX(-50%) rotate(-90deg);
+    transform-origin: center center;
+}
+
+/* HUD de Vidas do Boss posicionado à esquerda */
+.mundo-5 .boss-hud-vidas,
+.mundo-5 #boss-hud-vidas {
+    top: 14px;
+    left: clamp(20px, 2.5vw, 32px);
+}
+
+@media (max-width: 768px) {
+    .mundo-5 .btn-voltar-fase,
+    .mundo-5 #btn-voltar-fase {
+        top: 14px;
+        right: 12px;
+        left: auto;
+        bottom: auto;
+        padding: 0;
+        min-width: auto;
+        min-height: auto;
+    }
+
+    .mundo-5 .btn-voltar-fase img,
+    .mundo-5 #btn-voltar-fase img {
+        width: clamp(68px, 17vw, 84px);
+        height: auto;
+        display: block;
+    }
+
+    .mundo-5 .btn-som-fase,
+    .mundo-5 #volume-container-fase,
+    .mundo-5 .volume-container {
+        bottom: 12px;
+        left: 12px;
+    }
+
+    .mundo-5 .btn-som-fase .volume-slider,
+    .mundo-5 #volume-container-fase .volume-slider,
+    .mundo-5 .volume-container .volume-slider {
+        margin-bottom: 28px;
+    }
+}
+
+/* ==========================================================
+   5. INTERFACE DO BOSS (MUNDO 5) EM ALTO CONTRASTE
+   ========================================================== */
+
+/* 5.1. Botão Voltar (no canto superior direito para não sobrepor o HUD de vidas) */
+body.alto-contraste.mundo-5 .btn-voltar-fase,
+body.alto-contraste.mundo-5 #btn-voltar-fase {
+    top: 14px !important;
+    right: 16px !important;
+    left: auto !important;
+    bottom: auto !important;
+}
+
+/* 5.2. Botão de Volume (canto inferior esquerdo na fase do Boss) */
+body.alto-contraste.mundo-5 .btn-som-fase,
+body.alto-contraste.mundo-5 #volume-container-fase,
+body.alto-contraste.mundo-5 .volume-container {
+    top: auto !important;
+    right: auto !important;
+    bottom: 16px !important;
+    left: 16px !important;
+    z-index: 200 !important;
+}
+
+/* 5.3. Expansão do Volume para CIMA (upwards) para não sair da área visível */
+body.alto-contraste.mundo-5 .btn-som-fase .volume-slider,
+body.alto-contraste.mundo-5 #volume-container-fase .volume-slider,
+body.alto-contraste.mundo-5 .volume-container .volume-slider {
+    top: auto !important;
+    bottom: 130% !important;
+    margin-top: 0 !important;
+    margin-bottom: 32px !important;
+    transform: translateX(-50%) rotate(-90deg) !important;
+    transform-origin: center center !important;
+}
+
+@media (max-width: 768px) {
+    body.alto-contraste.mundo-5 .btn-voltar-fase,
+    body.alto-contraste.mundo-5 #btn-voltar-fase {
+        top: 14px !important;
+        right: 12px !important;
+        left: auto !important;
+        bottom: auto !important;
+        padding: 0 !important;
+        min-width: auto !important;
+        min-height: auto !important;
+    }
+
+    body.alto-contraste.mundo-5 .btn-voltar-fase img,
+    body.alto-contraste.mundo-5 #btn-voltar-fase img {
+        width: clamp(68px, 17vw, 84px) !important;
+        height: auto !important;
+        display: block !important;
+    }
+
+    body.alto-contraste.mundo-5 .btn-som-fase,
+    body.alto-contraste.mundo-5 #volume-container-fase,
+    body.alto-contraste.mundo-5 .volume-container {
+        bottom: 12px !important;
+        left: 12px !important;
+    }
+
+    body.alto-contraste.mundo-5 .btn-som-fase .volume-slider,
+    body.alto-contraste.mundo-5 #volume-container-fase .volume-slider,
+    body.alto-contraste.mundo-5 .volume-container .volume-slider {
+        margin-bottom: 28px !important;
+    }
+
+    body.alto-contraste .boss-hud-vidas,
+    body.alto-contraste #boss-hud-vidas {
+        top: 14px !important;
+        left: clamp(10px, 3vw, 16px) !important;
+        padding: 4px 12px !important;
+        gap: 6px !important;
+        height: 34px !important;
+        box-sizing: border-box !important;
+        transform: none !important;
+    }
+
+    body.alto-contraste .boss-hud-vidas .coracao-vida.ativo::before,
+    body.alto-contraste .boss-hud-vidas .coracao-vida.perdido::before {
+        font-size: 1.3rem !important;
+    }
+}
+
+/* 5.4. HUD de Vidas do Boss (aumentado em escala e destaque visual) */
+body.alto-contraste .boss-hud-vidas,
+body.alto-contraste #boss-hud-vidas {
+    top: 18px !important;
+    left: clamp(20px, 2.5vw, 32px) !important;
+    background: #ffffff !important;
+    border: 4px solid #000000 !important;
+    border-radius: 999px !important;
+    padding: 10px 22px !important;
+    gap: 12px !important;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35) !important;
+    backdrop-filter: none !important;
+    transform: scale(1.08) !important;
+    transform-origin: top left !important;
+}
+
+body.alto-contraste .boss-hud-vidas .coracao-vida {
+    font-size: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-family: "Segoe UI Symbol", "Apple Symbols", Arial, sans-serif !important;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease !important;
+}
+
+/* Corações ativos (cheios): brancos com contorno preto nítido e tamanho aumentado */
+body.alto-contraste .boss-hud-vidas .coracao-vida.ativo::before {
+    content: "♥" !important;
+    font-size: clamp(1.9rem, 2.8vw, 2.45rem) !important;
+    color: #ffffff !important;
+    -webkit-text-stroke: 2px #000000 !important;
+    text-shadow: -1.5px -1.5px 0 #000000, 1.5px -1.5px 0 #000000, -1.5px 1.5px 0 #000000, 1.5px 1.5px 0 #000000, 0 0 2px #000000 !important;
+    transform: scale(1) !important;
+    opacity: 1 !important;
+}
+
+/* Corações perdidos: perdem o preenchimento, ficando apenas vazados com contorno preto */
+body.alto-contraste .boss-hud-vidas .coracao-vida.perdido {
+    display: inline-flex !important;
+    opacity: 1 !important;
+}
+
+body.alto-contraste .boss-hud-vidas .coracao-vida.perdido::before {
+    content: "♡" !important;
+    font-size: clamp(1.9rem, 2.8vw, 2.45rem) !important;
+    color: #000000 !important;
+    -webkit-text-stroke: 0.8px #000000 !important;
+    transform: scale(0.92) !important;
+    opacity: 0.9 !important;
+}
+
+/* 5.5. Imagem do Boss e Balão de Fala sem filtros indesejados */
+body.alto-contraste .boss-imagem,
+body.alto-contraste #boss-imagem,
+body.alto-contraste .boss-risada,
+body.alto-contraste #boss-risada {
+    filter: none !important;
+}
+
+/* ==========================================================
+   FEEDBACK COMEMORATIVO DE ACERTO MATEMÁTICA E FOGOS
+   ========================================================== */
+
+.banner-comemoracao-acerto {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #2ecc71 0%, #1f7a45 100%);
+    color: #ffffff;
+    font-family: "Trebuchet MS", "Comic Sans MS", Arial, Helvetica, sans-serif;
+    font-size: clamp(1.4rem, 3.5vw, 2.2rem);
+    font-weight: 900;
+    text-align: center;
+    padding: clamp(16px, 2.8vh, 24px) clamp(24px, 5vw, 44px);
+    border: 4px solid #ffffff;
+    border-radius: 28px;
+    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.45), 0 0 32px rgba(46, 204, 113, 0.9);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    z-index: 90;
+    pointer-events: none;
+    user-select: none;
+    animation: surgirBannerAcerto 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.banner-comemoracao-acerto.banner-saindo {
+    animation: sumirBannerAcerto 0.3s ease-in forwards;
+}
+
+.icone-banner-acerto {
+    display: inline-block;
+    animation: balancoIconeAcerto 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes surgirBannerAcerto {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -40%) scale(0.65);
+    }
+    70% {
+        opacity: 1;
+        transform: translate(-50%, -52%) scale(1.06);
+    }
+    100% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+@keyframes sumirBannerAcerto {
+    0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -58%) scale(0.7);
+    }
+}
+
+@keyframes balancoIconeAcerto {
+    0% {
+        transform: rotate(-12deg) scale(1);
+    }
+    100% {
+        transform: rotate(12deg) scale(1.15);
+    }
+}
+
+/* Fogos de Artifício */
+.fogos-artificio-container {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 89;
+    overflow: hidden;
+    user-select: none;
+}
+
+.fogos-artificio-container.fogos-saindo {
+    opacity: 0;
+    transition: opacity 0.3s ease-out;
+}
+
+.estouro-fogos {
+    position: absolute;
+    left: var(--fogo-x, 50%);
+    top: var(--fogo-y, 50%);
+    width: 0;
+    height: 0;
+}
+
+.particula-fogo {
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--fogo-cor, #ffd13b);
+    box-shadow: 0 0 10px var(--fogo-cor, #ffd13b), 0 0 16px #ffffff;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.2);
+    animation: explodirParticulaFogo 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.estouro-1 .particula-fogo { animation-delay: 0.05s; }
+.estouro-2 .particula-fogo { animation-delay: 0.22s; }
+.estouro-3 .particula-fogo { animation-delay: 0.38s; }
+.estouro-4 .particula-fogo { animation-delay: 0.52s; }
+.estouro-5 .particula-fogo { animation-delay: 0.28s; }
+
+@keyframes explodirParticulaFogo {
+    0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(0.4);
+    }
+    45% {
+        opacity: 1;
+        transform: translate(calc(-50% + var(--part-x)), calc(-50% + var(--part-y))) scale(1.3);
+    }
+    80% {
+        opacity: 0.8;
+        transform: translate(calc(-50% + calc(var(--part-x) * 1.25)), calc(-50% + calc(var(--part-y) * 1.25) + 14px)) scale(0.9);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(calc(-50% + calc(var(--part-x) * 1.35)), calc(-50% + calc(var(--part-y) * 1.35) + 26px)) scale(0.2);
+    }
+}
+
+/* Suporte a Alto Contraste */
+body.alto-contraste .banner-comemoracao-acerto {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 3px solid #000000 !important;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.65) !important;
+    text-shadow: none !important;
+}
+
+body.alto-contraste .particula-fogo {
+    background: #ffff00 !important;
+    box-shadow: 0 0 6px #000000 !important;
 }

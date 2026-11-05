@@ -102,6 +102,13 @@
         : "assets/images/mundo_4/botton_voltar.png";
     }
 
+    const bossRisadaImg = document.querySelector("#boss-risada");
+    if (bossRisadaImg) {
+      bossRisadaImg.src = ativo
+        ? "assets/images/mundo_5/Acessibilidade/risada_monstro.png"
+        : "assets/images/mundo_5/risada_monstro.png";
+    }
+
     if (typeof window.atualizarVisualCestasAltoContraste === "function") {
       window.atualizarVisualCestasAltoContraste();
     }
@@ -131,6 +138,10 @@
     window.trocarTrilhaFundo(mundo.id);
   }
 
+  if (Number(mundo.id) === 5 && Number(faseId) === 1 && typeof window.tocarNarracao === "function") {
+    window.tocarNarracao("faseBonusInicio");
+  }
+
   const btnVoltarFase = document.querySelector("#btn-voltar-fase");
   if (btnVoltarFase) {
     btnVoltarFase.addEventListener("click", function () {
@@ -139,6 +150,15 @@
       }
       if (typeof window.trocarTrilhaFundo === "function") {
         window.trocarTrilhaFundo("menu");
+      }
+      try {
+        localStorage.removeItem("playBossCutscene");
+        sessionStorage.removeItem("playBossCutscene");
+        localStorage.removeItem("arruma_bagunca_cutscene_boss");
+        sessionStorage.removeItem("arruma_bagunca_cutscene_boss");
+      } catch (_erro) {}
+      if (typeof window !== "undefined") {
+        window.playBossCutscene = false;
       }
       if (typeof navegarEntreTelasDoJogo === "function" && window.parent !== window) {
         navegarEntreTelasDoJogo("menu", "index.html");
@@ -201,23 +221,15 @@
     }
   }
 
-  // O tutorial de arraste da fase 1-1 aponta para as cestas na posição de
-  // sempre, que no celular só aparecem durante o arraste. Por enquanto ele não
-  // roda nesse modo. removerElementosTutorialArraste (game.js) só desfaz o
-  // tutorial: não mexe em objetos, cestas, contadores nem progresso.
-  function encerrarTutorialDeArrasteNoCelular() {
-    if (document.querySelector("#tutorial-overlay") && typeof removerElementosTutorialArraste === "function") {
-      removerElementosTutorialArraste();
-    }
-  }
-
   function aplicarModoDasCestas() {
     const raiz = document.documentElement;
     if (deveUsarCestasDeCelular()) {
       raiz.dataset.modoCestas = "celular";
-      encerrarTutorialDeArrasteNoCelular();
     } else {
       delete raiz.dataset.modoCestas;
+    }
+    if (typeof atualizarCoordenadasTutorialArraste === "function") {
+      atualizarCoordenadasTutorialArraste();
     }
   }
 
@@ -241,7 +253,7 @@
 
   startGame(config);
 
-  // startGame pode ter aberto o tutorial de arraste (fase 1-1). No modo celular
-  // ele é encerrado aqui mesmo, antes de a tela ser desenhada.
+  // startGame pode ter aberto o tutorial de arraste (fase 1-1). Reavalia o modo
+  // e calibra as coordenadas do tutorial para a tela atual.
   aplicarModoDasCestas();
 })();

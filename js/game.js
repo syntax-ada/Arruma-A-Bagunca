@@ -3,6 +3,7 @@ let dropZones = [];
 const feedbackMessage = document.querySelector("#feedback-message");
 
 let activeDrag = null;
+let dragRafId = null;
 
 // ==========================================================
 // FUNÇÕES DE RANDOMIZAÇÃO E GERAÇÃO REUTILIZÁVEL DE OBJETOS
@@ -78,21 +79,6 @@ const CESTAS_PADRAO_ALTO_CONTRASTE_MUNDO4 = {
   mochila: "assets/images/mundo_4/Acessibilidade/cesta_mochila_padrao.png",
 };
 
-function normalizarNomeItemMundo1(identificador) {
-  if (!identificador) return "";
-  const s = String(identificador).toLowerCase().trim();
-  if (s.includes("urso") || s.includes("ursinho")) return "urso";
-  if (s.includes("trem") || s.includes("tren") || s.includes("trenzinho") || s.includes("comboio")) return "trem";
-  if (s.includes("robo") || s.includes("robô")) return "robo";
-  if (s.includes("banana")) return "banana";
-  if (s.includes("maca") || s.includes("maç") || s.includes("maça") || s.includes("maçã")) return "maca";
-  if (s.includes("pera") || s.includes("pêra")) return "pera";
-  if (s.includes("apontador")) return "apontador";
-  if (s.includes("borracha")) return "borracha";
-  if (s.includes("lapis") || s.includes("lápis")) return "lapis";
-  return "";
-}
-
 function isAltoContrasteAtivo() {
   return Boolean(
     typeof document !== "undefined" &&
@@ -117,53 +103,9 @@ function obterMundoAtivoId() {
   return 1;
 }
 
-function isMundo1AltoContraste() {
-  return Boolean(isAltoContrasteAtivo() && obterMundoAtivoId() === 1);
-}
-
-function isMundo2AltoContraste() {
-  return Boolean(isAltoContrasteAtivo() && obterMundoAtivoId() === 2);
-}
-
-function isMundo3AltoContraste() {
-  return Boolean(isAltoContrasteAtivo() && obterMundoAtivoId() === 3);
-}
-
-function isMundo4AltoContraste() {
-  return Boolean(isAltoContrasteAtivo() && obterMundoAtivoId() === 4);
-}
-
 function isCestaAltoContrasteDisponivel() {
   const mid = obterMundoAtivoId();
-  return Boolean(isAltoContrasteAtivo() && (mid === 1 || mid === 2 || mid === 3 || mid === 4));
-}
-
-function obterItensNaCesta(dropZone) {
-  if (!dropZone || typeof draggableItems === "undefined" || !draggableItems) return [];
-  const items = Array.from(draggableItems).filter(
-    (item) => item.dataset.dropZoneId === dropZone.id && item.classList.contains("is-correct")
-  );
-  return items
-    .map((item) => {
-      const imgItem = item.querySelector("img");
-      return normalizarNomeItemMundo1(
-        item.dataset.baseId ||
-        item.id ||
-        item.dataset.itemName ||
-        (imgItem && (imgItem.getAttribute("src") || imgItem.src)) ||
-        (imgItem && imgItem.alt) ||
-        ""
-      );
-    })
-    .filter(Boolean);
-}
-
-function obterTotalItensCategoria(categoria) {
-  if (typeof draggableItems === "undefined" || !draggableItems) return 3;
-  const count = Array.from(draggableItems).filter(
-    (item) => item.dataset.category === categoria
-  ).length;
-  return count > 0 ? count : 3;
+  return Boolean(isAltoContrasteAtivo() && (mid === 1 || mid === 2 || mid === 3 || mid === 4 || mid === 5));
 }
 
 function obterSpriteCestaAltoContraste(categoria, mundoId) {
@@ -238,8 +180,15 @@ function atualizarCoordenadasTutorialArraste() {
   }
 
   if (balao) {
-    const balaoX = Math.round(itemRect.left + itemRect.width / 2);
-    const balaoY = Math.max(80, Math.round(itemRect.top - 18));
+    const larguraBalao = balao.offsetWidth || 280;
+    const raioBalao = Math.round(larguraBalao / 2);
+    const larguraJanela = (typeof window !== "undefined" ? window.innerWidth : 0) || document.documentElement.clientWidth || 360;
+    const centroItem = Math.round(itemRect.left + itemRect.width / 2);
+    const minX = raioBalao + 12;
+    const maxX = Math.max(minX, larguraJanela - raioBalao - 12);
+    const balaoX = Math.min(Math.max(centroItem, minX), maxX);
+    const topoMinimo = ((typeof window !== "undefined" ? window.innerWidth : 1000) <= 768) ? 72 : 80;
+    const balaoY = Math.max(topoMinimo, Math.round(itemRect.top - 16));
     balao.style.setProperty("--tut-balao-x", `${balaoX}px`);
     balao.style.setProperty("--tut-balao-y", `${balaoY}px`);
   }
@@ -299,7 +248,17 @@ function iniciarTutorialArrasteFase1() {
   balao.className = "tutorial-balao-fase";
   balao.setAttribute("role", "status");
   balao.setAttribute("aria-live", "polite");
-  balao.textContent = "Arraste o objeto para sua cesta!";
+
+  const textoDesktop = document.createElement("span");
+  textoDesktop.className = "tutorial-texto-desktop";
+  textoDesktop.textContent = "Arraste o objeto para sua cesta!";
+
+  const textoMobile = document.createElement("span");
+  textoMobile.className = "tutorial-texto-mobile";
+  textoMobile.textContent = "Segure o objeto para as cestas aparecerem e arraste até a sua cesta!";
+
+  balao.appendChild(textoDesktop);
+  balao.appendChild(textoMobile);
   telaOrganizacao.appendChild(balao);
 
   const maozinha = document.createElement("img");
@@ -427,7 +386,6 @@ function renderizarCestas(listaCategorias = []) {
       ? cat.sprites
       : (Array.isArray(cat.sprites) && cat.sprites.length > 0 ? cat.sprites[0] : (cat.imgSrc || ""));
     dropZone._spriteNormal = cestaSrcNormal;
-    dropZone._itensAltoContraste = [];
 
     if (isCestaAltoContrasteDisponivel()) {
       const spriteInicial = obterSpriteCestaAltoContraste(cat.accepts, obterMundoAtivoId());
@@ -613,6 +571,9 @@ function startGame(config) {
   if (activeConfig.boss && typeof iniciarEtapaMatematica === "function") {
     iniciarEtapaMatematica(null, activeConfig);
   } else if (deveExibirTutorialFase1) {
+    if (typeof window.tocarNarracao === "function") {
+      window.tocarNarracao("organizarObjetos");
+    }
     iniciarTutorialArrasteFase1();
   }
 }
@@ -626,19 +587,32 @@ function startDrag(event) {
 
   const itemRect = item.getBoundingClientRect();
 
+  // Cache das posições das cestas para evitar getBoundingClientRect no moveDrag
+  const dropZoneRects = Array.from(dropZones).map((dropZone) => ({
+    dropZone,
+    rect: dropZone.getBoundingClientRect(),
+  }));
+
   // Durante o arraste, o objeto passa a usar a tela toda como referência.
   item.style.position = "fixed";
-  item.style.left = `${itemRect.left}px`;
-  item.style.top = `${itemRect.top}px`;
+  item.style.left = "0px";
+  item.style.top = "0px";
   item.style.width = `${itemRect.width}px`;
   item.style.height = `${itemRect.height}px`;
+  item.style.transform = `translate3d(${itemRect.left}px, ${itemRect.top}px, 0) scale(1.18)`;
 
   activeDrag = {
     item,
     pointerId: event.pointerId,
     // Mantém o centro visual do objeto abaixo do mouse ou toque.
-    shiftX: item.offsetWidth / 2,
-    shiftY: item.offsetHeight / 2,
+    shiftX: itemRect.width / 2,
+    shiftY: itemRect.height / 2,
+    itemWidth: itemRect.width,
+    itemHeight: itemRect.height,
+    dropZoneRects,
+    rafPending: false,
+    lastClientX: event.clientX,
+    lastClientY: event.clientY,
   };
 
   item.setPointerCapture(event.pointerId);
@@ -654,30 +628,27 @@ function moveDrag(event) {
     return;
   }
 
-  moveItemToPointer(activeDrag.item, event.clientX, event.clientY);
-  updateDropZoneHighlight(event.clientX, event.clientY);
+  activeDrag.lastClientX = event.clientX;
+  activeDrag.lastClientY = event.clientY;
+
+  if (activeDrag.rafPending) {
+    return;
+  }
+
+  activeDrag.rafPending = true;
+  dragRafId = requestAnimationFrame(() => {
+    if (!activeDrag || !activeDrag.rafPending) {
+      return;
+    }
+    activeDrag.rafPending = false;
+    moveItemToPointer(activeDrag.item, activeDrag.lastClientX, activeDrag.lastClientY);
+    updateDropZoneHighlight(activeDrag.lastClientX, activeDrag.lastClientY);
+  });
 }
 
 function adicionarItemSobreposto(dropZone, item) {
   if (!dropZone || !item) {
     return;
-  }
-
-  const imgItem = item.querySelector("img");
-  const chaveItemMundo1 = normalizarNomeItemMundo1(
-    item.dataset.baseId ||
-    item.id ||
-    item.dataset.itemName ||
-    (imgItem && (imgItem.getAttribute("src") || imgItem.src)) ||
-    (imgItem && imgItem.alt) ||
-    ""
-  );
-
-  if (!dropZone._itensAltoContraste) {
-    dropZone._itensAltoContraste = [];
-  }
-  if (chaveItemMundo1) {
-    dropZone._itensAltoContraste.push(chaveItemMundo1);
   }
 
   const containerSobrepostos = dropZone.querySelector(".itens-sobrepostos");
@@ -726,6 +697,11 @@ function finishDrag(event) {
     return;
   }
 
+  if (dragRafId) {
+    cancelAnimationFrame(dragRafId);
+    dragRafId = null;
+  }
+
   const item = activeDrag.item;
 
   item.releasePointerCapture(event.pointerId);
@@ -759,6 +735,9 @@ function finishDrag(event) {
 
     if (isOrganizationComplete()) {
       showFeedback("Parabéns! Você organizou todos os objetos!", "success");
+      if (typeof window.tocarNarracao === "function") {
+        window.tocarNarracao("acerto");
+      }
       if (activeConfig?.boss) {
         document.body.classList.add("cenario-arrumado");
         if (activeConfig.fundoArrumado) {
@@ -830,6 +809,11 @@ function cancelDrag(event) {
     return;
   }
 
+  if (dragRafId) {
+    cancelAnimationFrame(dragRafId);
+    dragRafId = null;
+  }
+
   const item = activeDrag.item;
 
   item.classList.remove("is-dragging");
@@ -848,13 +832,17 @@ function isCurrentPointer(event) {
 }
 
 function moveItemToPointer(item, clientX, clientY) {
+  const itemWidth = activeDrag?.itemWidth ?? item.offsetWidth;
+  const itemHeight = activeDrag?.itemHeight ?? item.offsetHeight;
   const newLeft = clientX - activeDrag.shiftX;
   const newTop = clientY - activeDrag.shiftY;
-  const maxLeft = window.innerWidth - item.offsetWidth;
-  const maxTop = window.innerHeight - item.offsetHeight;
+  const maxLeft = window.innerWidth - itemWidth;
+  const maxTop = window.innerHeight - itemHeight;
 
-  item.style.left = `${limitNumber(newLeft, 0, maxLeft)}px`;
-  item.style.top = `${limitNumber(newTop, 0, maxTop)}px`;
+  const limitedX = limitNumber(newLeft, 0, maxLeft);
+  const limitedY = limitNumber(newTop, 0, maxTop);
+
+  item.style.transform = `translate3d(${limitedX}px, ${limitedY}px, 0) scale(1.18)`;
 }
 
 function limitNumber(value, min, max) {
@@ -862,6 +850,16 @@ function limitNumber(value, min, max) {
 }
 
 function findDropZoneAtPoint(clientX, clientY) {
+  if (activeDrag && activeDrag.dropZoneRects) {
+    const match = activeDrag.dropZoneRects.find(({ rect }) => (
+      clientX >= rect.left &&
+      clientX <= rect.right &&
+      clientY >= rect.top &&
+      clientY <= rect.bottom
+    ));
+    return match ? match.dropZone : null;
+  }
+
   return Array.from(dropZones).find((dropZone) => {
     const dropZoneRect = dropZone.getBoundingClientRect();
 
@@ -923,7 +921,29 @@ function placeItemInsideDropZone(item, dropZone) {
   const row = Math.floor(placedItems / itemsPerRow);
   const rowWidth = itemsPerRow * itemRect.width + gap;
   const left = dropZoneRect.left - itemContainerRect.left + (dropZoneRect.width - rowWidth) / 2 + column * (itemRect.width + gap);
-  const top = dropZoneRect.top - itemContainerRect.top + 72 + row * (itemRect.height + gap);
+
+  const isMochila = dropZone.classList.contains("cesta-mochila") || dropZone.id === "cesta-mochila";
+  const isAnimais = dropZone.classList.contains("cesta-animais") || dropZone.id === "cesta-animais";
+  const mundoId = typeof obterMundoAtivoId === "function" ? obterMundoAtivoId() : 1;
+  const isBrinquedosM2 = mundoId === 2 && (dropZone.classList.contains("cesta-brinquedos") || dropZone.id === "cesta-brinquedos");
+  const isComidasM2 = mundoId === 2 && (dropZone.classList.contains("cesta-comidas") || dropZone.id === "cesta-comidas" || dropZone.classList.contains("cesta-comida") || dropZone.id === "cesta-comida");
+  const isBrinquedosM3 = mundoId === 3 && (dropZone.classList.contains("cesta-brinquedos") || dropZone.id === "cesta-brinquedos");
+  const isComidasM3 = mundoId === 3 && (dropZone.classList.contains("cesta-comidas") || dropZone.id === "cesta-comidas" || dropZone.classList.contains("cesta-comida") || dropZone.id === "cesta-comida");
+  const isBebidasM3 = mundoId === 3 && (dropZone.classList.contains("cesta-bebidas") || dropZone.id === "cesta-bebidas");
+  const isComidasM4 = mundoId === 4 && (dropZone.classList.contains("cesta-comidas") || dropZone.id === "cesta-comidas" || dropZone.classList.contains("cesta-comida") || dropZone.id === "cesta-comida");
+  const isMobileScreen = (typeof window !== "undefined" && window.innerWidth <= 768) || (typeof document !== "undefined" && document.documentElement.getAttribute("data-modo-cestas") === "celular");
+  const offsetBase = isMobileScreen
+    ? (isAnimais
+        ? Math.round(dropZoneRect.height * 0.35)
+        : (isBrinquedosM2 || isComidasM2 || isComidasM3 || isBebidasM3 || isComidasM4)
+          ? Math.round(dropZoneRect.height * 0.21)
+          : isBrinquedosM3
+            ? Math.round(dropZoneRect.height * -0.20)
+            : (!isMochila && (mundoId === 2 || mundoId === 3 || mundoId === 4))
+              ? Math.round(dropZoneRect.height * 0.56)
+              : 72)
+    : 72;
+  const top = dropZoneRect.top - itemContainerRect.top + offsetBase + row * (itemRect.height + gap);
 
   item.style.left = `${left}px`;
   item.style.top = `${top}px`;
@@ -958,10 +978,12 @@ function returnItemToStart(item) {
   item.style.top = "";
   item.style.width = "";
   item.style.height = "";
+  item.style.transform = "";
 }
 
 function restoreItemPositioning(item) {
   item.style.position = "";
+  item.style.transform = "";
 }
 
 function updateDropZoneHighlight(clientX, clientY) {
@@ -1053,6 +1075,9 @@ function handleDropZoneKeyboard(event) {
 
     if (isOrganizationComplete()) {
       showFeedback("Parabéns! Você organizou todos os objetos!", "success");
+      if (typeof window.tocarNarracao === "function") {
+        window.tocarNarracao("acerto");
+      }
       if (activeConfig?.boss) {
         document.body.classList.add("cenario-arrumado");
         if (activeConfig.fundoArrumado) {
@@ -1088,4 +1113,5 @@ if (typeof window !== "undefined") {
   window.findCorrectDropZone = findCorrectDropZone;
   window.atualizarVisualCestasAltoContraste = atualizarVisualCestasAltoContraste;
   window.obterSpriteCestaAltoContraste = obterSpriteCestaAltoContraste;
+  window.atualizarCoordenadasTutorialArraste = atualizarCoordenadasTutorialArraste;
 }

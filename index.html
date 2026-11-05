@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Arruma a Bagunça</title>
 
-    <link rel="stylesheet" href="global.css?v=5" />
-    <link rel="stylesheet" href="style-menu.css?v=8" />
+    <link rel="stylesheet" href="global.css?v=18" />
+    <link rel="stylesheet" href="style-menu.css?v=24" />
 
   </head>
 
@@ -289,14 +289,22 @@
         </div>
 
         <!-- Painel lateral (Sidebar) do Desafio do Boss - Mundo 5 -->
-        <aside id="sidebar-boss" class="sidebar-boss escondido" aria-label="Desafio do Monstro da Bagunça">
+        <aside id="sidebar-boss" class="sidebar-boss boss-sidebar-card escondido" aria-label="Desafio do Monstro da Bagunça">
           <button class="btn-fechar-sidebar-boss" id="btn-fechar-sidebar-boss" type="button" aria-label="Fechar desafio do Monstro">
             <img src="assets/images/mundo_1/botão_fechar.png" alt="Fechar" />
+            <span class="texto-fechar-boss">Fechar</span>
           </button>
-          <div class="conteudo-sidebar-boss">
-            <img class="img-boss-sidebar" src="assets/images/nova_tela_menu de_fases/Mundo_monstro.png" alt="Monstro da Bagunça" />
-            <p class="texto-boss-sidebar">O Monstro da Bagunça apareceu!</p>
-            <button class="btn-jogar-boss" id="btn-jogar-boss" type="button">JOGAR</button>
+          <div class="conteudo-sidebar-boss" id="boss-sidebar-card">
+            <div class="moldura-boss-sidebar">
+              <img class="fundo-boss-sidebar" src="assets/images/nova_tela_menu de_fases/fundo_boss.png" data-src-normal="assets/images/nova_tela_menu de_fases/fundo_boss.png" data-src-alto-contraste="assets/images/nova_tela_menu de_fases/Acessibilidade/Fundo_boss.png" alt="" aria-hidden="true" />
+              <img class="img-boss-sidebar" src="assets/images/nova_tela_menu de_fases/boss_mundo.png" data-src-normal="assets/images/nova_tela_menu de_fases/boss_mundo.png" data-src-alto-contraste="assets/images/nova_tela_menu de_fases/Acessibilidade/boss_mundo.png" alt="Monstro da Bagunça" />
+            </div>
+            <div class="bloco-info-boss">
+              <p class="texto-boss-sidebar"><strong>O Monstro da Bagunça<br />APARECEU!</strong></p>
+              <p class="descricao-boss-sidebar">Ele deixou seu quarto<br /><strong>todo bagunçado.</strong></p>
+              <p class="descricao-boss-sidebar"><strong>Resolva os desafios<br />para enfraquecê-lo e<br />recuperar seu quarto!</strong></p>
+              <button class="btn-jogar-boss" id="btn-jogar-boss" type="button">Jogar</button>
+            </div>
           </div>
         </aside>
 
@@ -314,6 +322,36 @@
       </section>
     </main>
     <iframe id="conteudo-fase" class="conteudo-fase escondido" title="Fase do jogo"></iframe>
+
+    <!-- Transição de Conclusão de Mundo: Cadeado Quebrando (Mundos 1 a 3) -->
+    <div id="modal-transicao-cadeado" class="modal-transicao-cadeado escondido" role="dialog" aria-modal="true" aria-labelledby="titulo-transicao-cadeado">
+      <div class="cartao-transicao-cadeado">
+        <h2 id="titulo-transicao-cadeado" class="titulo-transicao-cadeado">Novo Mundo Desbloqueado!</h2>
+        <div class="palco-transicao-cadeado">
+          <img id="img-mundo-desbloqueado" class="img-mundo-desbloqueado" src="assets/images/nova_tela_menu de_fases/mundo_2.png" alt="Mundo Desbloqueado" />
+          <div class="arena-cadeado" id="arena-cadeado">
+            <span class="icone-cadeado-transicao" id="icone-cadeado-transicao" aria-hidden="true">🔒</span>
+            <span class="estilhaco-cadeado estilhaco-1" aria-hidden="true">💥</span>
+            <span class="estilhaco-cadeado estilhaco-2" aria-hidden="true">✨</span>
+          </div>
+        </div>
+        <p id="subtitulo-transicao-cadeado" class="subtitulo-transicao-cadeado">Você liberou uma nova aventura!</p>
+        <button class="btn-continuar-transicao" id="btn-continuar-transicao" type="button">Continuar</button>
+      </div>
+    </div>
+
+    <!-- Cutscene do Boss (Mundo 4 -> Mundo 5) -->
+    <div id="modal-cutscene-boss" class="modal-cutscene-boss escondido" role="dialog" aria-modal="true" aria-label="Apresentação do Monstro da Bagunça">
+      <div class="conteiner-video-boss">
+        <video id="video-cutscene-boss" class="video-cutscene-boss" playsinline preload="auto">
+          <source id="source-cutscene-boss" type="video/mp4" />
+          Seu navegador não suporta a reprodução deste vídeo.
+        </video>
+        <button class="btn-pular-cutscene" id="btn-pular-cutscene" type="button" aria-label="Pular apresentação do Monstro">
+          Pular cutscene ⏭
+        </button>
+      </div>
+    </div>
     <script src="js/regras-progresso.js"></script>
     <script src="js/progresso.js"></script>
     <script src="js/mundos/mundo1.js"></script>
@@ -323,7 +361,7 @@
     <script src="js/mundos/mundo5.js"></script>
     <script src="js/audio.js"></script>
     <script src="js/jogador.js"></script>
-    <script src="js/menu.js?v=7"></script>
+    <script src="js/menu.js?v=13"></script>
     <script src="js/dev.js"></script>
   </body>
 </html>
