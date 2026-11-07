@@ -279,7 +279,7 @@ test("identificação carrega o progresso DESTE jogador (navegador + banco) ante
   const progresso = copia(ambiente.pagina.obterProgresso());
   assert.deepEqual(progresso.fasesConcluidas, ["1-1", "1-2", "1-3"]);
   assert.deepEqual(progresso.mundosDesbloqueados, [1, 2]);
-  assert.equal(ambiente.$(".porcentagem-progresso").textContent, "66%", "a barra do menu já mostra o progresso somado");
+  assert.equal(ambiente.$(".porcentagem-progresso").textContent, "25%", "a barra do menu já mostra o progresso somado");
   assert.deepEqual(localStorage.remocoes, []);
 });
 
@@ -295,7 +295,7 @@ test("falha de rede ao carregar o progresso não impede a entrada; vale o progre
   assert.ok(visivel(ambiente.$("#menu-fases")));
   assert.deepEqual(copia(ambiente.pagina.obterProgresso()).faseMaximaPorMundo, { 1: 3 });
   assert.deepEqual(JSON.parse(localStorage.dados.get(CHAVE_ANA)).fasesConcluidas, ["1-1", "1-2"], "nada foi apagado");
-  assert.equal(ambiente.$(".porcentagem-progresso").textContent, "45%");
+  assert.equal(ambiente.$(".porcentagem-progresso").textContent, "17%");
 });
 
 test("falha ao criar ou recuperar o jogador continua mostrando o aviso de conexão (sem entrar)", async () => {

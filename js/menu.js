@@ -716,27 +716,22 @@ function atualizarInterfaceProgresso() {
   });
 
   // 3. Atualização visual da barra de progresso
-  // Escala recalibrada para 4 mundos: os degraus do Mundo 1 (10/25/45) e o
-  // desbloqueio do Mundo 2 (66) ficam como estavam; o antigo teto do Mundo 3
-  // (100) passa a 83, e o Mundo 4 desbloqueado assume o teto de 100%.
-  let porcentagem = 10;
-  if (mundosLiberados.includes(4)) {
-    porcentagem = 100;
-  } else if (mundosLiberados.includes(3)) {
-    porcentagem = 83;
-  } else if (mundosLiberados.includes(2)) {
-    porcentagem = 66;
-  } else if (faseMaximaMundo1 >= 3) {
-    porcentagem = 45;
-  } else if (faseMaximaMundo1 >= 2) {
-    porcentagem = 25;
-  }
+  // Base de cálculo: 12 fases (Mundos 1 a 4 com 3 fases cada). O Mundo 5 (Boss) é ignorado.
+  const TOTAL_FASES_PROGRESSO = 12;
+  const listaFases = Array.isArray(progresso.fasesConcluidas) ? progresso.fasesConcluidas : [];
+  const fasesValidas = listaFases.filter((id) => typeof id === "string" && !id.startsWith("5-"));
+  const fasesConcluidas = fasesValidas.length > 0 ? Math.min(fasesValidas.length, TOTAL_FASES_PROGRESSO) : 0;
+  const porcentagem = fasesConcluidas === 0 ? 0 : Math.round((fasesConcluidas / TOTAL_FASES_PROGRESSO) * 100);
 
   if (trilhoPreenchimento) {
     trilhoPreenchimento.style.width = `${porcentagem}%`;
   }
   if (textoProgresso) {
     textoProgresso.textContent = `${porcentagem}%`;
+  }
+  const trilhoProgresso = document.querySelector(".trilho-progresso");
+  if (trilhoProgresso) {
+    trilhoProgresso.setAttribute("aria-valuenow", String(porcentagem));
   }
 
   // Tutorial do Menu Inicial (exibido no card do Mundo 1 quando o jogador ainda não tem progresso)
