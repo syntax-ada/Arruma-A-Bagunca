@@ -21,29 +21,29 @@
   // quando a fase está dentro do iframe do menu.
   const NARRACOES = {
     acerto: [
-      "assets/audio/Narração/Acerto1.mp3",
-      "assets/audio/Narração/Acerto2.mp3",
-      "assets/audio/Narração/Acerto3.mp3",
-      "assets/audio/Narração/Acerto4.mp3",
+      "assets/audio/narração/Acerto1.mp3",
+      "assets/audio/narração/Acerto2.mp3",
+      "assets/audio/narração/Acerto3.mp3",
+      "assets/audio/narração/Acerto4.mp3",
     ],
     erro: [
-      "assets/audio/Narração/Erro1.mp3",
-      "assets/audio/Narração/Erro2.mp3",
+      "assets/audio/narração/Erro1.mp3",
+      "assets/audio/narração/Erro2.mp3",
     ],
-    faseBonusInicio: "assets/audio/Narração/FaseBonusInicio.mp3",
-    faseBonusFinal: "assets/audio/Narração/FaseBonusFinal.mp3",
+    faseBonusInicio: "assets/audio/narração/FaseBonusInicio.mp3",
+    faseBonusFinal: "assets/audio/narração/FaseBonusFinal.mp3",
     faseConcluida: [
-      "assets/audio/Narração/FaseConcluida1.mp3",
-      "assets/audio/Narração/FaseConcluida2.mp3",
+      "assets/audio/narração/FaseConcluida1.mp3",
+      "assets/audio/narração/FaseConcluida2.mp3",
     ],
     novoMapa: [
-      "assets/audio/Narração/NovoMapaDesbloqueado1.mp3",
-      "assets/audio/Narração/NovoMapaDesbloqueado2.mp3",
+      "assets/audio/narração/NovoMapaDesbloqueado1.mp3",
+      "assets/audio/narração/NovoMapaDesbloqueado2.mp3",
     ],
-    organizarObjetos: "assets/audio/Narração/OrganizarObjetos.mp3",
-    resolverConta: "assets/audio/Narração/ResolverConta.mp3",
-    telaDeFases: "assets/audio/Narração/TelaDeFases.mp3",
-    apelido: "assets/audio/Narração/Apelido.mp3",
+    organizarObjetos: "assets/audio/narração/OrganizarObjetos.mp3",
+    resolverConta: "assets/audio/narração/ResolverConta.mp3",
+    telaDeFases: "assets/audio/narração/TelaDeFases.mp3",
+    apelido: "assets/audio/narração/Apelido.mp3",
   };
 
   const TRILHAS_MUNDOS = {
